@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T03:44:17.447Z",
-  "updatedBy": "Enzo",
+  "updatedAt": "2026-08-01T03:44:31.630Z",
+  "updatedBy": "Robert",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -21,7 +21,7 @@
       "id": "p_ms9tjr52g",
       "label": "6UE-688",
       "note": "",
-      "checkedOutBy": "Enzo",
+      "checkedOutBy": "Robert",
       "checkedOutAt": "2026-08-01T03:44:17.447Z"
     },
     {
@@ -41,6 +41,14 @@
   ],
   "tasks": [],
   "audit": [
+    {
+      "id": "a_ms9tv43y2",
+      "at": "2026-08-01T03:44:31.630Z",
+      "who": "Robert",
+      "action": "identity.rename",
+      "subject": "Robert",
+      "detail": "was Enzo"
+    },
     {
       "id": "a_ms9tut5z4",
       "at": "2026-08-01T03:44:17.447Z",
