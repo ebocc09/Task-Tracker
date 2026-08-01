@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- viewport-fit=cover lets the layout reach under a notch; the CSS pays that
+     back with env(safe-area-inset-*) padding where content would be clipped. -->
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#171A20">
 <title>Task Tracker</title>
 <meta name="description" content="Shared team task board. No server, no build step.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,7 +15,7 @@
 <!-- ?v= is a cache-buster. GitHub Pages serves assets with a 10-minute max-age,
      so without it a browser keeps running old JS after a deploy while happily
      showing fresh HTML. Bump these on every release. -->
-<link rel="stylesheet" href="styles.css?v=6">
+<link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
 
@@ -361,9 +365,9 @@
 <!-- Toasts -->
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="config.js?v=6"></script>
-<script src="sync.js?v=6"></script>
-<script src="app.js?v=6"></script>
-<script src="admin.js?v=6"></script>
+<script src="config.js?v=7"></script>
+<script src="sync.js?v=7"></script>
+<script src="app.js?v=7"></script>
+<script src="admin.js?v=7"></script>
 </body>
 </html>
