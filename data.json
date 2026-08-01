@@ -1,8 +1,25 @@
 {
   "version": 1,
-  "updatedAt": null,
-  "updatedBy": null,
-  "plates": [],
+  "updatedAt": "2026-08-01T03:35:21.252Z",
+  "updatedBy": "Enzo",
+  "plates": [
+    {
+      "id": "p_ms9tjbasa",
+      "label": "6EX-831",
+      "note": "",
+      "checkedOutBy": null,
+      "checkedOutAt": null
+    }
+  ],
   "tasks": [],
-  "audit": []
+  "audit": [
+    {
+      "id": "a_ms9tjbfoc",
+      "at": "2026-08-01T03:35:21.252Z",
+      "who": "Enzo",
+      "action": "plate.add",
+      "subject": "6EX-831",
+      "detail": ""
+    }
+  ]
 }
