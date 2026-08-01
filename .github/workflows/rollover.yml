@@ -8,8 +8,9 @@ name: Daily rollover
 # the board's own timezone instead. The cron below is only a heartbeat — it asks
 # "is anything due?" and almost always answers no.
 #
-# Deliberately no `schedule:` trigger yet. Run this by hand from the Actions tab
-# a couple of times first; the cron line goes in once it's proven.
+# Run it by hand any time from the Actions tab — "Roll over now, ignoring the
+# schedule" forces one, and the dry-run tickbox prints the decision without
+# writing anything.
 
 on:
   # Twice an hour, deliberately off the hour: GitHub's queue peaks at :00 and

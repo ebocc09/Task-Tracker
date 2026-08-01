@@ -340,9 +340,9 @@ they didn't expect to be empty.
 2. **Actions tab → Daily rollover → Run workflow** to test it by hand. Tick
    *Decide and print, but write nothing* for a dry run first; tick *Roll over
    now, ignoring the schedule* to force one.
-3. Once two manual runs look right, uncomment the `schedule:` block at the top of
-   `.github/workflows/rollover.yml` and push. Until then the workflow only runs
-   when you press the button.
+3. The cron is live — the workflow checks twice an hour. To change when it fires,
+   use the Quick add panel, not the workflow file.
+
 
 #### If it stops firing
 
