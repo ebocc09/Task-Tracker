@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T21:38:21.672Z",
+  "updatedAt": "2026-08-01T21:38:23.132Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -157,6 +157,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msaw83rwn",
+      "at": "2026-08-01T21:38:23.132Z",
+      "who": "Enzo",
+      "action": "schedule.set",
+      "subject": "",
+      "detail": "16:41 MTFS America/Chicago"
+    },
     {
       "id": "a_msaw82nbi",
       "at": "2026-08-01T21:38:21.671Z",
@@ -935,8 +943,7 @@
     "enabled": true,
     "time": "16:41",
     "days": [
-      2,
-      3,
+      1,
       4,
       5,
       6
