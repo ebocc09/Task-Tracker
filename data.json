@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T16:32:45.276Z",
+  "updatedAt": "2026-08-01T16:32:46.141Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -51,6 +51,14 @@
   ],
   "tasks": [],
   "audit": [
+    {
+      "id": "a_msalb2v1b",
+      "at": "2026-08-01T16:32:46.141Z",
+      "who": "Enzo",
+      "action": "template.delete",
+      "subject": "Service Loaner Audit",
+      "detail": ""
+    },
     {
       "id": "a_msalb270a",
       "at": "2026-08-01T16:32:45.276Z",
@@ -405,14 +413,7 @@
     }
   ],
   "blocked": [],
-  "templates": [
-    {
-      "id": "q_msajzptn9",
-      "title": "Service Loaner Audit",
-      "description": "Via mission control, filter for service loaners at Cypress, ensure no loaners are being held at offsite, post a photo in the teams chat of all loaners actively at Cypress before completing;",
-      "stages": []
-    }
-  ],
+  "templates": [],
   "renames": [
     {
       "id": "r_ms9va2ex3",
