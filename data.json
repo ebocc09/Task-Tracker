@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T15:56:56.843Z",
+  "updatedAt": "2026-08-01T16:31:00.164Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -49,20 +49,16 @@
       "forcedAt": null
     }
   ],
-  "tasks": [
-    {
-      "id": "t_msajy1ux7",
-      "title": "Plate Audit",
-      "description": "Gather all plates and send a photo in the teams chat",
-      "createdBy": "Enzo",
-      "createdAt": "2026-08-01T15:54:38.697Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
-      "statusNote": null
-    }
-  ],
+  "tasks": [],
   "audit": [
+    {
+      "id": "a_msal8t382",
+      "at": "2026-08-01T16:31:00.164Z",
+      "who": "Enzo",
+      "action": "task.delete",
+      "subject": "Plate Audit",
+      "detail": ""
+    },
     {
       "id": "a_msak10gbe",
       "at": "2026-08-01T15:56:56.843Z",
@@ -397,17 +393,20 @@
     {
       "id": "q_ms9vcvus9",
       "title": "Plate Audit",
-      "description": "Gather all plates and send a photo in the teams chat"
+      "description": "Gather all plates and send a photo in the teams chat",
+      "stages": []
     },
     {
       "id": "q_msajzptn9",
       "title": "Service Loaner Audit",
-      "description": "Via mission control, filter for service loaners at Cypress, ensure no loaners are being held at offsite, post a photo in the teams chat of all loaners actively at Cypress before completing;"
+      "description": "Via mission control, filter for service loaners at Cypress, ensure no loaners are being held at offsite, post a photo in the teams chat of all loaners actively at Cypress before completing;",
+      "stages": []
     },
     {
       "id": "q_msak1047c",
       "title": "Key Box Audit",
-      "description": "Check all 3 key boxes for our keys (White Envelopes) and post a photo of all 3 key boxes empty of our keys."
+      "description": "Check all 3 key boxes for our keys (White Envelopes) and post a photo of all 3 key boxes empty of our keys.",
+      "stages": []
     }
   ],
   "renames": [
