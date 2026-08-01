@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T03:45:04.500Z",
-  "updatedBy": "Enzo",
+  "updatedAt": "2026-08-01T03:45:16.297Z",
+  "updatedBy": "Robert",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -14,15 +14,15 @@
       "id": "p_ms9tjkoid",
       "label": "6EU-300",
       "note": "",
-      "checkedOutBy": null,
-      "checkedOutAt": null
+      "checkedOutBy": "Robert",
+      "checkedOutAt": "2026-08-01T03:45:16.297Z"
     },
     {
       "id": "p_ms9tjr52g",
       "label": "6UE-688",
       "note": "",
-      "checkedOutBy": "Robert",
-      "checkedOutAt": "2026-08-01T03:44:17.447Z"
+      "checkedOutBy": null,
+      "checkedOutAt": null
     },
     {
       "id": "p_ms9tk05oj",
@@ -41,6 +41,22 @@
   ],
   "tasks": [],
   "audit": [
+    {
+      "id": "a_ms9tw2kp8",
+      "at": "2026-08-01T03:45:16.297Z",
+      "who": "Robert",
+      "action": "plate.checkout",
+      "subject": "6EU-300",
+      "detail": ""
+    },
+    {
+      "id": "a_ms9tw2kp7",
+      "at": "2026-08-01T03:45:16.297Z",
+      "who": "Robert",
+      "action": "plate.release",
+      "subject": "6UE-688",
+      "detail": ""
+    },
     {
       "id": "a_ms9tvth0a",
       "at": "2026-08-01T03:45:04.500Z",
