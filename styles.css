@@ -501,6 +501,29 @@ code{font-size:12px;font-weight:500;letter-spacing:.04em;font-variant-numeric:ta
 }
 .inp:focus{border-color:var(--ink)}
 .inp.locked,.inp[readonly]{background:var(--paper-alt);color:var(--ink-mute);cursor:not-allowed}
+/* The app's first checkbox. .field label is a bold uppercase section label, so
+   it's reset back to reading as an option; .inp is a 42px full-width control,
+   so it isn't reused — and deliberately NOT given .inp, which would make it the
+   first field openAdminModal focuses instead of the title. Tick is painted with
+   clip-path so it inherits --ink and needs no font or SVG. */
+.check{
+  display:flex;align-items:center;gap:9px;margin-bottom:0;cursor:pointer;
+  font-size:13px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ink);
+}
+.check input{
+  appearance:none;-webkit-appearance:none;margin:0;flex:none;
+  width:16px;height:16px;border:1px solid var(--line);border-radius:var(--r-sm);
+  background:var(--paper);display:grid;place-content:center;cursor:pointer;
+  transition:border-color .15s,background .15s;
+}
+.check input::before{
+  content:"";width:9px;height:9px;background:var(--paper);
+  transform:scale(0);transition:transform .12s var(--e-in);
+  clip-path:polygon(14% 44%,0 60%,39% 100%,100% 18%,86% 4%,39% 72%);
+}
+.check input:checked{background:var(--ink);border-color:var(--ink)}
+.check input:checked::before{transform:scale(1)}
+.check input:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .reqPending{
   margin:0 0 12px;padding:10px 13px;border-radius:var(--r-md);
   background:var(--t-warm-bg);color:var(--t-warm-fg);
@@ -690,6 +713,18 @@ select.inp{cursor:pointer}
 .audit-row .ax{flex:1;min-width:0;color:var(--ink-soft);line-height:1.45}
 .audit-row .at{flex:none;font-size:11px;color:var(--ink-mute);font-variant-numeric:tabular-nums;white-space:nowrap}
 .audit-row .ad{display:block;margin-top:2px;font-size:11.5px;color:var(--ink-mute)}
+
+/* Leaderboard — reuses the .audit-list shell for the bordered, hairline-divided
+   column. The bar is a light-surface sibling of .hero-bar, which is tuned for
+   the dark hero and would vanish here. */
+.lb-row{align-items:center}
+.lb-row .aw{min-width:0;flex:none;width:34px;color:var(--ink-mute);font-variant-numeric:tabular-nums}
+.lb-row .lb-name{font-weight:600;color:var(--ink);margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-bar{height:6px;border-radius:99px;background:var(--line-soft);overflow:hidden}
+.lb-bar>i{display:block;height:100%;border-radius:99px;background:var(--ink);transition:width .3s var(--e-move)}
+.lb-row:first-child .lb-bar>i{background:var(--green)}
+.lb-sub{display:block;margin-top:5px;font-size:11px;color:var(--ink-mute);font-variant-numeric:tabular-nums}
+.lb-pct{flex:none;min-width:38px;text-align:right;font-size:12.5px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
 
 /* Confirm */
 .confirm{

@@ -70,17 +70,31 @@ function syncScrollLock(){
   }
 }
 
-function openModal(id){
+/* Land focus on the field someone opened the dialog to fill in. Document order
+   alone always picks the close X — it's the first button in every modal head —
+   so the first keystroke went nowhere until you clicked. Text fields win,
+   buttons are the fallback, and anything hidden is skipped so the passcode
+   boxes can't swallow focus while the unlocked panel is the thing on screen.
+   No select(): reopening shouldn't put a half-typed draft one keystroke from
+   being wiped. */
+function focusFirst(root, preferred){
+  const usable = el => el && !el.disabled && el.offsetParent !== null;
+  const pick   = sel => [...root.querySelectorAll(sel)].find(usable);
+  const target = (preferred && pick(preferred))
+              || pick("input:not([type=hidden]),textarea,select")
+              || pick("button.solid")
+              || pick("button");
+  if(target) target.focus();
+}
+
+function openModal(id, focusSel){
   lastFocus = document.activeElement;
   closePlateMenu();
   OVERLAYS.forEach(o => { if(o !== id) $(o).classList.remove("on"); });
   $(id).classList.add("on");
   $("scrim").classList.add("on");
   syncScrollLock();
-  setTimeout(() => {
-    const first = $(id).querySelector("input:not([type=hidden]),textarea,button.solid,button");
-    if(first) first.focus();
-  }, 90);
+  setTimeout(() => focusFirst($(id), focusSel), 90);
 }
 
 function closeOverlays(){
@@ -605,13 +619,33 @@ function setTaskStatus(taskId, status, note){
   if(hasStages(task)) return setStageStatus(taskId, status, note);
   const title = task.title;
 
+  // Minted out here, not inside the mutator: uid() bumps a module counter, so a
+  // replay would mint a second id and credit the same completion twice.
+  const scoreId = uid("sc"), scoreAt = nowIso(), scoreWho = me();
+
   return commit(`${STATUS[status].label} "${title}"`, data => {
     const t = data.tasks.find(x => x.id === taskId);
     if(!t) throw new Error("That task was deleted by someone else.");
+
+    /* Read off the FRESH task, before we write. Two people can complete the
+       same task at once: the loser gets a 409 and replays against data where
+       it's already complete, and without this they'd be credited too. A
+       double-click does the same thing with one person. Scoring only — the
+       status write itself still goes through, as it always has. */
+    const wasComplete = t.status === "complete";
+
     t.status     = status;
     t.statusBy   = status === "pending" ? null : me();
     t.statusAt   = status === "pending" ? null : nowIso();
     t.statusNote = status === "pending" ? null : (note || null);
+
+    if(t.leaderboard && status === "complete" && !wasComplete){
+      awardScore(data, {
+        id: scoreId, at: scoreAt, who: scoreWho,
+        taskId: t.id, stageId: null, title: t.title, value: 1
+      });
+    }
+
     return {
       action : "task." + status,
       subject: t.title,
@@ -632,6 +666,8 @@ function setStageStatus(taskId, status, note){
     ? `Complete "${task.title}"`
     : `${STATUS[status].label} stage ${n} of "${task.title}"`;
 
+  const scoreId = uid("sc"), scoreAt = nowIso(), scoreWho = me();
+
   return commit(label, data => {
     const t = data.tasks.find(x => x.id === taskId);
     if(!t) throw new Error("That task was deleted by someone else.");
@@ -642,6 +678,8 @@ function setStageStatus(taskId, status, note){
        right move is to abort rather than silently skip ahead. */
     const s = (t.stages || []).find(x => x.id === stage.id);
     if(!s) throw new Error("That stage no longer exists.");
+    // Doing double duty now: this is also what stops a stage being credited
+    // twice, so the staged path needs no separate guard.
     if(s.status === "complete") throw new Error("Someone already completed that stage.");
 
     s.status = status;
@@ -652,6 +690,16 @@ function setStageStatus(taskId, status, note){
     const idx  = t.stages.indexOf(s) + 1;
     const of   = t.stages.length;
     const next = statusFromStages(t.stages);
+
+    /* Each stage is worth an equal share of one task, credited to whoever
+       landed it — so two people splitting a three-stage task split the credit
+       2/3 and 1/3. Denominator read off the fresh task, not the captured one. */
+    if(t.leaderboard && status === "complete"){
+      awardScore(data, {
+        id: scoreId, at: scoreAt, who: scoreWho,
+        taskId: t.id, stageId: s.id, title: t.title, value: 1 / of
+      });
+    }
     t.status     = next;
     t.statusBy   = me();
     t.statusAt   = nowIso();

@@ -8,7 +8,7 @@
 /* Bump on every deploy, and match the ?v= on the script tags in index.html.
    Shown in the footer and logged at boot, so "which build am I actually
    running?" is answerable at a glance instead of by guesswork. */
-const BUILD = "19";
+const BUILD = "21";
 
 /* Which repository holds the shared board data.
    Point this at your own repo, then commit and push. */
@@ -37,6 +37,15 @@ const POLL_SECONDS = { member: 20, viewer: 120 };
 
 /* Keep at most this many audit entries so data.json cannot grow forever. */
 const AUDIT_CAP = 500;
+
+/* Leaderboard completions kept, as a backstop only. The real bound is age:
+   anything older than the start of the PREVIOUS quarter is dropped, which
+   guarantees the quarter-to-date filter is always complete with a quarter of
+   headroom. A pure count cap would quietly truncate QTD from the bottom. */
+const SCORE_CAP = 2000;
+
+/* Which day the week-to-date filter starts on. 0 = Sunday (US), 1 = Monday. */
+const WEEK_STARTS_ON = 0;
 
 /* Give up on any single request after this long. Guards against corporate
    proxies that swallow a request without ever answering it. */

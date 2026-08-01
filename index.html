@@ -15,7 +15,7 @@
 <!-- ?v= is a cache-buster. GitHub Pages serves assets with a 10-minute max-age,
      so without it a browser keeps running old JS after a deploy while happily
      showing fresh HTML. Bump these on every release. -->
-<link rel="stylesheet" href="styles.css?v=19">
+<link rel="stylesheet" href="styles.css?v=21">
 </head>
 <body>
 
@@ -267,6 +267,11 @@
         Approvals
         <span class="warn" id="apprDot" hidden></span>
       </button>
+      <button class="rail-item" data-sec="leaderboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3"/><path d="M7 5H4v2a3 3 0 0 0 3 3"/></svg>
+        Leaderboard
+        <span class="count rail-count" id="lbRailCount">0</span>
+      </button>
       <button class="rail-item" data-sec="audit">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
         Audit log
@@ -287,8 +292,9 @@
 
       <!-- Tasks -->
       <section class="sec on" data-sec="tasks">
-        <h4 class="sec-h">Add a task</h4>
-        <p class="sec-p">Appears on the active board for everyone as soon as it saves.</p>
+        <h4 class="sec-h" id="taskFormHead">Add a task</h4>
+        <p class="sec-p" id="taskFormSub">Appears on the active board for everyone as soon as it saves.</p>
+        <div class="reqPending" id="taskEditBanner" hidden></div>
         <div class="field">
           <label for="taskTitle">Title</label>
           <input class="inp" id="taskTitle" maxlength="90" placeholder="e.g. Pre-delivery inspection" autocomplete="off">
@@ -299,17 +305,34 @@
         </div>
 
         <div class="field">
+          <label class="check" for="taskLb">
+            <input type="checkbox" id="taskLb">
+            <span>Leaderboard task</span>
+          </label>
+          <div class="hint">Completing it earns credit on the <strong>Leaderboard</strong>. A staged task splits its credit evenly between stages, each going to whoever completed that stage.</div>
+        </div>
+
+        <div class="field">
           <label>Stages <span class="opt">optional</span></label>
           <div id="stageList"></div>
           <button class="btn-block" id="stageAdd">Add stage</button>
           <div class="hint">The title and description above are <strong>stage 1</strong>. Add stages to break the task into steps the team completes in order — leave it alone for a normal one-step task.</div>
         </div>
 
-        <div class="row2">
-          <button class="btn-block solid" id="taskAdd">Submit task</button>
-          <button class="btn-block" id="taskSave">Save task</button>
+        <div id="taskBtns">
+          <div class="row2">
+            <button class="btn-block solid" id="taskAdd">Submit task</button>
+            <button class="btn-block" id="taskSave">Save task</button>
+          </div>
+          <div class="hint">Submit adds it to the board now. Save stores it in Quick add for one-click reuse later.</div>
         </div>
-        <div class="hint">Submit adds it to the board now. Save stores it in Quick add for one-click reuse later.</div>
+        <div id="taskEditBtns" hidden>
+          <div class="row2">
+            <button class="btn-block solid" id="taskUpdate">Update saved task</button>
+            <button class="btn-block" id="taskEditCancel">Cancel</button>
+          </div>
+          <div class="hint">Submit is hidden while editing so one stray click can't discard your changes.</div>
+        </div>
 
         <div class="sep"></div>
         <h4 class="sec-h">Board <span class="count" id="taskCount">0</span></h4>
@@ -398,6 +421,31 @@
           there. Approving renames them everywhere, including past audit entries.
         </p>
         <div class="adm-list" id="admApprovals"></div>
+      </section>
+
+      <!-- Leaderboard -->
+      <section class="sec" data-sec="leaderboard">
+        <h4 class="sec-h">Leaderboard <span class="count" id="lbCount">0</span></h4>
+        <p class="sec-p">
+          Share of the team's completed <strong>leaderboard tasks</strong> — tick
+          <em>Leaderboard task</em> when adding one to make it count. Credit is kept
+          across board resets and is not affected by clearing the audit log.
+        </p>
+        <!-- Options are static on purpose. renderAdmin re-runs on every poll while
+             the panel is open, so rebuilding them would reset the choice mid-read. -->
+        <div class="row2 filters">
+          <select class="inp" id="lbWindow">
+            <option value="wtd">Week to date</option>
+            <option value="mtd">Month to date</option>
+            <option value="qtd">Quarter to date</option>
+            <option value="all">All time</option>
+          </select>
+        </div>
+        <div class="audit-list" id="lbList"></div>
+        <div class="hint" id="lbFoot"></div>
+        <div class="sep"></div>
+        <button class="btn-block red" id="lbReset">Reset leaderboard</button>
+        <div class="hint">Clears every recorded completion for everyone. Tasks, plates and the audit log are untouched.</div>
       </section>
 
       <!-- Audit -->
@@ -508,9 +556,9 @@
 <!-- Toasts -->
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="config.js?v=19"></script>
-<script src="sync.js?v=19"></script>
-<script src="app.js?v=19"></script>
-<script src="admin.js?v=19"></script>
+<script src="config.js?v=21"></script>
+<script src="sync.js?v=21"></script>
+<script src="app.js?v=21"></script>
+<script src="admin.js?v=21"></script>
 </body>
 </html>

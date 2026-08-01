@@ -10,11 +10,17 @@
 
 const UNLOCK_KEY = "tt.unlocked";
 
+/* The first text field of whichever section is showing — what focus should land
+   on when the panel opens, so you can just start typing. */
+const ADMIN_FIRST_FIELD = "#adminPane .sec.on .inp";
+
 const isUnlocked = () => sessionStorage.getItem(UNLOCK_KEY) === "1";
 
 /* ─────────────────────────────── open / gate ───────────────────────────── */
 
 function openAdminModal(){
+  // Never reopen into a half-finished edit from last time the panel was open.
+  cancelTemplateEdit();
   const unlocked = isUnlocked();
   $("adminGate").hidden = unlocked;
   $("adminBody").hidden = !unlocked;
@@ -25,9 +31,9 @@ function openAdminModal(){
     renderAdmin();
   }else{
     otpClear(false);
-    setTimeout(() => otpBoxes[0].focus(), 60);
   }
-  openModal("adminModal");
+  // One focus decision, made by openModal — a second timer here just raced it.
+  openModal("adminModal", unlocked ? ADMIN_FIRST_FIELD : "#otp .otp-box");
 }
 
 /* ── six-digit gate ─────────────────────────────────────────────────────── */
@@ -100,6 +106,9 @@ function submitGate(){
     $("adminModal").classList.add("wide");
     renderAdmin();
     showSection("tasks");
+    // The box that had focus is now hidden; carry it into the panel instead of
+    // dropping it on <body> and making you click.
+    focusFirst($("adminModal"), ADMIN_FIRST_FIELD);
   }else{
     $("otp").classList.add("bad");
     $("gateErr").textContent = "Incorrect code.";
@@ -125,6 +134,8 @@ function flash(message){
 function renderAdmin(){
   renderAdminTasks();
   renderQuickAdd();
+  renderTaskFormMode();
+  renderLeaderboard();
   renderAdminPlates();
   renderAdminPeople();
   renderApprovals();
@@ -163,6 +174,9 @@ function applyRename(data, oldName, newName){
   }
   // Scrub the old name from history too — the whole point when it's a bad name.
   (data.audit || []).forEach(a => { if(a.who === oldName) a.who = newName; });
+  // Miss this and a rename splits one person into two leaderboard rows, each
+  // with a share of the credit they actually earned as one person.
+  (data.scores || []).forEach(s => { if(s.who === oldName) s.who = newName; });
   data.renames = data.renames || [];
   data.renames.push({ id: uid("r"), at: nowIso(), by: me() || "an admin", from: oldName, to: newName });
   if(data.renames.length > 200) data.renames = data.renames.slice(-200);
@@ -248,9 +262,28 @@ async function approveReopen(id){
     data.reopenRequests = (data.reopenRequests || []).filter(x => x.id !== id);
     const task = data.tasks.find(t => t.id === req.taskId);
     if(!task) return null;                  // task deleted meanwhile — just drop the request
+
+    /* Hand back this round's leaderboard credit. A board reset keeps credit —
+       it starts a new round, and the work really was done. A reopen says the
+       opposite: it wasn't. Without this, complete → reopen → complete scores
+       the same task twice. Read before resetStages, which clears the stage
+       state this needs, and take only the NEWEST event per stage — scores is
+       newest-first, so findIndex is that — leaving earlier rounds alone. */
+    const marks = (task.stages || []).length
+      ? task.stages.filter(s => s.status === "complete").map(s => s.id)
+      : (task.status === "complete" ? [null] : []);
+    let revoked = 0;
+    marks.forEach(stageId => {
+      const i = (data.scores || []).findIndex(s => s.taskId === task.id && s.stageId === stageId);
+      if(i !== -1){ revoked += data.scores[i].value; data.scores.splice(i, 1); }
+    });
+
     task.status = "pending"; task.statusBy = null; task.statusAt = null; task.statusNote = null;
     resetStages(task);
-    return { action:"reopen.approve", subject: task.title, detail: req.reason };
+    const detail = revoked
+      ? `${req.reason}${req.reason ? " · " : ""}${fmtCredit(revoked)} leaderboard credit revoked`
+      : req.reason;
+    return { action:"reopen.approve", subject: task.title, detail };
   });
   render();
   renderAdmin();
@@ -321,6 +354,15 @@ async function rejectRequest(id){
 
 function renderQuickAdd(){
   const tpls = state.data.templates || [];
+
+  /* This runs on every poll, so it's also where an edit finds out its template
+     was deleted by someone else. Drop out of edit mode but keep what they've
+     typed — losing their work to another admin's Delete is the wrong trade. */
+  if(editingTemplateId && !tpls.some(t => t.id === editingTemplateId)){
+    cancelTemplateEdit(true);
+    toast("That saved task was removed by someone else. Your text is still in the form.", "bad");
+  }
+
   $("qaCount").textContent = tpls.length;
   $("qaRailCount").textContent = tpls.length;
   $("qaAddAll").hidden = tpls.length === 0;
@@ -339,11 +381,123 @@ function renderQuickAdd(){
     <div class="adm-t">${escHtml(tp.title)}</div>
     <div class="adm-s">${tp.description ? escHtml(tp.description) : "No description"}</div>
   </div>
+  ${tp.leaderboard ? `<span class="pill ok">Leaderboard</span>` : ""}
   ${n ? `<span class="pill info">${n} stages</span>` : ""}
   <button class="mini" data-qaadd="${tp.id}">Add to board</button>
+  <button class="mini" data-qaedit="${tp.id}">Edit</button>
   <button class="mini red" data-qadel="${tp.id}">Delete</button>
 </div>`;
   }).join("");
+}
+
+/* ── editing a saved task ──
+   The Add-a-task form is retargeted rather than duplicated, so the stage editor,
+   validation and the leaderboard checkbox all behave identically either way.
+   Which template is live is held here; null means the form is in add mode. */
+let editingTemplateId = null;
+
+/* One clear path for both Submit and Save. They each did this by hand before,
+   which was survivable while it was two text fields — miss the checkbox and the
+   NEXT task an admin submits is silently flagged for the leaderboard. */
+function clearTaskForm(){
+  $("taskTitle").value = "";
+  $("taskDesc").value  = "";
+  $("taskLb").checked  = false;
+  clearStageRows();
+}
+
+/* Excludes the template being edited, or changing only a description would
+   collide with itself. */
+function templateTitleTaken(title, exceptId){
+  const want = title.toLowerCase();
+  return (state.data.templates || []).some(t => t.id !== exceptId && t.title.toLowerCase() === want);
+}
+
+function loadTemplateIntoForm(tp){
+  /* Fields first: renderStageRows ends in refreshStageBase, which reads
+     #taskTitle to paint the stage-1 preview. */
+  $("taskTitle").value = tp.title;
+  $("taskDesc").value  = tp.description || "";
+  $("taskLb").checked  = tp.leaderboard === true;
+  /* slice(1) is load-bearing. stages[0] IS the title and description above —
+     see stagesToSave, which prepends them — and the base row already renders
+     it. Passing the whole array shows stage 1 twice and re-saving keeps the
+     duplicate, so the list would grow by one on every edit round trip. */
+  renderStageRows((tp.stages || []).slice(1));
+}
+
+function beginTemplateEdit(id){
+  const tp = (state.data.templates || []).find(t => t.id === id);
+  if(!tp) return;
+  editingTemplateId = id;
+  loadTemplateIntoForm(tp);
+  renderTaskFormMode();
+  showSection("tasks");
+  $("taskTitle").focus();
+}
+
+/* keepText: the template was deleted by someone else mid-edit. Losing their
+   typed work to that is the wrong trade, so the form is left as it stands. */
+function cancelTemplateEdit(keepText){
+  if(!editingTemplateId) return;
+  editingTemplateId = null;
+  if(!keepText) clearTaskForm();
+  renderTaskFormMode();
+}
+
+/* Swaps the heading, banner and button row between add and edit. */
+function renderTaskFormMode(){
+  const tp = editingTemplateId
+    ? (state.data.templates || []).find(t => t.id === editingTemplateId)
+    : null;
+  const editing = Boolean(tp);
+
+  $("taskFormHead").textContent = editing ? "Edit saved task" : "Add a task";
+  $("taskFormSub").textContent  = editing
+    ? "Changes are saved to Quick add."
+    : "Appears on the active board for everyone as soon as it saves.";
+
+  const banner = $("taskEditBanner");
+  banner.hidden = !editing;
+  if(editing){
+    banner.innerHTML = `Editing <strong>${escHtml(tp.title)}</strong> — changes apply to Quick add only, not to tasks already on the board.`;
+  }
+
+  $("taskBtns").hidden     = editing;
+  $("taskEditBtns").hidden = !editing;
+}
+
+async function updateTemplate(){
+  const id = editingTemplateId;
+  if(!id) return;
+
+  const titleEl = $("taskTitle"), descEl = $("taskDesc");
+  const title = titleEl.value.trim();
+  const desc  = descEl.value.trim();
+  const stages = stagesToSave(title, desc);
+  const leaderboard = $("taskLb").checked;
+
+  if(!title){ toast("Give the task a title.", "bad"); titleEl.focus(); return; }
+  if(templateTitleTaken(title, id)){
+    toast(`"${title}" is already in Quick add.`, "bad");
+    return;
+  }
+
+  const ok = await commit(`Update saved task "${title}"`, data => {
+    const t = (data.templates || []).find(x => x.id === id);
+    if(!t) throw new Error("That saved task no longer exists.");
+    t.title = title; t.description = desc; t.stages = stages; t.leaderboard = leaderboard;
+    return { action:"template.edit", subject: title };
+  });
+
+  if(ok){
+    editingTemplateId = null;
+    clearTaskForm();
+    renderTaskFormMode();
+    flash("Saved task updated");
+    renderAdmin();
+    showSection("quickadd");
+  }
 }
 
 /* ── stage rows in the Add-a-task form ──
@@ -427,22 +581,22 @@ async function saveTaskTemplate(){
   const stages = stagesToSave(title, desc);
 
   if(!title){ toast("Give the task a title to save it.", "bad"); titleEl.focus(); return; }
-  if((state.data.templates || []).some(t => t.title.toLowerCase() === title.toLowerCase())){
+  if(templateTitleTaken(title, null)){
     toast(`"${title}" is already in Quick add.`, "bad");
     return;
   }
 
+  const leaderboard = $("taskLb").checked;
   const id = uid("q");
   const ok = await commit(`Save task template "${title}"`, data => {
     data.templates = data.templates || [];
-    data.templates.push({ id, title, description: desc, stages });
+    data.templates.push({ id, title, description: desc, leaderboard, stages });
     return { action:"template.save", subject: title };
   });
 
   if(ok){
     // Clear like Submit does, so building a library is a fast type-Save-repeat.
-    titleEl.value = ""; descEl.value = "";
-    clearStageRows();
+    clearTaskForm();
     titleEl.focus();
     flash("Saved to Quick add");
     renderAdmin();
@@ -457,6 +611,9 @@ function taskFromTemplate(tp){
     id: uid("t"), title: tp.title, description: tp.description,
     createdBy: me(), createdAt: nowIso(),
     status: "pending", statusBy: null, statusAt: null, statusNote: null,
+    // Carried here rather than at the call sites, so Add to board and Add all
+    // both pick it up.
+    leaderboard: tp.leaderboard === true,
     stages: (tp.stages || []).map(s => ({
       id: uid("s"), title: s.title, description: s.description || "",
       status: "pending", by: null, at: null, note: null
@@ -522,6 +679,144 @@ async function deleteTemplate(id){
   renderAdmin();
 }
 
+/* ──────────────────────────── leaderboard ──────────────────────────────── */
+
+/* Credit is carried in task-equivalents, so three thirds can land on
+   1.0000000000000002. Round the float noise off, then trim so a whole number
+   reads "3" rather than "3.00". */
+function fmtCredit(n){
+  const r = Math.round(n * 1e6) / 1e6;
+  return r.toFixed(2).replace(/\.?0+$/, "");
+}
+
+/* Largest-remainder apportionment. Rounding each share on its own gives columns
+   that total 99 or 101, which looks like a bug in a number whose whole claim is
+   "share of the team" — so the leftover points go to the biggest remainders.
+   Ties break by position, which keeps it stable between renders. */
+function apportion(values, total){
+  if(!total) return values.map(() => 0);
+  const exact = values.map(v => (v / total) * 100);
+  const out   = exact.map(Math.floor);
+  const left  = 100 - out.reduce((a, b) => a + b, 0);
+  exact.map((e, i) => [e - Math.floor(e), i])
+       .sort((a, b) => b[0] - a[0] || a[1] - b[1])
+       .slice(0, Math.max(0, left))
+       .forEach(([, i]) => out[i]++);
+  return out;
+}
+
+/* Everyone who earned credit in the window, best first. */
+function leaderboardRows(windowKey){
+  const from = windowStart(windowKey);
+  const events = (state.data.scores || []).filter(s => {
+    if(from == null) return true;
+    const t = Date.parse(s.at);
+    return !Number.isNaN(t) && t >= from;
+  });
+
+  const by = new Map();                 // name -> { name, credit, events, lastAt }
+  events.forEach(s => {
+    const row = by.get(s.who) || { name: s.who, credit: 0, events: 0, lastAt: null };
+    row.credit += s.value;
+    row.events += 1;
+    if(!row.lastAt || Date.parse(s.at) > Date.parse(row.lastAt)) row.lastAt = s.at;
+    by.set(s.who, row);
+  });
+
+  const rows  = [...by.values()].sort((a, b) => b.credit - a.credit || a.name.localeCompare(b.name));
+  const total = rows.reduce((n, r) => n + r.credit, 0);
+  const pcts  = apportion(rows.map(r => r.credit), total);
+  rows.forEach((r, i) => {
+    r.pct   = pcts[i];                          // the claim — sums to exactly 100
+    r.share = total ? (r.credit / total) * 100 : 0;   // the picture — unrounded
+  });
+  return { rows, total, events: events.length };
+}
+
+const LB_WINDOW_LABEL = { wtd:"this week", mtd:"this month", qtd:"this quarter", all:"all time" };
+
+function renderLeaderboard(){
+  const key = $("lbWindow").value || "wtd";
+  const { rows, total, events } = leaderboardRows(key);
+
+  $("lbCount").textContent     = rows.length;
+  $("lbRailCount").textContent = rows.length;
+
+  const box = $("lbList");
+  if(!rows.length){
+    const any = (state.data.tasks || []).some(t => t.leaderboard);
+    box.innerHTML = `<div class="adm-empty">${
+      any
+        ? `No leaderboard completions ${escHtml(LB_WINDOW_LABEL[key] || "yet")}.`
+        : `No leaderboard tasks yet. Tick <strong>Leaderboard task</strong> in <strong>Tasks</strong> to start scoring.`
+    }</div>`;
+    $("lbFoot").textContent = "";
+    return;
+  }
+
+  box.innerHTML = rows.map((r, i) => `
+<div class="audit-row lb-row">
+  <span class="aw">${i + 1}</span>
+  <span class="ax">
+    <div class="lb-name">${escHtml(r.name)}</div>
+    <div class="lb-bar"><i style="width:${r.share.toFixed(2)}%"></i></div>
+    <span class="lb-sub">${fmtCredit(r.credit)} task${r.credit === 1 ? "" : "s"} · ${r.events} completion${r.events === 1 ? "" : "s"} · last ${escHtml(relTime(r.lastAt))}</span>
+  </span>
+  <span class="at lb-pct">${r.pct}%</span>
+  <button class="mini red" data-lbdel="${escHtml(r.name)}">Remove</button>
+</div>`).join("");
+
+  $("lbFoot").textContent =
+    `${fmtCredit(total)} task${total === 1 ? "" : "s"} completed ${LB_WINDOW_LABEL[key] || ""} across ${events} completion${events === 1 ? "" : "s"}.`;
+}
+
+async function removeFromLeaderboard(name){
+  const mine = (state.data.scores || []).filter(s => s.who === name);
+  if(!mine.length) return;
+
+  const ok = await askConfirm({
+    title: `Remove ${name} from the leaderboard?`,
+    text : "Their completions are deleted and everyone else's percentage recalculates. They reappear if they complete another leaderboard task. Tasks and the audit log are untouched.",
+    facts: [["Completions", String(mine.length)],
+            ["Credit", `${fmtCredit(mine.reduce((n, s) => n + s.value, 0))} tasks`]],
+    yes  : "Remove", danger: true
+  });
+  if(!ok) return;
+
+  await commit(`Remove ${name} from the leaderboard`, data => {
+    // Counted from fresh data so a replay reports what it actually removed.
+    const before = (data.scores || []).length;
+    data.scores = (data.scores || []).filter(s => s.who !== name);
+    const gone = before - data.scores.length;
+    if(!gone) return null;
+    return { action:"leaderboard.remove", subject: name, detail: `${gone} completions removed` };
+  });
+  renderAdmin();
+  flash("Removed");
+}
+
+async function resetLeaderboard(){
+  const count = (state.data.scores || []).length;
+  if(!count){ toast("The leaderboard is already empty.", ""); return; }
+
+  const ok = await askConfirm({
+    title: "Reset the leaderboard?",
+    text : "Every recorded completion is deleted for everyone, including past quarters. Tasks, plates and the audit log are untouched. This cannot be undone.",
+    facts: [["Completions", String(count)]],
+    yes  : "Reset", danger: true
+  });
+  if(!ok) return;
+
+  await commit("Reset the leaderboard", data => {
+    const gone = (data.scores || []).length;
+    if(!gone) return null;
+    data.scores = [];
+    return { action:"leaderboard.reset", subject: "", detail: `${gone} completions removed` };
+  });
+  renderAdmin();
+  flash("Leaderboard reset");
+}
+
 /* ─────────────────────────────── people ────────────────────────────────── */
 
 /* There are no sessions to enumerate — no server, no logins. The honest
@@ -538,6 +833,9 @@ function knownPeople(){
 
   state.data.audit.forEach(a => note(a.who, a.at));
   state.data.plates.forEach(p => note(p.checkedOutBy, p.checkedOutAt));
+  // Scores outlive the audit cap, so without this someone could top the
+  // leaderboard while having vanished from this list entirely.
+  (state.data.scores || []).forEach(s => note(s.who, s.at));
   const mine = me();
   if(mine && !seen.has(mine)) seen.set(mine, { name: mine, lastAt: null, actions: 0 });
 
@@ -956,6 +1254,7 @@ function renderAdminTasks(){
     <div class="adm-t">${escHtml(t.title)}</div>
     <div class="adm-s">${sub}</div>
   </div>
+  ${t.leaderboard ? `<span class="pill ok" title="Completing this scores on the leaderboard">Leaderboard</span>` : ""}
   <span class="pill ${staged && t.status === "pending" ? "info" : st.pill}">${escHtml(label)}</span>
   <button class="mini red" data-deltask="${t.id}">Delete</button>
 </div>`;
@@ -1044,7 +1343,10 @@ function auditPhrase(r){
     case "task.pending":   return `reopened “${s}”`;
     case "task.add":       return `added task “${s}”`;
     case "template.save":  return `saved “${s}” to Quick add`;
+    case "template.edit":  return `edited saved task “${s}”`;
     case "template.delete":return `removed “${s}” from Quick add`;
+    case "leaderboard.remove": return `removed ${s} from the leaderboard`;
+    case "leaderboard.reset":  return `reset the leaderboard`;
     case "task.delete":    return `deleted task “${s}”`;
     case "task.move":      return `reordered “${s}”`;
     case "plate.checkout": return `checked out plate ${s}`;
@@ -1090,12 +1392,14 @@ async function addTask(){
     if(!ok) return;
   }
 
+  const leaderboard = $("taskLb").checked;
   const id = uid("t");
   const ok = await commit(`Add task "${title}"`, data => {
     data.tasks.push({
       id, title, description: desc,
       createdBy: me(), createdAt: nowIso(),
       status: "pending", statusBy: null, statusAt: null, statusNote: null,
+      leaderboard,
       stages: stages.map(s => ({
         id: uid("s"), title: s.title, description: s.description,
         status: "pending", by: null, at: null, note: null
@@ -1109,8 +1413,7 @@ async function addTask(){
   });
 
   if(ok){
-    titleEl.value = ""; descEl.value = "";
-    clearStageRows();
+    clearTaskForm();
     titleEl.focus();
     flash(stages.length ? `Task added with ${stages.length} stages` : "Task added");
     renderAdmin();
@@ -1237,7 +1540,7 @@ async function resetBoard(){
 
   const first = await askConfirm({
     title: "Reset the board?",
-    text : "Every task goes back to Pending and every plate is released. Tasks, plates, and the audit log are kept.",
+    text : "Every task goes back to Pending and every plate is released. Tasks, plates, the audit log and the leaderboard are kept — completing a task again next round scores again.",
     facts: [["Tasks to reset", `${done} of ${total}`], ["Plates to release", String(out)]],
     yes  : "Continue", danger: true
   });
@@ -1299,7 +1602,7 @@ async function wipeEverything(){
 
   const first = await askConfirm({
     title: "Delete all tasks and plates?",
-    text : "The board is emptied completely. The audit log is kept as the record.",
+    text : "The board is emptied completely. The audit log and the leaderboard are kept as the record.",
     facts: [["Tasks", String(t)], ["Plates", String(p)]],
     yes  : "Continue", danger: true
   });
@@ -1384,12 +1687,21 @@ function exportAuditCsv(){
 
   $("adminRail").addEventListener("click", e => {
     const btn = e.target.closest(".rail-item");
-    if(btn && !btn.disabled) showSection(btn.dataset.sec);
+    if(!btn || btn.disabled) return;
+    // The edit banner lives inside Tasks, so navigating away would leave an
+    // armed editor with nothing on screen saying so.
+    if(btn.dataset.sec !== "tasks") cancelTemplateEdit();
+    showSection(btn.dataset.sec);
   });
 
   $("taskAdd").addEventListener("click", addTask);
   $("taskSave").addEventListener("click", saveTaskTemplate);
-  $("taskTitle").addEventListener("keydown", e => { if(e.key === "Enter") addTask(); });
+  $("taskUpdate").addEventListener("click", updateTemplate);
+  $("taskEditCancel").addEventListener("click", () => cancelTemplateEdit());
+  // Enter has to follow the mode too, or it submits a new task and discards the edit.
+  $("taskTitle").addEventListener("keydown", e => {
+    if(e.key === "Enter") editingTemplateId ? updateTemplate() : addTask();
+  });
 
   $("stageAdd").addEventListener("click", addStageRow);
   $("taskTitle").addEventListener("input", refreshStageBase);
@@ -1405,10 +1717,19 @@ function exportAuditCsv(){
     }
   });
 
+  $("lbWindow").addEventListener("change", renderLeaderboard);
+  $("lbReset").addEventListener("click", resetLeaderboard);
+  $("lbList").addEventListener("click", e => {
+    const del = e.target.closest("[data-lbdel]");
+    if(del) removeFromLeaderboard(del.dataset.lbdel);
+  });
+
   $("qaAddAll").addEventListener("click", addAllTemplates);
   $("admQuick").addEventListener("click", e => {
     const add = e.target.closest("[data-qaadd]");
     if(add) return addTemplateToBoard(add.dataset.qaadd);
+    const ed = e.target.closest("[data-qaedit]");
+    if(ed) return beginTemplateEdit(ed.dataset.qaedit);
     const del = e.target.closest("[data-qadel]");
     if(del) return deleteTemplate(del.dataset.qadel);
   });

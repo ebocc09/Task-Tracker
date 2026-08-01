@@ -196,6 +196,19 @@ stage at a time rather than finishing the whole thing:
 - Saving a staged task to **Quick add** keeps its stages, so you can re-add the
   whole sequence in one click.
 
+### Leaderboard tasks
+
+A task can be marked **Leaderboard task** when it's created. Completing it earns
+credit toward the [Leaderboard](#leaderboard) in the admin menu. Leave the box
+unticked and the task behaves normally but scores nothing.
+
+Credit follows the same arithmetic as the progress bar: a plain task is worth 1,
+and a staged one splits evenly between its stages, each going to whoever
+completed *that* stage. Two people splitting a three-stage task earn 0.67 and
+0.33.
+
+Only **Complete** scores. Partial and Could-not-complete earn nothing.
+
 **Progress bar** — how much of the board is done, in task-equivalents. A plain
 task counts once it's addressed; a staged one earns partial credit as its stages
 land, so finishing 2 of 3 moves the bar by two thirds of a task. Turns green when
@@ -209,14 +222,56 @@ every task is addressed.
 
 Unlock with the passcode. Stays unlocked for that tab only.
 
-- **Tasks** — add a task (title + optional description), reorder with the arrows,
-  delete.
+- **Tasks** — add a task (title + optional description, optional stages, optional
+  **Leaderboard task**), reorder with the arrows, delete.
+- **Quick add** — saved task templates. **Add to board** drops one on the board,
+  **Edit** opens it back up in the Tasks form to change the title, description,
+  stages or leaderboard flag, and **Delete** removes it. Editing a saved task
+  changes the template only — tasks already on the board are untouched.
+- **Leaderboard** — see below.
 - **Plates** — add a plate (with an optional note like *"Model Y — bay 3"*),
   delete, or **force release** one somebody forgot to hand back.
 - **Audit log** — everything that has happened, newest first, filterable by person
   and by action. Hover a timestamp for the exact time. **Export CSV** downloads it,
   and **Clear audit log** sits at the bottom of the same section.
 - **Reset** — see below.
+
+### Leaderboard
+
+Ranks everyone by **share of the team's completed leaderboard tasks** — your
+credit divided by all credit earned in the window. The column adds up to 100%, so
+it answers "who is carrying the load" rather than "how much of the board did each
+person get through".
+
+```
+  Week to date · 18 tasks completed across 22 completions
+
+  1  Marisol   ████████████░░░░░░░░   45%    8 tasks · 8 completions
+  2  Danny     ████████░░░░░░░░░░░░   33%    6 tasks · 9 completions
+  3  Enzo      █████░░░░░░░░░░░░░░░   22%    4 tasks · 5 completions
+```
+
+Filter by **week / month / quarter to date**, or all time. Weeks start on Sunday
+— change `WEEK_STARTS_ON` in `config.js` to `1` for Monday.
+
+**Remove** deletes one person's completions; everyone else's percentage
+recalculates over the smaller total, and they reappear if they complete another
+leaderboard task. **Reset leaderboard** clears every recorded completion.
+
+What does and doesn't affect it:
+
+| | Effect on the leaderboard |
+|---|---|
+| Reset board | **Kept.** A reset starts a new round, so completing the same task again next week scores again — that's what makes week-to-date mean anything. |
+| Delete all tasks and plates | **Kept.** Each completion snapshots its task title, so the record survives the task. |
+| Clear audit log | **Kept.** The leaderboard is stored separately, precisely so it can't be wiped this way. |
+| Approving a **Reopen** | **Revoked.** A reopen says the work wasn't really done, so that round's credit goes back. Earlier rounds are untouched. |
+| Renaming someone | Their history follows the new name. |
+| Blocking someone | No effect — blocking isn't deletion, and they keep their standing. |
+
+History is bounded: completions older than the start of the previous quarter are
+dropped, with a hard ceiling of `SCORE_CAP` (2,000) entries. Quarter-to-date is
+therefore always complete.
 
 ### Reset board
 
@@ -296,11 +351,20 @@ on `file://`, and double-clicking `index.html` should work.
       "status": "complete",        // pending | complete | partial | blocked
       "statusBy": "Marisol", "statusAt": "2026-07-31T19:40:00Z",
       "statusNote": null,
+      "leaderboard": true,         // completing it scores
       "stages": [] }               // empty = an ordinary one-step task
   ],
   "audit": [
     { "id": "a_b3", "at": "2026-07-31T19:40:00Z", "who": "Marisol",
       "action": "task.complete", "subject": "Pre-delivery inspection", "detail": "" }
+  ],
+  "scores": [
+    // One per completion. Kept separately from the audit log so the 500-entry
+    // cap and Clear audit log can't gut it. `title` is a snapshot so the entry
+    // stays readable after the task is deleted.
+    { "id": "sc_c4", "at": "2026-07-31T19:40:00Z", "who": "Marisol",
+      "taskId": "t_a2", "stageId": null,
+      "title": "Pre-delivery inspection", "value": 1 }
   ]
 }
 ```

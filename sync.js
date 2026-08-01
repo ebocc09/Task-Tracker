@@ -29,7 +29,7 @@ const state = {
 };
 
 function emptyBoard(){
-  return { version:1, updatedAt:null, updatedBy:null, plates:[], tasks:[], audit:[], blocked:[], templates:[], renames:[], requests:[], reopenRequests:[] };
+  return { version:1, updatedAt:null, updatedBy:null, plates:[], tasks:[], audit:[], scores:[], blocked:[], templates:[], renames:[], requests:[], reopenRequests:[] };
 }
 
 /* Defensive: never trust the shape of a file other people can edit. */
@@ -61,6 +61,8 @@ function normalize(raw){
     id         : String(t.id),
     title      : String(t.title),
     description: t.description ? String(t.description) : "",
+    // Carried so a saved task keeps scoring when it's re-added to the board.
+    leaderboard: t.leaderboard === true,
     // Blueprint only — no status/by/at. taskFromTemplate mints those fresh.
     stages     : Array.isArray(t.stages) ? t.stages.filter(s => s && s.title).map(s => ({
       title      : String(s.title),
@@ -127,6 +129,9 @@ function normalize(raw){
     statusBy   : t.statusBy ? String(t.statusBy) : null,
     statusAt   : t.statusAt ? String(t.statusAt) : null,
     statusNote : t.statusNote ? String(t.statusNote) : null,
+    // Completing this earns leaderboard credit. Absent on every task created
+    // before the leaderboard existed, which normalizes to false — no migration.
+    leaderboard: t.leaderboard === true,
     stages     : stagesOf(t)
   })) : [];
 
@@ -138,6 +143,25 @@ function normalize(raw){
     subject: a.subject ? String(a.subject) : "",
     detail : a.detail ? String(a.detail) : ""
   })) : [];
+
+  /* Leaderboard credit, one event per completion, newest first like the audit.
+     It lives here rather than being derived from the audit log because that log
+     is capped at 500 entries and an admin can clear it outright — either would
+     silently gut month- and quarter-to-date. The title is snapshotted so an
+     event stays readable after the task is deleted or renamed. */
+  board.scores = Array.isArray(d.scores) ? d.scores.filter(s => s && s.id && s.who).map(s => ({
+    id     : String(s.id),
+    at     : s.at ? String(s.at) : null,
+    who    : String(s.who),
+    taskId : s.taskId ? String(s.taskId) : "",
+    // null on an unstaged task — the whole task was one award.
+    stageId: s.stageId ? String(s.stageId) : null,
+    title  : s.title ? String(s.title) : "",
+    // A share of one task, so never above 1. A junk value scores nothing
+    // rather than poisoning everyone else's percentage.
+    value  : Number.isFinite(Number(s.value)) && Number(s.value) > 0
+      ? Math.min(Number(s.value), 1) : 0
+  })).slice(0, SCORE_CAP) : [];
 
   return board;
 }
@@ -180,6 +204,33 @@ function fullTime(iso){
   if(!iso) return "";
   const t = Date.parse(iso);
   return Number.isNaN(t) ? "" : new Date(t).toLocaleString();
+}
+
+/* Start of the week / month / quarter to date, as a local-midnight epoch.
+   Local rather than UTC deliberately: relTime and fullTime already render in
+   the reader's zone, and "this week" has to mean the week they're standing in,
+   not one that turns over mid-afternoon. Returns null for "all", which callers
+   read as "no lower bound".
+     back:  how many whole periods to step back. windowStart("qtd") is this
+            quarter; windowStart("qtd", 1) is the start of the previous one,
+            which is where score pruning cuts. */
+function windowStart(key, back = 0){
+  if(key === "all") return null;
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  if(key === "wtd"){
+    const offset = (d.getDay() - WEEK_STARTS_ON + 7) % 7;
+    d.setDate(d.getDate() - offset - back * 7);
+  }else if(key === "mtd"){
+    d.setDate(1);
+    d.setMonth(d.getMonth() - back);
+  }else if(key === "qtd"){
+    d.setDate(1);
+    d.setMonth(Math.floor(d.getMonth() / 3) * 3 - back * 3);
+  }else{
+    return null;
+  }
+  return d.getTime();
 }
 
 /* Identity — the name every action is stamped with. */
@@ -377,6 +428,42 @@ function pushAudit(data, entries){
     });
   });
   if(data.audit.length > AUDIT_CAP) data.audit.length = AUDIT_CAP;
+}
+
+/* ────────────────────────────── leaderboard ────────────────────────────── */
+
+/* Record one completion's worth of credit. Called from inside a mutator, so it
+   has to be replay-safe: the id and timestamp are minted by the CALLER outside
+   commit(), because uid() increments a module counter and a fresh call on each
+   replay pass would mint a different id every time. The id guard below then
+   makes a second pass over the same data a no-op rather than a double-credit. */
+function awardScore(data, entry){
+  data.scores = data.scores || [];
+  if(data.scores.some(s => s.id === entry.id)) return;
+  data.scores.unshift({
+    id     : entry.id,
+    at     : entry.at,
+    who    : entry.who,
+    taskId : entry.taskId,
+    stageId: entry.stageId || null,
+    title  : entry.title || "",
+    value  : entry.value
+  });
+  pruneScores(data);
+}
+
+/* Bounded by age first, count second. The age floor is the start of the
+   previous quarter, so quarter-to-date can never be showing a truncated
+   window; SCORE_CAP is only a backstop against a pathologically busy board. */
+function pruneScores(data){
+  const floor = windowStart("qtd", 1);
+  if(floor != null){
+    data.scores = data.scores.filter(s => {
+      const t = Date.parse(s.at);
+      return Number.isNaN(t) || t >= floor;   // keep undated rather than guess
+    });
+  }
+  if(data.scores.length > SCORE_CAP) data.scores.length = SCORE_CAP;
 }
 
 /* Run a mutator against a board and record whatever it reports.
