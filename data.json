@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T19:28:29.260Z",
+  "updatedAt": "2026-08-01T19:28:30.857Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -51,47 +51,6 @@
   ],
   "tasks": [
     {
-      "id": "t_msaoivwe9",
-      "title": "Box Audit - Service",
-      "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
-      "createdBy": "Enzo",
-      "createdAt": "2026-08-01T18:02:49.214Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
-      "statusNote": null,
-      "leaderboard": false,
-      "stages": [
-        {
-          "id": "s_msaoivwea",
-          "title": "Box Audit - Service",
-          "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
-          "status": "pending",
-          "by": null,
-          "at": null,
-          "note": null
-        },
-        {
-          "id": "s_msaoivweb",
-          "title": "Box Audit - Washline",
-          "description": "Remove any of our keys (White envelops) from the service drop off box and sort them in the key bin.",
-          "status": "pending",
-          "by": null,
-          "at": null,
-          "note": null
-        },
-        {
-          "id": "s_msaoivwec",
-          "title": "Box Audit - Offsite",
-          "description": "Remove any keys in the offsite drop off box and sort them into the key bin.",
-          "status": "pending",
-          "by": null,
-          "at": null,
-          "note": null
-        }
-      ]
-    },
-    {
       "id": "t_msarkvckl",
       "title": "Plate Audit",
       "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
@@ -125,6 +84,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msarl37ts",
+      "at": "2026-08-01T19:28:30.857Z",
+      "who": "Enzo",
+      "action": "task.delete",
+      "subject": "Box Audit - Service",
+      "detail": ""
+    },
     {
       "id": "a_msarl1zgq",
       "at": "2026-08-01T19:28:29.260Z",
