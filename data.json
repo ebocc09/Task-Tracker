@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T16:32:51.685Z",
+  "updatedAt": "2026-08-01T16:32:57.200Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -56,24 +56,32 @@
       "description": "Gather all the plates at the start of the shift and post a photo in the teams chat before clearing this stage.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-01T16:32:51.685Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "status": "complete",
+      "statusBy": "Enzo",
+      "statusAt": "2026-08-01T16:32:57.200Z",
       "statusNote": null,
       "stages": [
         {
           "id": "s_msalb751j",
           "title": "Plate Audit (EoD)",
           "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Enzo",
+          "at": "2026-08-01T16:32:57.200Z",
           "note": null
         }
       ]
     }
   ],
   "audit": [
+    {
+      "id": "a_msalbbe8m",
+      "at": "2026-08-01T16:32:57.200Z",
+      "who": "Enzo",
+      "action": "task.complete",
+      "subject": "Plate Audit",
+      "detail": ""
+    },
     {
       "id": "a_msalb751k",
       "at": "2026-08-01T16:32:51.685Z",
