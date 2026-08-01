@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T16:31:00.164Z",
+  "updatedAt": "2026-08-01T16:32:43.636Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -51,6 +51,14 @@
   ],
   "tasks": [],
   "audit": [
+    {
+      "id": "a_msalb0xg4",
+      "at": "2026-08-01T16:32:43.636Z",
+      "who": "Enzo",
+      "action": "template.delete",
+      "subject": "Plate Audit",
+      "detail": ""
+    },
     {
       "id": "a_msal8t382",
       "at": "2026-08-01T16:31:00.164Z",
@@ -390,12 +398,6 @@
   ],
   "blocked": [],
   "templates": [
-    {
-      "id": "q_ms9vcvus9",
-      "title": "Plate Audit",
-      "description": "Gather all plates and send a photo in the teams chat",
-      "stages": []
-    },
     {
       "id": "q_msajzptn9",
       "title": "Service Loaner Audit",
