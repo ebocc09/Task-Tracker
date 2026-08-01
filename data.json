@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T21:59:37.856Z",
-  "updatedBy": "Daily rollover",
+  "updatedAt": "2026-08-01T22:11:55.757Z",
+  "updatedBy": "Enzo",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -57,8 +57,8 @@
       "createdBy": "Daily rollover",
       "createdAt": "2026-08-01T21:59:37.565Z",
       "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "statusBy": "Enzo",
+      "statusAt": "2026-08-01T22:11:55.757Z",
       "statusNote": null,
       "leaderboard": true,
       "stages": [
@@ -66,9 +66,9 @@
           "id": "s_msawzfcw2",
           "title": "Plate Audit",
           "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Enzo",
+          "at": "2026-08-01T22:11:55.757Z",
           "note": null
         },
         {
@@ -157,6 +157,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msaxf8q53",
+      "at": "2026-08-01T22:11:55.757Z",
+      "who": "Enzo",
+      "action": "task.stage",
+      "subject": "Plate Audit · stage 1 of 2",
+      "detail": ""
+    },
     {
       "id": "a_msawzfcwb",
       "at": "2026-08-01T21:59:37.856Z",
@@ -999,6 +1007,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_msaxf8e91",
+      "at": "2026-08-01T22:11:55.329Z",
+      "who": "Enzo",
+      "taskId": "t_msawzfcw1",
+      "stageId": "s_msawzfcw2",
+      "title": "Plate Audit",
+      "value": 0.5
+    },
     {
       "id": "sc_msaw8y211j",
       "at": "2026-08-01T21:39:02.377Z",
