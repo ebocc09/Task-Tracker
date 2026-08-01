@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T21:38:58.933Z",
+  "updatedAt": "2026-08-01T21:39:02.656Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -122,7 +122,7 @@
       "createdAt": "2026-08-01T19:29:40.619Z",
       "status": "pending",
       "statusBy": "Enzo",
-      "statusAt": "2026-08-01T21:38:53.359Z",
+      "statusAt": "2026-08-01T21:39:02.656Z",
       "statusNote": null,
       "leaderboard": true,
       "stages": [
@@ -139,9 +139,9 @@
           "id": "s_msarml1n1n",
           "title": "Box Audit - Washline",
           "description": "Remove any of our keys (White envelops) from the service drop off box and sort them in the key bin.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Enzo",
+          "at": "2026-08-01T21:39:02.656Z",
           "note": null
         },
         {
@@ -157,6 +157,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msaw8y9s1l",
+      "at": "2026-08-01T21:39:02.656Z",
+      "who": "Enzo",
+      "action": "task.stage",
+      "subject": "Box Audit - Service · stage 2 of 3",
+      "detail": ""
+    },
     {
       "id": "a_msaw8ved1i",
       "at": "2026-08-01T21:38:58.933Z",
@@ -935,6 +943,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_msaw8y211j",
+      "at": "2026-08-01T21:39:02.377Z",
+      "who": "Enzo",
+      "taskId": "t_msarml1n1l",
+      "stageId": "s_msarml1n1n",
+      "title": "Box Audit - Service",
+      "value": 0.3333333333333333
+    },
     {
       "id": "sc_msaw8v3n1g",
       "at": "2026-08-01T21:38:58.547Z",
