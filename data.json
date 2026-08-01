@@ -1,46 +1,76 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T03:45:23.941Z",
-  "updatedBy": "Robert",
+  "updatedAt": "2026-08-01T04:01:22.003Z",
+  "updatedBy": "Enzo",
   "plates": [
     {
       "id": "p_ms9tjbasa",
       "label": "6EX-831",
       "note": "",
       "checkedOutBy": null,
-      "checkedOutAt": null
+      "checkedOutAt": null,
+      "forcedBy": null,
+      "forcedAt": null
     },
     {
       "id": "p_ms9tjkoid",
       "label": "6EU-300",
       "note": "",
       "checkedOutBy": null,
-      "checkedOutAt": null
+      "checkedOutAt": null,
+      "forcedBy": null,
+      "forcedAt": null
     },
     {
       "id": "p_ms9tjr52g",
       "label": "6UE-688",
       "note": "",
       "checkedOutBy": "Robert",
-      "checkedOutAt": "2026-08-01T03:45:23.941Z"
+      "checkedOutAt": "2026-08-01T03:45:23.941Z",
+      "forcedBy": null,
+      "forcedAt": null
     },
     {
       "id": "p_ms9tk05oj",
       "label": "6EU-998",
       "note": "",
       "checkedOutBy": null,
-      "checkedOutAt": null
+      "checkedOutAt": null,
+      "forcedBy": null,
+      "forcedAt": null
     },
     {
       "id": "p_ms9tk9unm",
       "label": "6EY-464",
       "note": "",
       "checkedOutBy": "Enzo",
-      "checkedOutAt": "2026-08-01T03:45:04.500Z"
+      "checkedOutAt": "2026-08-01T03:45:04.500Z",
+      "forcedBy": null,
+      "forcedAt": null
     }
   ],
-  "tasks": [],
+  "tasks": [
+    {
+      "id": "t_ms9ugrio1",
+      "title": "Plate Audit",
+      "description": "",
+      "createdBy": "Enzo",
+      "createdAt": "2026-08-01T04:01:22.003Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
+      "statusNote": null
+    }
+  ],
   "audit": [
+    {
+      "id": "a_ms9ugrpv3",
+      "at": "2026-08-01T04:01:22.003Z",
+      "who": "Enzo",
+      "action": "task.add",
+      "subject": "Plate Audit",
+      "detail": ""
+    },
     {
       "id": "a_ms9tw8h1c",
       "at": "2026-08-01T03:45:23.941Z",
@@ -185,5 +215,6 @@
       "subject": "6EX-831",
       "detail": ""
     }
-  ]
+  ],
+  "blocked": []
 }
