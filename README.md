@@ -171,9 +171,9 @@ sends a request to an admin for approval rather than changing the task itself.
 
 ### Staged tasks
 
-A task can optionally be broken into ordered **stages** — add them when you create
-the task (Admin → Tasks → **Add stage**). Leave it empty and the task behaves
-exactly like any other.
+A task can optionally be broken into ordered **stages**. The task's own title and
+description **are stage 1** — clicking Admin → Tasks → **Add stage** adds stage 2,
+then 3, and so on. Add none and the task behaves exactly like any other.
 
 On a staged task the card shows one bubble per stage, and **Complete** advances one
 stage at a time rather than finishing the whole thing:

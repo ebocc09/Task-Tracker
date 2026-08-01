@@ -397,6 +397,15 @@ code{font-size:12px;font-weight:500;letter-spacing:.04em;font-variant-numeric:ta
 }
 .stage-row .inp{background:var(--paper)}
 .stage-row .stage-row-t{margin-bottom:7px}
+/* Stage 1 mirrors the title field above, so it's shown but not editable here. */
+.stage-row.base{border-style:dashed;background:transparent}
+.stage-row-tag{
+  font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-mute);
+}
+.stage-base-t{
+  font-size:13px;font-weight:600;letter-spacing:.03em;color:var(--ink-soft);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
 
 /* Pills */
 .pill{

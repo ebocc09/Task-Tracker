@@ -133,12 +133,6 @@ function renderAdmin(){
   renderRailFoot();
 }
 
-/* ─────────────────────────── rename engine ─────────────────────────────── */
-
-/* Rewrite one display name everywhere it appears in the shared data, and drop
-   a breadcrumb so the affected browser updates itself (see applyIdentityRenames
-   in sync.js). Shared by the People pencil and by approving a request. Runs
-   inside a commit mutator, so it must be a pure function of `data`. */
 /* Reopen and Reset both put a staged task back to stage 1 rather than to
    wherever it stopped — both mean "start this over", so finished stages are
    cleared along with everything else. */
@@ -146,6 +140,12 @@ const resetStages = t => (t.stages || []).forEach(s => {
   s.status = "pending"; s.by = null; s.at = null; s.note = null;
 });
 
+/* ─────────────────────────── rename engine ─────────────────────────────── */
+
+/* Rewrite one display name everywhere it appears in the shared data, and drop
+   a breadcrumb so the affected browser updates itself (see applyIdentityRenames
+   in sync.js). Shared by the People pencil and by approving a request. Runs
+   inside a commit mutator, so it must be a pure function of `data`. */
 function applyRename(data, oldName, newName){
   (data.tasks || []).forEach(t => {
     if(t.statusBy  === oldName) t.statusBy  = newName;
@@ -352,28 +352,56 @@ function renderQuickAdd(){
    state to keep anywhere else. Rows are re-rendered from their own current
    values on every add/remove, which is what keeps typed text from being lost. */
 function readStageRows(){
-  return [...document.querySelectorAll("#stageList .stage-row")].map(row => ({
+  // :not(.base) — the stage-1 preview row is in here too and has no inputs.
+  return [...document.querySelectorAll("#stageList .stage-row:not(.base)")].map(row => ({
     title      : row.querySelector(".stage-row-t").value.trim(),
     description: row.querySelector(".stage-row-d").value.trim()
   }));
 }
 
-/* An admin who adds a row and changes their mind shouldn't get a blank stage
-   on the board, so untitled rows are dropped rather than rejected. */
-const stagesToSave = () => readStageRows().filter(s => s.title);
+/* The task's own title and description ARE stage 1, so "Add stage" starts at
+   stage 2 and the rows here are only the ones after the first. No extra rows
+   means an ordinary one-step task, not a one-stage one.
+
+   An admin who adds a row and changes their mind shouldn't get a blank stage on
+   the board, so untitled rows are dropped rather than rejected. */
+function stagesToSave(title, description){
+  const extra = readStageRows().filter(s => s.title);
+  return extra.length ? [{ title, description }, ...extra] : [];
+}
 
 function renderStageRows(rows){
-  $("stageList").innerHTML = rows.map((s, i) => `
+  const box = $("stageList");
+  if(!rows.length){ box.innerHTML = ""; return; }
+
+  // Stage 1 is shown but not editable here — it mirrors the fields above.
+  box.innerHTML = `
+<div class="stage-row base">
+  <div class="stage-row-h">
+    <span class="stage-row-n">Stage 1</span>
+    <span class="stage-row-tag">the title above</span>
+  </div>
+  <div class="stage-base-t" id="stageBaseTitle"></div>
+</div>` + rows.map((s, i) => `
 <div class="stage-row">
   <div class="stage-row-h">
-    <span class="stage-row-n">Stage ${i + 1}</span>
+    <span class="stage-row-n">Stage ${i + 2}</span>
     <button class="mini red" data-stagedel="${i}">Remove</button>
   </div>
   <input class="inp stage-row-t" maxlength="90" autocomplete="off"
-         placeholder="e.g. Photograph every plate" value="${escHtml(s.title)}">
+         placeholder="e.g. Upload the photos to Teams" value="${escHtml(s.title)}">
   <textarea class="inp ta stage-row-d" maxlength="400" rows="2"
             placeholder="What does this stage involve? (optional)">${escHtml(s.description)}</textarea>
 </div>`).join("");
+
+  refreshStageBase();
+}
+
+/* Keep the stage-1 preview in step with the title field as it's typed. Set as
+   text, not markup, so this can't disturb focus in the rows below it. */
+function refreshStageBase(){
+  const el = $("stageBaseTitle");
+  if(el) el.textContent = $("taskTitle").value.trim() || "Untitled task";
 }
 
 function addStageRow(){
@@ -396,7 +424,7 @@ async function saveTaskTemplate(){
   const titleEl = $("taskTitle"), descEl = $("taskDesc");
   const title = titleEl.value.trim();
   const desc  = descEl.value.trim();
-  const stages = stagesToSave();
+  const stages = stagesToSave(title, desc);
 
   if(!title){ toast("Give the task a title to save it.", "bad"); titleEl.focus(); return; }
   if((state.data.templates || []).some(t => t.title.toLowerCase() === title.toLowerCase())){
@@ -1050,7 +1078,7 @@ async function addTask(){
   const titleEl = $("taskTitle"), descEl = $("taskDesc");
   const title = titleEl.value.trim();
   const desc  = descEl.value.trim();
-  const stages = stagesToSave();
+  const stages = stagesToSave(title, desc);
 
   if(!title){ toast("Give the task a title.", "bad"); titleEl.focus(); return; }
   if(state.data.tasks.some(t => t.title.toLowerCase() === title.toLowerCase())){
@@ -1364,6 +1392,7 @@ function exportAuditCsv(){
   $("taskTitle").addEventListener("keydown", e => { if(e.key === "Enter") addTask(); });
 
   $("stageAdd").addEventListener("click", addStageRow);
+  $("taskTitle").addEventListener("input", refreshStageBase);
   $("stageList").addEventListener("click", e => {
     const del = e.target.closest("[data-stagedel]");
     if(del) removeStageRow(Number(del.dataset.stagedel));

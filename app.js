@@ -398,7 +398,7 @@ function taskCard(t, readOnly){
     </span>
   </button>
   <div class="task-drawer"><div class="dw"><div class="dw-inner">
-    ${t.description ? `<p class="dw-desc">${escHtml(t.description)}</p>` : ""}
+    ${!staged && t.description ? `<p class="dw-desc">${escHtml(t.description)}</p>` : ""}
     ${staged ? stageList(t) : ""}
     ${actions}
     ${staged ? "" : noteBlock}
