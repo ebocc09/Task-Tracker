@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T16:32:57.200Z",
+  "updatedAt": "2026-08-01T16:33:12.146Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -74,6 +74,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msalbmxeo",
+      "at": "2026-08-01T16:33:12.146Z",
+      "who": "Enzo",
+      "action": "template.delete",
+      "subject": "Plate Audit",
+      "detail": ""
+    },
     {
       "id": "a_msalbbe8m",
       "at": "2026-08-01T16:32:57.200Z",
@@ -460,19 +468,7 @@
     }
   ],
   "blocked": [],
-  "templates": [
-    {
-      "id": "q_msalb3atc",
-      "title": "Plate Audit",
-      "description": "Gather all the plates at the start of the shift and post a photo in the teams chat before clearing this stage.",
-      "stages": [
-        {
-          "title": "Plate Audit (EoD)",
-          "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task."
-        }
-      ]
-    }
-  ],
+  "templates": [],
   "renames": [
     {
       "id": "r_ms9va2ex3",
