@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T15:49:45.616Z",
+  "updatedAt": "2026-08-01T15:54:35.520Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -49,20 +49,16 @@
       "forcedAt": null
     }
   ],
-  "tasks": [
-    {
-      "id": "t_ms9ugrio1",
-      "title": "Plate Audit",
-      "description": "",
-      "createdBy": "Enzo",
-      "createdAt": "2026-08-01T04:01:22.003Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
-      "statusNote": null
-    }
-  ],
+  "tasks": [],
   "audit": [
+    {
+      "id": "a_msajxzeo2",
+      "at": "2026-08-01T15:54:35.520Z",
+      "who": "Enzo",
+      "action": "task.delete",
+      "subject": "Plate Audit",
+      "detail": ""
+    },
     {
       "id": "a_msajrrps2",
       "at": "2026-08-01T15:49:45.616Z",
