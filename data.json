@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T04:01:22.003Z",
+  "updatedAt": "2026-08-01T04:24:08.889Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -25,7 +25,7 @@
       "id": "p_ms9tjr52g",
       "label": "6UE-688",
       "note": "",
-      "checkedOutBy": "Robert",
+      "checkedOutBy": "Hibert",
       "checkedOutAt": "2026-08-01T03:45:23.941Z",
       "forcedBy": null,
       "forcedAt": null
@@ -64,6 +64,14 @@
   ],
   "audit": [
     {
+      "id": "a_ms9va2ex4",
+      "at": "2026-08-01T04:24:08.889Z",
+      "who": "Enzo",
+      "action": "person.rename",
+      "subject": "Hibert",
+      "detail": ""
+    },
+    {
       "id": "a_ms9ugrpv3",
       "at": "2026-08-01T04:01:22.003Z",
       "who": "Enzo",
@@ -74,7 +82,7 @@
     {
       "id": "a_ms9tw8h1c",
       "at": "2026-08-01T03:45:23.941Z",
-      "who": "Robert",
+      "who": "Hibert",
       "action": "plate.checkout",
       "subject": "6UE-688",
       "detail": ""
@@ -82,7 +90,7 @@
     {
       "id": "a_ms9tw6m0a",
       "at": "2026-08-01T03:45:21.528Z",
-      "who": "Robert",
+      "who": "Hibert",
       "action": "plate.release",
       "subject": "6EU-300",
       "detail": ""
@@ -90,7 +98,7 @@
     {
       "id": "a_ms9tw2kp8",
       "at": "2026-08-01T03:45:16.297Z",
-      "who": "Robert",
+      "who": "Hibert",
       "action": "plate.checkout",
       "subject": "6EU-300",
       "detail": ""
@@ -98,7 +106,7 @@
     {
       "id": "a_ms9tw2kp7",
       "at": "2026-08-01T03:45:16.297Z",
-      "who": "Robert",
+      "who": "Hibert",
       "action": "plate.release",
       "subject": "6UE-688",
       "detail": ""
@@ -130,7 +138,7 @@
     {
       "id": "a_ms9tv43y2",
       "at": "2026-08-01T03:44:31.630Z",
-      "who": "Robert",
+      "who": "Hibert",
       "action": "identity.rename",
       "subject": "Robert",
       "detail": "was Enzo"
@@ -216,5 +224,16 @@
       "detail": ""
     }
   ],
-  "blocked": []
+  "blocked": [],
+  "templates": [],
+  "renames": [
+    {
+      "id": "r_ms9va2ex3",
+      "at": "2026-08-01T04:24:08.889Z",
+      "by": "Enzo",
+      "from": "Robert",
+      "to": "Hibert"
+    }
+  ],
+  "requests": []
 }
