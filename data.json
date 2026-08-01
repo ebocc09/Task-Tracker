@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T21:42:10.670Z",
-  "updatedBy": "Enzo",
+  "updatedAt": "2026-08-01T21:59:37.856Z",
+  "updatedBy": "Daily rollover",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -51,11 +51,11 @@
   ],
   "tasks": [
     {
-      "id": "t_msawczcec",
+      "id": "t_msawzfcw1",
       "title": "Plate Audit",
       "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
-      "createdBy": "Enzo",
-      "createdAt": "2026-08-01T21:42:10.670Z",
+      "createdBy": "Daily rollover",
+      "createdAt": "2026-08-01T21:59:37.565Z",
       "status": "pending",
       "statusBy": null,
       "statusAt": null,
@@ -63,7 +63,7 @@
       "leaderboard": true,
       "stages": [
         {
-          "id": "s_msawczced",
+          "id": "s_msawzfcw2",
           "title": "Plate Audit",
           "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
           "status": "pending",
@@ -72,7 +72,7 @@
           "note": null
         },
         {
-          "id": "s_msawczcee",
+          "id": "s_msawzfcw3",
           "title": "Plate Audit (EoD)",
           "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task.",
           "status": "pending",
@@ -83,11 +83,11 @@
       ]
     },
     {
-      "id": "t_msawczcef",
+      "id": "t_msawzfcw4",
       "title": "Box Audit - Service",
       "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
-      "createdBy": "Enzo",
-      "createdAt": "2026-08-01T21:42:10.670Z",
+      "createdBy": "Daily rollover",
+      "createdAt": "2026-08-01T21:59:37.565Z",
       "status": "pending",
       "statusBy": null,
       "statusAt": null,
@@ -95,7 +95,7 @@
       "leaderboard": true,
       "stages": [
         {
-          "id": "s_msawczceg",
+          "id": "s_msawzfcw5",
           "title": "Box Audit - Service",
           "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
           "status": "pending",
@@ -104,7 +104,7 @@
           "note": null
         },
         {
-          "id": "s_msawczceh",
+          "id": "s_msawzfcw6",
           "title": "Box Audit - Washline",
           "description": "Remove any of our keys (White envelops) from the service drop off box and sort them in the key bin.",
           "status": "pending",
@@ -113,7 +113,7 @@
           "note": null
         },
         {
-          "id": "s_msawczcei",
+          "id": "s_msawzfcw7",
           "title": "Box Audit - Offsite",
           "description": "Remove any keys in the offsite drop off box and sort them into the key bin.",
           "status": "pending",
@@ -124,11 +124,11 @@
       ]
     },
     {
-      "id": "t_msawczcej",
+      "id": "t_msawzfcw8",
       "title": "Loaner Audit - Evening",
       "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
-      "createdBy": "Enzo",
-      "createdAt": "2026-08-01T21:42:10.670Z",
+      "createdBy": "Daily rollover",
+      "createdAt": "2026-08-01T21:59:37.565Z",
       "status": "pending",
       "statusBy": null,
       "statusAt": null,
@@ -136,7 +136,7 @@
       "leaderboard": true,
       "stages": [
         {
-          "id": "s_msawczcek",
+          "id": "s_msawzfcw9",
           "title": "Loaner Audit - Evening",
           "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
           "status": "pending",
@@ -145,7 +145,7 @@
           "note": null
         },
         {
-          "id": "s_msawczcel",
+          "id": "s_msawzfcwa",
           "title": "Loaner Audit - Closing",
           "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
           "status": "pending",
@@ -157,6 +157,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msawzfcwb",
+      "at": "2026-08-01T21:59:37.856Z",
+      "who": "Daily rollover",
+      "action": "board.rollover",
+      "subject": "",
+      "detail": "3 tasks removed (3 still pending), 3 rebuilt, 0 plates released"
+    },
     {
       "id": "a_msawczcem",
       "at": "2026-08-01T21:42:10.670Z",
@@ -1131,6 +1139,6 @@
     ],
     "tz": "America/Chicago",
     "lastRunKey": "2026-08-01",
-    "lastRunAt": "2026-08-01T21:42:10.670Z"
+    "lastRunAt": "2026-08-01T21:59:37.565Z"
   }
 }
