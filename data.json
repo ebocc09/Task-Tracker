@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T15:34:26.709Z",
+  "updatedAt": "2026-08-01T15:40:30.701Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -63,6 +63,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msajfvjha",
+      "at": "2026-08-01T15:40:30.701Z",
+      "who": "Enzo",
+      "action": "reopen.request",
+      "subject": "Plate Audit",
+      "detail": "open"
+    },
     {
       "id": "a_msaj82ol6",
       "at": "2026-08-01T15:34:26.709Z",
@@ -353,5 +361,14 @@
     }
   ],
   "requests": [],
-  "reopenRequests": []
+  "reopenRequests": [
+    {
+      "id": "ro_msajfvjh9",
+      "at": "2026-08-01T15:40:30.701Z",
+      "by": "Enzo",
+      "taskId": "t_ms9ugrio1",
+      "taskTitle": "Plate Audit",
+      "reason": "open"
+    }
+  ]
 }
