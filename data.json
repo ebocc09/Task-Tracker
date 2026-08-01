@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T04:24:08.889Z",
-  "updatedBy": "Enzo",
+  "updatedAt": "2026-08-01T04:24:35.170Z",
+  "updatedBy": "Hibert",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -63,6 +63,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_ms9vamoy4",
+      "at": "2026-08-01T04:24:35.170Z",
+      "who": "Hibert",
+      "action": "request.open",
+      "subject": "Bob",
+      "detail": ""
+    },
     {
       "id": "a_ms9va2ex4",
       "at": "2026-08-01T04:24:08.889Z",
@@ -235,5 +243,12 @@
       "to": "Hibert"
     }
   ],
-  "requests": []
+  "requests": [
+    {
+      "id": "req_ms9vamoy3",
+      "at": "2026-08-01T04:24:35.170Z",
+      "from": "Hibert",
+      "to": "Bob"
+    }
+  ]
 }
