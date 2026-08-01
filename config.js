@@ -8,8 +8,8 @@
 /* Which repository holds the shared board data.
    Point this at your own repo, then commit and push. */
 const REPO = {
-  owner : "YOUR-GITHUB-USERNAME",   // ← change me
-  name  : "task-tracker",           // ← change me if you renamed the repo
+  owner : "ebocc09",
+  name  : "Task-Tracker",
   branch: "main",
   path  : "data.json"
 };

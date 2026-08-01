@@ -338,7 +338,13 @@ function explainError(err, verb){
   if(s === 0)   return "No connection. Your change was not saved.";
   if(s === 401) return "Your token was rejected. Click the status chip in the top bar to reconnect.";
   if(s === 403) return "That token can't write to this repo. It needs Contents: Read and write.";
-  if(s === 404) return "Repository or data.json not found. Check the settings in config.js.";
+  if(s === 404){
+    // 404 here is ambiguous on purpose from GitHub's side: a private repo looks
+    // exactly like a missing one to an anonymous reader. Name both.
+    return `Couldn't find ${REPO.owner}/${REPO.name} → ${REPO.path} on branch "${REPO.branch}". ` +
+           `Check config.js matches the repo exactly, that data.json is committed on that branch, ` +
+           `and — if the repo is private — that you've connected a token.`;
+  }
   if(s === 409) return "Someone else saved at the same moment and we couldn't merge. Try again.";
   if(s === 422) return "GitHub rejected the write. Refresh and try again.";
   return `Couldn't ${verb}: ${(err && err.message) || "unknown error"}`;
@@ -445,6 +451,17 @@ async function determineMode(){
     state.sha  = result.sha;
     state.lastSync = Date.now();
   }catch(err){
+    // Print the exact request that failed — guessing at config typos from a
+    // rendered error message is miserable.
+    console.error(
+      "[Task Tracker] Could not load board data.\n" +
+      "  Tried : " + contentsUrl() + "?ref=" + REPO.branch + "\n" +
+      "  Status: " + (err.status || "network") + " " + (err.message || "") + "\n" +
+      "  Config: owner=" + REPO.owner + "  name=" + REPO.name +
+      "  branch=" + REPO.branch + "  path=" + REPO.path + "\n" +
+      "  Open that URL in a new tab: JSON back = config is right; " +
+      '{"message":"Not Found"} = wrong repo/branch/path, or the repo is private.'
+    );
     if(!token() && (err.status === 403 || err.status === 429)){
       try{
         const result = await pullRawFallback();
