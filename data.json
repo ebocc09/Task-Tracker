@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T21:37:46.651Z",
+  "updatedAt": "2026-08-01T21:37:49.363Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -157,6 +157,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msaw7dpv5",
+      "at": "2026-08-01T21:37:49.363Z",
+      "who": "Enzo",
+      "action": "schedule.set",
+      "subject": "",
+      "detail": "06:00 MTWTF America/Los_Angeles"
+    },
     {
       "id": "a_msaw75gl2",
       "at": "2026-08-01T21:37:38.661Z",
@@ -876,7 +884,7 @@
   "requests": [],
   "reopenRequests": [],
   "schedule": {
-    "enabled": false,
+    "enabled": true,
     "time": "06:00",
     "days": [
       1,
@@ -886,7 +894,7 @@
       5
     ],
     "tz": "America/Los_Angeles",
-    "lastRunKey": null,
+    "lastRunKey": "2026-08-01",
     "lastRunAt": null
   }
 }
