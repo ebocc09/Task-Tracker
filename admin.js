@@ -135,6 +135,7 @@ function renderAdmin(){
   renderAdminTasks();
   renderQuickAdd();
   renderTaskFormMode();
+  renderSchedule();
   renderLeaderboard();
   renderAdminPlates();
   renderAdminPeople();
@@ -381,13 +382,31 @@ function renderQuickAdd(){
     <div class="adm-t">${escHtml(tp.title)}</div>
     <div class="adm-s">${tp.description ? escHtml(tp.description) : "No description"}</div>
   </div>
+  ${tp.auto ? `<span class="pill warm" title="Rebuilt onto the board by the daily rollover">Daily</span>` : ""}
   ${tp.leaderboard ? `<span class="pill ok">Leaderboard</span>` : ""}
   ${n ? `<span class="pill info">${n} stages</span>` : ""}
+  <button class="mini" data-qaauto="${tp.id}">${tp.auto ? "Not daily" : "Make daily"}</button>
   <button class="mini" data-qaadd="${tp.id}">Add to board</button>
   <button class="mini" data-qaedit="${tp.id}">Edit</button>
   <button class="mini red" data-qadel="${tp.id}">Delete</button>
 </div>`;
   }).join("");
+}
+
+/* Flip whether the daily rollover rebuilds this saved task. */
+async function toggleTemplateAuto(id){
+  const tp = (state.data.templates || []).find(t => t.id === id);
+  if(!tp) return;
+  const next = !tp.auto;
+
+  await commit(`${next ? "Include" : "Exclude"} "${tp.title}" in the daily rollover`, data => {
+    const t = (data.templates || []).find(x => x.id === id);
+    if(!t) return null;                       // deleted underneath us
+    if(t.auto === next) return null;          // someone already did it
+    t.auto = next;
+    return { action: next ? "template.auto.on" : "template.auto.off", subject: t.title };
+  });
+  renderAdmin();
 }
 
 /* ── editing a saved task ──
@@ -677,6 +696,133 @@ async function deleteTemplate(id){
     return { action:"template.delete", subject: tp.title };
   });
   renderAdmin();
+}
+
+/* ─────────────────────────── daily rollover ────────────────────────────── */
+
+const DAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
+const DAY_NAMES  = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+/* The controls are re-rendered on every poll, so anything the admin is
+   mid-edit would be stomped. Values are only written into the inputs when they
+   differ from what's already there, and never while that input has focus. */
+function renderSchedule(){
+  const s = state.data.schedule || {};
+  const on = s.enabled === true;
+
+  setIfIdle($("schedOn"),   "checked", on);
+  setIfIdle($("schedTime"), "value",   s.time || "06:00");
+  setIfIdle($("schedTz"),   "value",   s.tz   || "America/Los_Angeles");
+  $("schedBody").classList.toggle("off", !on);
+
+  const days = Array.isArray(s.days) ? s.days : [];
+  $("schedDays").innerHTML = DAY_LABELS.map((label, i) =>
+    `<button type="button" class="${days.includes(i) ? "on" : ""}" data-schedday="${i}"
+             aria-pressed="${days.includes(i)}" title="${DAY_NAMES[i]}">${label}</button>`
+  ).join("");
+
+  // Warnings only where they're actionable — an enabled schedule that can't fire.
+  const autos = (state.data.templates || []).filter(t => t.auto).length;
+  const warn  = $("schedWarn");
+  let msg = "";
+  if(on && !days.length){
+    msg = "No days selected, so this will never run. Pick at least one day above.";
+  }else if(on && !autos){
+    msg = "No saved tasks are marked <strong>Daily</strong>, so there'd be nothing to rebuild. " +
+          "The rollover skips rather than leaving the board empty — mark at least one above.";
+  }
+  warn.hidden = !msg;
+  if(msg) warn.innerHTML = msg;
+
+  $("schedNext").innerHTML = nextRunLine(s, autos);
+}
+
+/* Don't fight the admin for an input they're currently typing in. */
+function setIfIdle(el, prop, value){
+  if(!el || el === document.activeElement) return;
+  if(el[prop] !== value) el[prop] = value;
+}
+
+function nextRunLine(s, autos){
+  if(s.enabled !== true) return "Automatic rollover is <strong>off</strong>. Nothing happens on its own.";
+
+  const next = describeNextRun(s, new Date());
+  if(!next) return "Enabled, but no day is selected — it will never run.";
+
+  const when = next.days === 0 ? "today" : next.days === 1 ? "tomorrow" : DAY_NAMES[new Date(next.key + "T12:00:00").getDay()];
+  const last = s.lastRunAt ? ` Last rollover ${escHtml(relTime(s.lastRunAt))}.` : "";
+  const nope = autos ? "" : " (nothing marked Daily yet, so it will skip)";
+  return `Next rollover <strong>${when} at ${escHtml(next.time)}</strong> ${escHtml(next.key)}${nope}.${last}`;
+}
+
+/* Any change to when it runs re-seeds lastRunKey, so a schedule edited at noon
+   doesn't immediately fire for a time that's already passed today. Alarm-clock
+   semantics: changes take effect from the next occurrence. */
+async function saveSchedule(patch, label){
+  const merged = Object.assign({}, state.data.schedule, patch);
+
+  await commit(label, data => {
+    const s = Object.assign({}, data.schedule, patch);
+    s.lastRunKey = seedKey(s, new Date());
+    data.schedule = s;
+    return { action:"schedule.set", detail: scheduleSummary(s) };
+  });
+  renderAdmin();
+  return merged;
+}
+
+const scheduleSummary = s => s.enabled
+  ? `${s.time} ${s.days.length === 7 ? "every day" : s.days.map(d => DAY_LABELS[d]).join("")} ${s.tz}`
+  : "off";
+
+async function toggleScheduleDay(i){
+  const days = new Set((state.data.schedule || {}).days || []);
+  days.has(i) ? days.delete(i) : days.add(i);
+  await saveSchedule({ days: [...days].sort() }, "Change rollover days");
+}
+
+/* The same mutation the robot performs, run by hand. Deliberately NOT a
+   trigger for the workflow — doing that from the page would need actions:write,
+   which is not a permission to hand out on a public repo. */
+async function runRolloverNow(){
+  const autos = (state.data.templates || []).filter(t => t.auto);
+  if(!autos.length){
+    toast("No saved tasks are marked Daily — nothing to rebuild.", "bad");
+    return;
+  }
+
+  const first = await askConfirm({
+    title: "Roll the board over now?",
+    text : "Every task is deleted and the board is rebuilt from the saved tasks marked Daily. Every plate is released. The audit log and the leaderboard are kept.",
+    facts: [["Tasks now on the board", String(state.data.tasks.length)],
+            ["Will be rebuilt as", `${autos.length} task${autos.length === 1 ? "" : "s"}`]],
+    yes  : "Continue", danger: true
+  });
+  if(!first) return;
+
+  const second = await askConfirm({
+    title: "Really roll over?",
+    text : "This clears everyone's board immediately and cannot be undone.",
+    yes  : "Roll over", danger: true
+  });
+  if(!second) return;
+
+  const ok = await commit("Rollover", data => {
+    const summary = applyRollover(data, { uid, now: nowIso(), who: me() || "an admin" });
+    if(!summary) return null;
+    // Counts as today's rollover, so the scheduled run doesn't repeat it.
+    if(data.schedule) {
+      data.schedule.lastRunKey = dateKeyIn(data.schedule.tz, new Date());
+      data.schedule.lastRunAt  = nowIso();
+    }
+    return { action:"board.rollover", detail: summary.detail };
+  });
+
+  if(ok){
+    render();
+    renderAdmin();
+    flash("Board rolled over");
+  }
 }
 
 /* ──────────────────────────── leaderboard ──────────────────────────────── */
@@ -1344,6 +1490,11 @@ function auditPhrase(r){
     case "task.add":       return `added task “${s}”`;
     case "template.save":  return `saved “${s}” to Quick add`;
     case "template.edit":  return `edited saved task “${s}”`;
+    case "template.auto.on":  return `added “${s}” to the daily rollover`;
+    case "template.auto.off": return `removed “${s}” from the daily rollover`;
+    case "schedule.set":      return `changed the rollover schedule`;
+    case "board.rollover":    return `rolled the board over`;
+    case "board.rollover.skip": return `skipped a scheduled rollover`;
     case "template.delete":return `removed “${s}” from Quick add`;
     case "leaderboard.remove": return `removed ${s} from the leaderboard`;
     case "leaderboard.reset":  return `reset the leaderboard`;
@@ -1717,6 +1868,26 @@ function exportAuditCsv(){
     }
   });
 
+  $("schedOn").addEventListener("change", e =>
+    saveSchedule({ enabled: e.target.checked },
+      e.target.checked ? "Turn on the daily rollover" : "Turn off the daily rollover"));
+  // change, not input — a time field fires on every keystroke, and each one
+  // would be a commit.
+  $("schedTime").addEventListener("change", e => {
+    if(!/^([01]\d|2[0-3]):([0-5]\d)$/.test(e.target.value)){
+      toast("Enter a time as HH:MM.", "bad");
+      renderSchedule();
+      return;
+    }
+    saveSchedule({ time: e.target.value }, "Change the rollover time");
+  });
+  $("schedTz").addEventListener("change", e => saveSchedule({ tz: e.target.value }, "Change the rollover timezone"));
+  $("schedDays").addEventListener("click", e => {
+    const b = e.target.closest("[data-schedday]");
+    if(b) toggleScheduleDay(Number(b.dataset.schedday));
+  });
+  $("schedRunNow").addEventListener("click", runRolloverNow);
+
   $("lbWindow").addEventListener("change", renderLeaderboard);
   $("lbReset").addEventListener("click", resetLeaderboard);
   $("lbList").addEventListener("click", e => {
@@ -1730,6 +1901,8 @@ function exportAuditCsv(){
     if(add) return addTemplateToBoard(add.dataset.qaadd);
     const ed = e.target.closest("[data-qaedit]");
     if(ed) return beginTemplateEdit(ed.dataset.qaedit);
+    const au = e.target.closest("[data-qaauto]");
+    if(au) return toggleTemplateAuto(au.dataset.qaauto);
     const del = e.target.closest("[data-qadel]");
     if(del) return deleteTemplate(del.dataset.qadel);
   });

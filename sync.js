@@ -29,7 +29,25 @@ const state = {
 };
 
 function emptyBoard(){
-  return { version:1, updatedAt:null, updatedBy:null, plates:[], tasks:[], audit:[], scores:[], blocked:[], templates:[], renames:[], requests:[], reopenRequests:[] };
+  return {
+    version:1, updatedAt:null, updatedBy:null,
+    plates:[], tasks:[], audit:[], scores:[], blocked:[], templates:[],
+    renames:[], requests:[], reopenRequests:[],
+    schedule: defaultSchedule()
+  };
+}
+
+/* Off by default. Turning this on wipes the board every morning, so it is not
+   something anyone should get by accident. */
+function defaultSchedule(){
+  return {
+    enabled   : false,
+    time      : "06:00",
+    days      : [1,2,3,4,5],
+    tz        : "America/Los_Angeles",
+    lastRunKey: null,
+    lastRunAt : null
+  };
 }
 
 /* Defensive: never trust the shape of a file other people can edit. */
@@ -63,6 +81,9 @@ function normalize(raw){
     description: t.description ? String(t.description) : "",
     // Carried so a saved task keeps scoring when it's re-added to the board.
     leaderboard: t.leaderboard === true,
+    // Rebuilt onto the board by the daily rollover. Off by default, so an
+    // occasional saved task doesn't turn up every morning.
+    auto       : t.auto === true,
     // Blueprint only — no status/by/at. taskFromTemplate mints those fresh.
     stages     : Array.isArray(t.stages) ? t.stages.filter(s => s && s.title).map(s => ({
       title      : String(s.title),
@@ -163,7 +184,50 @@ function normalize(raw){
       ? Math.min(Number(s.value), 1) : 0
   })).slice(0, SCORE_CAP) : [];
 
+  board.schedule = normalizeSchedule(d.schedule);
+
   return board;
+}
+
+/* The daily rollover's settings. Validated harder than the rest of the file
+   because a bad value here fails silently and repeatedly — twice an hour,
+   forever, with no one watching — rather than loudly once. */
+function normalizeSchedule(s){
+  const def = defaultSchedule();
+  if(!s || typeof s !== "object") return def;
+
+  /* Zero-padded or nothing. The due check compares "HH:MM" as strings, and
+     "6:00" >= "06:00" is true, so an unpadded value would fire at midnight. */
+  const time = typeof s.time === "string" && /^([01]\d|2[0-3]):([0-5]\d)$/.test(s.time)
+    ? s.time : def.time;
+
+  /* 0=Sunday..6=Saturday. An empty list means never — not every day. */
+  const days = Array.isArray(s.days)
+    ? [...new Set(s.days.map(Number).filter(n => Number.isInteger(n) && n >= 0 && n <= 6))].sort()
+    : def.days;
+
+  return {
+    enabled   : s.enabled === true,
+    time,
+    days,
+    tz        : validTz(s.tz) ? String(s.tz) : def.tz,
+    lastRunKey: typeof s.lastRunKey === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.lastRunKey)
+      ? s.lastRunKey : null,
+    lastRunAt : s.lastRunAt ? String(s.lastRunAt) : null
+  };
+}
+
+/* An unknown zone makes Intl throw RangeError, which in the scheduled job means
+   a failing run twice an hour and an email as the only signal. Check once here
+   so a hand-edited file degrades to the default instead. */
+function validTz(tz){
+  if(typeof tz !== "string" || !tz) return false;
+  try{
+    new Intl.DateTimeFormat("en-US", { timeZone: tz });
+    return true;
+  }catch(err){
+    return false;
+  }
 }
 
 /* ───────────────────────────── small helpers ───────────────────────────── */
