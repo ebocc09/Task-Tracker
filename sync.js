@@ -30,7 +30,7 @@ const state = {
 };
 
 function emptyBoard(){
-  return { version:1, updatedAt:null, updatedBy:null, plates:[], tasks:[], audit:[], blocked:[], templates:[], renames:[], requests:[] };
+  return { version:1, updatedAt:null, updatedBy:null, plates:[], tasks:[], audit:[], blocked:[], templates:[], renames:[], requests:[], reopenRequests:[] };
 }
 
 /* Defensive: never trust the shape of a file other people can edit. */
@@ -82,6 +82,16 @@ function normalize(raw){
     at  : r.at ? String(r.at) : null,
     from: String(r.from),
     to  : String(r.to)
+  })) : [];
+
+  // Pending task-reopen requests awaiting admin approval.
+  board.reopenRequests = Array.isArray(d.reopenRequests) ? d.reopenRequests.filter(r => r && r.id && r.taskId).map(r => ({
+    id       : String(r.id),
+    at       : r.at ? String(r.at) : null,
+    by       : r.by ? String(r.by) : "Unknown",
+    taskId   : String(r.taskId),
+    taskTitle: r.taskTitle ? String(r.taskTitle) : "",
+    reason   : r.reason ? String(r.reason) : ""
   })) : [];
 
   const OK = ["pending","complete","partial","blocked"];

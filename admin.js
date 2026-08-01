@@ -185,17 +185,36 @@ async function renamePerson(oldName){
 /* ────────────────────────────── approvals ──────────────────────────────── */
 
 function renderApprovals(){
-  const reqs = state.data.requests || [];
-  $("apprCount").textContent = reqs.length;
-  $("apprDot").hidden = reqs.length === 0;
+  const reqs   = state.data.requests || [];
+  const reopen = state.data.reopenRequests || [];
+  const total  = reqs.length + reopen.length;
+  $("apprCount").textContent = total;
+  $("apprDot").hidden = total === 0;
 
   const box = $("admApprovals");
-  if(!reqs.length){
-    box.innerHTML = `<div class="adm-empty">No pending name-change requests.</div>`;
+  if(!total){
+    box.innerHTML = `<div class="adm-empty">No pending requests.</div>`;
     return;
   }
 
-  box.innerHTML = reqs.map(r => `
+  let html = "";
+
+  if(reopen.length){
+    html += `<div class="adm-subhead">Task reopens</div>`;
+    html += reopen.map(r => `
+<div class="adm-row">
+  <div class="am">
+    <div class="adm-t">${escHtml(r.taskTitle)}</div>
+    <div class="adm-s">${escHtml(r.by)} · ${escHtml(relTime(r.at))} — “${escHtml(r.reason)}”</div>
+  </div>
+  <button class="mini" data-roapprove="${r.id}">Approve</button>
+  <button class="mini red" data-roreject="${r.id}">Reject</button>
+</div>`).join("");
+  }
+
+  if(reqs.length){
+    html += `<div class="adm-subhead">Name changes</div>`;
+    html += reqs.map(r => `
 <div class="adm-row">
   <div class="am">
     <div class="adm-t">${escHtml(r.from)} → ${escHtml(r.to)}</div>
@@ -204,6 +223,49 @@ function renderApprovals(){
   <button class="mini" data-approve="${r.id}">Approve</button>
   <button class="mini red" data-reject="${r.id}">Reject</button>
 </div>`).join("");
+  }
+
+  box.innerHTML = html;
+}
+
+async function approveReopen(id){
+  const r = (state.data.reopenRequests || []).find(x => x.id === id);
+  if(!r) return;
+
+  await commit(`Approve reopen: ${r.taskTitle}`, data => {
+    const req = (data.reopenRequests || []).find(x => x.id === id);
+    if(!req) return null;
+    data.reopenRequests = (data.reopenRequests || []).filter(x => x.id !== id);
+    const task = data.tasks.find(t => t.id === req.taskId);
+    if(!task) return null;                  // task deleted meanwhile — just drop the request
+    task.status = "pending"; task.statusBy = null; task.statusAt = null; task.statusNote = null;
+    return { action:"reopen.approve", subject: task.title, detail: req.reason };
+  });
+  render();
+  renderAdmin();
+  flash("Reopened");
+}
+
+async function rejectReopen(id){
+  const r = (state.data.reopenRequests || []).find(x => x.id === id);
+  if(!r) return;
+
+  const ok = await askConfirm({
+    title: "Reject reopen request?",
+    text : `“${r.taskTitle}” stays as it is.`,
+    facts: [["Requested by", r.by], ["Reason", r.reason]],
+    yes  : "Reject", danger: true
+  });
+  if(!ok) return;
+
+  await commit("Reject reopen", data => {
+    const req = (data.reopenRequests || []).find(x => x.id === id);
+    if(!req) return null;
+    data.reopenRequests = (data.reopenRequests || []).filter(x => x.id !== id);
+    return { action:"reopen.reject", subject: req.taskTitle };
+  });
+  renderAdmin();
+  flash("Rejected");
 }
 
 async function approveRequest(id){
@@ -896,6 +958,9 @@ function auditPhrase(r){
     case "request.cancel": return `withdrew a name-change request`;
     case "request.approve":return `approved a name change to “${s}”`;
     case "request.reject": return `rejected a name-change request`;
+    case "reopen.request": return `requested a reopen of “${s}”`;
+    case "reopen.approve": return `approved a reopen of “${s}”`;
+    case "reopen.reject":  return `rejected a reopen of “${s}”`;
     case "board.reset":    return `reset the board`;
     case "audit.clear":    return `cleared the audit log`;
     case "board.wipe":     return `deleted all tasks and plates`;
@@ -1197,6 +1262,10 @@ function exportAuditCsv(){
     if(ap) return approveRequest(ap.dataset.approve);
     const rj = e.target.closest("[data-reject]");
     if(rj) return rejectRequest(rj.dataset.reject);
+    const roa = e.target.closest("[data-roapprove]");
+    if(roa) return approveReopen(roa.dataset.roapprove);
+    const ror = e.target.closest("[data-roreject]");
+    if(ror) return rejectReopen(ror.dataset.roreject);
   });
 
   $("adminRail").addEventListener("click", e => {

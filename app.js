@@ -108,6 +108,7 @@ document.addEventListener("keydown", e => {
 /* Promise-based confirm, replacing window.confirm. */
 let confirmResolve = null;
 let confirmHasInput = false;
+let confirmRequire = false;
 
 /* Options:
    - solo:true   one button, an acknowledgement ("you may not do that").
@@ -121,6 +122,7 @@ function askConfirm({ title, text, facts = [], yes = "Confirm", no = "Cancel", d
 
   const field = $("confirmField"), inp = $("confirmInput");
   confirmHasInput = !!input;
+  confirmRequire  = !!(input && input.required);
   if(input){
     inp.value = input.value != null ? String(input.value) : "";
     inp.placeholder = input.placeholder || "";
@@ -138,6 +140,8 @@ function askConfirm({ title, text, facts = [], yes = "Confirm", no = "Cancel", d
   const yesBtn = $("confirmYes");
   yesBtn.textContent = yes;
   yesBtn.className = "btn-block " + (danger ? "red" : "solid");
+  // A required input keeps the confirm button disabled until something's typed.
+  yesBtn.disabled = confirmRequire && !inp.value.trim();
   $("confirmNo").textContent = no;
   $("confirmNo").hidden = solo;
 
@@ -319,6 +323,12 @@ function taskCard(t, readOnly){
   const noteBlock = t.statusNote
     ? `<div class="dw-note">${escHtml(t.statusNote)}</div>` : "";
 
+  const roPending = (state.data.reopenRequests || []).some(r => r.taskId === t.id);
+  const reopenBtn = t.status === "pending" ? ""
+    : roPending
+      ? `<button class="act ghost" disabled>${svg(ICON.undo)}Reopen requested</button>`
+      : `<button class="act ghost" data-act="reopen" data-id="${t.id}">${svg(ICON.undo)}Reopen</button>`;
+
   const actions = readOnly
     ? `<div class="dw-meta">Connect a token to change this task.</div>`
     : drafting
@@ -330,9 +340,7 @@ function taskCard(t, readOnly){
              ${svg(ICON.half)}Partial</button>
            <button class="act bad ${t.status === "blocked" ? "on" : ""}" data-act="blocked" data-id="${t.id}">
              ${svg(ICON.slash)}Could not complete</button>
-           ${t.status !== "pending"
-             ? `<button class="act ghost" data-act="reopen" data-id="${t.id}">${svg(ICON.undo)}Reopen</button>`
-             : ""}
+           ${reopenBtn}
          </div>`;
 
   return `
@@ -441,6 +449,37 @@ function setTaskStatus(taskId, status, note){
       detail : note || ""
     };
   });
+}
+
+async function requestReopen(taskId){
+  const task = state.data.tasks.find(t => t.id === taskId);
+  if(!task) return;
+
+  if((state.data.reopenRequests || []).some(r => r.taskId === taskId)){
+    toast("A reopen request for this task is already pending.", "");
+    return;
+  }
+
+  const reason = await askConfirm({
+    title: "Request reopen",
+    text : `Ask an admin to reopen “${task.title}”. A reason is required.`,
+    input: { value: "", placeholder: "Why does this need reopening?", maxlength: 200, required: true },
+    yes  : "Request reopen"
+  });
+  if(!reason) return;                       // cancelled
+  const clean = String(reason).trim();
+  if(!clean){ toast("A reason is required.", "bad"); return; }
+
+  const ok = await commit(`Request reopen: ${task.title}`, data => {
+    const t = data.tasks.find(x => x.id === taskId);
+    if(!t) throw new Error("That task no longer exists.");
+    data.reopenRequests = data.reopenRequests || [];
+    data.reopenRequests = data.reopenRequests.filter(r => r.taskId !== taskId);  // one per task
+    data.reopenRequests.push({ id: uid("ro"), at: nowIso(), by: me(), taskId, taskTitle: t.title, reason: clean });
+    return { action:"reopen.request", subject: t.title, detail: clean };
+  });
+
+  if(ok) toast("Reopen request sent to an admin.", "good");
 }
 
 function checkoutPlate(plateId){
@@ -709,8 +748,14 @@ function wireEvents(){
   $("confirmScrim").addEventListener("click", () => closeConfirm(false));
   $("confirmNo").addEventListener("click", () => closeConfirm(false));
   $("confirmYes").addEventListener("click", () => closeConfirm(confirmAnswer()));
+  $("confirmInput").addEventListener("input", () => {
+    if(confirmRequire) $("confirmYes").disabled = !$("confirmInput").value.trim();
+  });
   $("confirmInput").addEventListener("keydown", e => {
-    if(e.key === "Enter"){ e.preventDefault(); closeConfirm(confirmAnswer()); }
+    if(e.key !== "Enter") return;
+    if(confirmRequire && !e.target.value.trim()) return;   // required, still empty
+    e.preventDefault();
+    closeConfirm(confirmAnswer());
   });
 
   // Username modal
@@ -778,7 +823,7 @@ function wireEvents(){
         break;
       case "reopen":
         state.noteDraft = null;
-        setTaskStatus(id, "pending");
+        requestReopen(id);
         break;
     }
   });
