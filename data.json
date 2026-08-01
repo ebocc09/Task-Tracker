@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T15:55:57.125Z",
+  "updatedAt": "2026-08-01T15:56:56.843Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -63,6 +63,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msak10gbe",
+      "at": "2026-08-01T15:56:56.843Z",
+      "who": "Enzo",
+      "action": "template.save",
+      "subject": "Key Box Audit",
+      "detail": ""
+    },
     {
       "id": "a_msajzqdhb",
       "at": "2026-08-01T15:55:57.125Z",
@@ -395,6 +403,11 @@
       "id": "q_msajzptn9",
       "title": "Service Loaner Audit",
       "description": "Via mission control, filter for service loaners at Cypress, ensure no loaners are being held at offsite, post a photo in the teams chat of all loaners actively at Cypress before completing;"
+    },
+    {
+      "id": "q_msak1047c",
+      "title": "Key Box Audit",
+      "description": "Check all 3 key boxes for our keys (White Envelopes) and post a photo of all 3 key boxes empty of our keys."
     }
   ],
   "renames": [
