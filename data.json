@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T04:36:19.481Z",
-  "updatedBy": "Bob",
+  "updatedAt": "2026-08-01T04:40:58.162Z",
+  "updatedBy": "Enzo",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -56,13 +56,21 @@
       "description": "",
       "createdBy": "Enzo",
       "createdAt": "2026-08-01T04:01:22.003Z",
-      "status": "complete",
-      "statusBy": "Bob",
-      "statusAt": "2026-08-01T04:35:57.995Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null
     }
   ],
   "audit": [
+    {
+      "id": "a_ms9vvp6a2",
+      "at": "2026-08-01T04:40:58.162Z",
+      "who": "Enzo",
+      "action": "reopen.approve",
+      "subject": "Plate Audit",
+      "detail": "Completed by mistake"
+    },
     {
       "id": "a_ms9vpq554",
       "at": "2026-08-01T04:36:19.481Z",
@@ -321,14 +329,5 @@
     }
   ],
   "requests": [],
-  "reopenRequests": [
-    {
-      "id": "ro_ms9vpq553",
-      "at": "2026-08-01T04:36:19.481Z",
-      "by": "Bob",
-      "taskId": "t_ms9ugrio1",
-      "taskTitle": "Plate Audit",
-      "reason": "Completed by mistake"
-    }
-  ]
+  "reopenRequests": []
 }
