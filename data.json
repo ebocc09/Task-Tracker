@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T18:04:29.136Z",
+  "updatedAt": "2026-08-01T18:04:45.154Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -82,6 +82,37 @@
       ]
     },
     {
+      "id": "t_msaokn9sl",
+      "title": "Loaner Audit - Evening",
+      "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
+      "createdBy": "Enzo",
+      "createdAt": "2026-08-01T18:04:11.344Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
+      "statusNote": null,
+      "stages": [
+        {
+          "id": "s_msaokn9sm",
+          "title": "Loaner Audit - Evening",
+          "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
+          "status": "pending",
+          "by": null,
+          "at": null,
+          "note": null
+        },
+        {
+          "id": "s_msaokn9sn",
+          "title": "Loaner Audit - Closing",
+          "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
+          "status": "pending",
+          "by": null,
+          "at": null,
+          "note": null
+        }
+      ]
+    },
+    {
       "id": "t_msaoivwe9",
       "title": "Box Audit - Service",
       "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
@@ -114,37 +145,6 @@
           "id": "s_msaoivwec",
           "title": "Box Audit - Offsite",
           "description": "Remove any keys in the offsite drop off box and sort them into the key bin.",
-          "status": "pending",
-          "by": null,
-          "at": null,
-          "note": null
-        }
-      ]
-    },
-    {
-      "id": "t_msaokn9sl",
-      "title": "Loaner Audit - Evening",
-      "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
-      "createdBy": "Enzo",
-      "createdAt": "2026-08-01T18:04:11.344Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
-      "statusNote": null,
-      "stages": [
-        {
-          "id": "s_msaokn9sm",
-          "title": "Loaner Audit - Evening",
-          "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
-          "status": "pending",
-          "by": null,
-          "at": null,
-          "note": null
-        },
-        {
-          "id": "s_msaokn9sn",
-          "title": "Loaner Audit - Closing",
-          "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
           "status": "pending",
           "by": null,
           "at": null,
