@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T21:38:33.048Z",
+  "updatedAt": "2026-08-01T21:38:46.889Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -57,8 +57,8 @@
       "createdBy": "Enzo",
       "createdAt": "2026-08-01T19:29:32.849Z",
       "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "statusBy": "Enzo",
+      "statusAt": "2026-08-01T21:38:46.889Z",
       "statusNote": null,
       "leaderboard": true,
       "stages": [
@@ -66,9 +66,9 @@
           "id": "s_msarmf1t15",
           "title": "Plate Audit",
           "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Enzo",
+          "at": "2026-08-01T21:38:46.889Z",
           "note": null
         },
         {
@@ -157,6 +157,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msaw8m3ty",
+      "at": "2026-08-01T21:38:46.889Z",
+      "who": "Enzo",
+      "action": "task.stage",
+      "subject": "Plate Audit · stage 1 of 2",
+      "detail": ""
+    },
     {
       "id": "a_msaw8bfcv",
       "at": "2026-08-01T21:38:33.048Z",
@@ -894,7 +902,17 @@
       "detail": ""
     }
   ],
-  "scores": [],
+  "scores": [
+    {
+      "id": "sc_msaw8lvew",
+      "at": "2026-08-01T21:38:46.586Z",
+      "who": "Enzo",
+      "taskId": "t_msarmf1t14",
+      "stageId": "s_msarmf1t15",
+      "title": "Plate Audit",
+      "value": 0.5
+    }
+  ],
   "blocked": [],
   "templates": [
     {
