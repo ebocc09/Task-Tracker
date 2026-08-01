@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T19:28:55.265Z",
-  "updatedBy": "Bob",
+  "updatedAt": "2026-08-01T19:29:23.454Z",
+  "updatedBy": "Enzo",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -84,6 +84,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msarm7sux",
+      "at": "2026-08-01T19:29:23.454Z",
+      "who": "Enzo",
+      "action": "leaderboard.reset",
+      "subject": "",
+      "detail": "2 completions removed"
+    },
     {
       "id": "a_msarlm1t3",
       "at": "2026-08-01T19:28:55.265Z",
@@ -677,26 +685,7 @@
       "detail": ""
     }
   ],
-  "scores": [
-    {
-      "id": "sc_msarllub1",
-      "at": "2026-08-01T19:28:54.995Z",
-      "who": "Bob",
-      "taskId": "t_msarkvckl",
-      "stageId": "s_msarkvckn",
-      "title": "Plate Audit",
-      "value": 0.5
-    },
-    {
-      "id": "sc_msarl4yjt",
-      "at": "2026-08-01T19:28:33.115Z",
-      "who": "Enzo",
-      "taskId": "t_msarkvckl",
-      "stageId": "s_msarkvckm",
-      "title": "Plate Audit",
-      "value": 0.5
-    }
-  ],
+  "scores": [],
   "blocked": [],
   "templates": [
     {
