@@ -30,7 +30,7 @@ const state = {
 };
 
 function emptyBoard(){
-  return { version:1, updatedAt:null, updatedBy:null, plates:[], tasks:[], audit:[], blocked:[], templates:[] };
+  return { version:1, updatedAt:null, updatedBy:null, plates:[], tasks:[], audit:[], blocked:[], templates:[], renames:[], requests:[] };
 }
 
 /* Defensive: never trust the shape of a file other people can edit. */
@@ -62,6 +62,26 @@ function normalize(raw){
     id         : String(t.id),
     title      : String(t.title),
     description: t.description ? String(t.description) : ""
+  })) : [];
+
+  // Rename breadcrumbs. A browser can't reach into another's localStorage, so
+  // when an admin renames someone the change is logged here; each client checks
+  // on sync whether its own name was changed and catches up. Capped so it can't
+  // grow without bound.
+  board.renames = Array.isArray(d.renames) ? d.renames.filter(r => r && r.from && r.to).map(r => ({
+    id  : r.id ? String(r.id) : uid("r"),
+    at  : r.at ? String(r.at) : null,
+    by  : r.by ? String(r.by) : null,
+    from: String(r.from),
+    to  : String(r.to)
+  })).slice(-200) : [];
+
+  // Pending name-change requests awaiting admin approval.
+  board.requests = Array.isArray(d.requests) ? d.requests.filter(r => r && r.id && r.from && r.to).map(r => ({
+    id  : String(r.id),
+    at  : r.at ? String(r.at) : null,
+    from: String(r.from),
+    to  : String(r.to)
   })) : [];
 
   const OK = ["pending","complete","partial","blocked"];
@@ -159,6 +179,33 @@ const canWrite = () => (state.mode === "member" || state.mode === "local") && !a
 function amBlocked(){
   const n = me();
   return !!n && Array.isArray(state.data.blocked) && state.data.blocked.includes(n);
+}
+
+/* Did an admin rename me since I last looked? Follow the breadcrumb chain
+   (BadName → X → Y handles two renames while I was offline), update my own
+   localStorage identity, and tell me firmly. Self-limiting: once my stored
+   name is the chain's end, nothing matches on the next pass. */
+function applyIdentityRenames(){
+  const original = me();
+  const renames = state.data && state.data.renames;
+  if(!original || !Array.isArray(renames) || !renames.length) return;
+
+  let name = original;
+  [...renames]
+    .sort((a, b) => Date.parse(a.at || 0) - Date.parse(b.at || 0))
+    .forEach(r => { if(r.from === name) name = r.to; });
+
+  if(name !== original){
+    setMe(name);
+    if(typeof renderChrome === "function") renderChrome();
+    if(typeof askConfirm === "function"){
+      askConfirm({
+        title: "Your display name was changed",
+        text : `An admin changed your display name to “${name}”. It's now used for everything you do on the board.`,
+        yes  : "OK", solo: true
+      });
+    }
+  }
 }
 
 /* UTF-8 safe base64 — btoa alone mangles anything non-ASCII. */
@@ -441,6 +488,7 @@ async function refresh({ quiet = false } = {}){
 
     state.lastSync  = Date.now();
     state.lastError = null;
+    applyIdentityRenames();       // catch an admin rename that landed since last poll
     render();
   }catch(err){
     state.lastError = explainError(err, "refresh");
@@ -511,6 +559,7 @@ async function determineMode(){
     state.data = result.data;
     state.sha  = result.sha;
     state.lastSync = Date.now();
+    applyIdentityRenames();
   }catch(err){
     // Print the exact request that failed — guessing at config typos from a
     // rendered error message is miserable.

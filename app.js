@@ -16,6 +16,7 @@ const ICON = {
   undo    : '<path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.1-6.4L3 9"/>',
   up      : '<path d="m6 15 6-6 6 6"/>',
   down    : '<path d="m6 9 6 6 6-6"/>',
+  pencil  : '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
   x       : '<path d="M18 6 6 18M6 6l12 12"/>'
 };
 
@@ -106,14 +107,28 @@ document.addEventListener("keydown", e => {
 
 /* Promise-based confirm, replacing window.confirm. */
 let confirmResolve = null;
+let confirmHasInput = false;
 
-/* solo:true turns this into an acknowledgement — one button, no choice. Used
-   where the answer is "you may not do that" rather than "are you sure?". */
-function askConfirm({ title, text, facts = [], yes = "Confirm", no = "Cancel", danger = false, solo = false } = {}){
+/* Options:
+   - solo:true   one button, an acknowledgement ("you may not do that").
+   - input:{...} adds a text field; the promise then resolves with the trimmed
+                 string (or false on cancel) instead of a boolean. */
+function askConfirm({ title, text, facts = [], yes = "Confirm", no = "Cancel", danger = false, solo = false, input = null } = {}){
   if(confirmResolve) closeConfirm(false);
   $("confirmTitle").textContent = title || "Are you sure?";
   $("confirmText").textContent  = text || "";
   $("confirmIc").className = "confirm-ic" + (danger ? "" : " calm");
+
+  const field = $("confirmField"), inp = $("confirmInput");
+  confirmHasInput = !!input;
+  if(input){
+    inp.value = input.value != null ? String(input.value) : "";
+    inp.placeholder = input.placeholder || "";
+    inp.maxLength = input.maxlength || 80;
+    field.hidden = false;
+  }else{
+    field.hidden = true;
+  }
 
   const box = $("confirmFacts");
   box.innerHTML = facts.map(([k,v]) =>
@@ -129,9 +144,12 @@ function askConfirm({ title, text, facts = [], yes = "Confirm", no = "Cancel", d
   $("confirm").classList.add("on");
   $("confirmScrim").classList.add("on");
   syncScrollLock();
-  setTimeout(() => yesBtn.focus(), 60);
+  setTimeout(() => { if(input){ inp.focus(); inp.select(); } else yesBtn.focus(); }, 60);
   return new Promise(resolve => { confirmResolve = resolve; });
 }
+
+// What the Confirm button hands back: the field's value in input mode, else true.
+const confirmAnswer = () => confirmHasInput ? $("confirmInput").value : true;
 
 function closeConfirm(answer){
   $("confirm").classList.remove("on");
@@ -520,40 +538,88 @@ async function connectTeamCode(value){
 
 /* ───────────────────────────── user modal ──────────────────────────────── */
 
-function openUserModal(){
-  const needsCode = repoConfigured() && !token();
-  const firstRun  = !me();
+function myPendingRequest(){
+  const n = me();
+  if(!n) return null;
+  return (state.data.requests || []).find(r => r.from === n) || null;
+}
 
-  $("userModalTitle").textContent = firstRun ? "Welcome" : "Your details";
-  $("userInput").value = me() || "";
+function openUserModal(){
+  const nameSet   = !!me();
+  const needsCode = repoConfigured() && !token();
+
+  $("userModalTitle").textContent = nameSet ? "Your details" : "Welcome";
+
+  const nameInput = $("userInput");
+  nameInput.value = me() || "";
+  nameInput.readOnly = nameSet;                 // locked once set
+  nameInput.classList.toggle("locked", nameSet);
+  $("userHint").hidden = nameSet;               // the "choose carefully" note is only for first run
+
+  // Request-a-change block, only once a name is locked in.
+  $("reqBlock").hidden = !nameSet;
+  const pend = myPendingRequest();
+  const pd = $("reqPending");
+  const reqInput = $("reqNameInput");
+  const reqBtn = $("reqChange");
+  if(pend){
+    pd.hidden = false;
+    pd.innerHTML = `Pending: <strong>${escHtml(pend.from)}</strong> → <strong>${escHtml(pend.to)}</strong>. An admin will review it.`;
+    reqInput.hidden = true;
+    reqBtn.textContent = "Cancel request";
+    reqBtn.dataset.mode = "cancel";
+  }else{
+    pd.hidden = true;
+    reqInput.hidden = false;
+    reqInput.value = "";
+    reqBtn.textContent = "Request change";
+    reqBtn.dataset.mode = "request";
+  }
+
   $("teamCodeField").hidden = !needsCode;
   $("teamCodeInput").value = "";
   $("userErr").hidden = true;
-  $("userSave").textContent = needsCode ? "Save and connect" : "Save";
+
+  // The solid button: sets the name on first run; only connects a code once the
+  // name is locked; and disappears when there's nothing for it to do.
+  const save = $("userSave");
+  if(!nameSet){
+    save.hidden = false;
+    save.textContent = needsCode ? "Save and connect" : "Save";
+  }else if(needsCode){
+    save.hidden = false;
+    save.textContent = "Connect";
+  }else{
+    save.hidden = true;
+  }
+  $("userCancel").textContent = nameSet ? "Close" : "Cancel";
+
   openModal("userModal");
 }
 
 async function saveUserName(){
-  const input = $("userInput");
+  const input  = $("userInput");
   const codeEl = $("teamCodeInput");
-  const err   = $("userErr");
-  const btn   = $("userSave");
-  const next  = input.value.trim();
+  const err    = $("userErr");
+  const btn    = $("userSave");
+  const firstRun = !me();
 
   const fail = (msg, focusEl) => {
     err.textContent = msg;
     err.hidden = false;
     (focusEl || input).focus();
   };
-
   err.hidden = true;
-  if(next.length < 2)  return fail("Please enter at least two characters.");
-  if(next.length > 40) return fail("That's a bit long — 40 characters max.");
 
-  const previous = me();
-  setMe(next);
+  // Set the name only on first run — it's locked afterwards.
+  if(firstRun){
+    const next = input.value.trim();
+    if(next.length < 2)  return fail("Please enter at least two characters.");
+    if(next.length > 40) return fail("That's a bit long — 40 characters max.");
+    setMe(next);
+  }
 
-  // Optional: a team code may also have been pasted on this first run.
+  // Connect a team code if one was entered.
   const code = $("teamCodeField").hidden ? "" : codeEl.value.trim();
   if(code){
     const label = btn.textContent;
@@ -563,25 +629,46 @@ async function saveUserName(){
     btn.disabled = false;
     btn.textContent = label;
     if(!result.ok){
-      render();                       // the name still saved; surface that
+      render();
       return fail(result.error, codeEl);
     }
   }
 
   closeOverlays();
   render();
+  if(firstRun) toast(code ? `Welcome, ${me()}. You can make changes.` : `You're set as ${me()}.`, "good");
+}
 
-  if(!previous){
-    toast(code ? `Welcome, ${next}. You can make changes.` : `You're set as ${next}.`, "good");
-  }else if(previous !== next){
-    toast(`Name changed to ${next}.`, "good");
-    // Keep history coherent: reattribute anything this browser still holds.
-    if(state.mode !== "viewer"){
-      commit("Rename", data => {
-        data.plates.forEach(p => { if(p.checkedOutBy === previous) p.checkedOutBy = next; });
-        return { action:"identity.rename", subject: next, detail:`was ${previous}` };
-      });
-    }
+async function requestNameChange(){
+  const btn = $("reqChange");
+  const err = $("userErr");
+  err.hidden = true;
+
+  if(btn.dataset.mode === "cancel"){
+    await commit("Cancel name-change request", data => {
+      const before = (data.requests || []).length;
+      data.requests = (data.requests || []).filter(r => r.from !== me());
+      return data.requests.length === before ? null : { action:"request.cancel", subject: me() };
+    });
+    openUserModal();
+    return;
+  }
+
+  const desired = $("reqNameInput").value.trim();
+  if(desired.length < 2)  { err.textContent = "Enter a name of at least two characters."; err.hidden = false; return; }
+  if(desired.length > 40) { err.textContent = "That's a bit long — 40 characters max.";   err.hidden = false; return; }
+  if(desired === me())    { err.textContent = "That's already your name.";                  err.hidden = false; return; }
+
+  const ok = await commit(`Request name change to ${desired}`, data => {
+    data.requests = data.requests || [];
+    data.requests = data.requests.filter(r => r.from !== me());   // one pending request per person
+    data.requests.push({ id: uid("req"), at: nowIso(), from: me(), to: desired });
+    return { action:"request.open", subject: desired };
+  });
+
+  if(ok){
+    toast("Request sent. An admin will review it.", "good");
+    openUserModal();
   }
 }
 
@@ -621,13 +708,18 @@ function wireEvents(){
   $("scrim").addEventListener("click", closeOverlays);
   $("confirmScrim").addEventListener("click", () => closeConfirm(false));
   $("confirmNo").addEventListener("click", () => closeConfirm(false));
-  $("confirmYes").addEventListener("click", () => closeConfirm(true));
+  $("confirmYes").addEventListener("click", () => closeConfirm(confirmAnswer()));
+  $("confirmInput").addEventListener("keydown", e => {
+    if(e.key === "Enter"){ e.preventDefault(); closeConfirm(confirmAnswer()); }
+  });
 
   // Username modal
   $("userSave").addEventListener("click", saveUserName);
   $("userInput").addEventListener("keydown", e => { if(e.key === "Enter") saveUserName(); });
 
   $("teamCodeInput").addEventListener("keydown", e => { if(e.key === "Enter") saveUserName(); });
+  $("reqChange").addEventListener("click", requestNameChange);
+  $("reqNameInput").addEventListener("keydown", e => { if(e.key === "Enter") requestNameChange(); });
 
   // Stat filters
   document.querySelectorAll(".strip .stat").forEach(cell => {

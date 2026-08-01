@@ -127,9 +127,121 @@ function renderAdmin(){
   renderQuickAdd();
   renderAdminPlates();
   renderAdminPeople();
+  renderApprovals();
   renderAdminAudit();
   renderConnection();
   renderRailFoot();
+}
+
+/* ─────────────────────────── rename engine ─────────────────────────────── */
+
+/* Rewrite one display name everywhere it appears in the shared data, and drop
+   a breadcrumb so the affected browser updates itself (see applyIdentityRenames
+   in sync.js). Shared by the People pencil and by approving a request. Runs
+   inside a commit mutator, so it must be a pure function of `data`. */
+function applyRename(data, oldName, newName){
+  (data.tasks || []).forEach(t => {
+    if(t.statusBy  === oldName) t.statusBy  = newName;
+    if(t.createdBy === oldName) t.createdBy = newName;
+  });
+  (data.plates || []).forEach(p => {
+    if(p.checkedOutBy === oldName) p.checkedOutBy = newName;
+    if(p.forcedBy     === oldName) p.forcedBy     = newName;
+  });
+  if(Array.isArray(data.blocked)){
+    data.blocked = [...new Set(data.blocked.map(n => n === oldName ? newName : n))];
+  }
+  // Scrub the old name from history too — the whole point when it's a bad name.
+  (data.audit || []).forEach(a => { if(a.who === oldName) a.who = newName; });
+  data.renames = data.renames || [];
+  data.renames.push({ id: uid("r"), at: nowIso(), by: me() || "an admin", from: oldName, to: newName });
+  if(data.renames.length > 200) data.renames = data.renames.slice(-200);
+}
+
+async function renamePerson(oldName){
+  const next = await askConfirm({
+    title: "Change display name",
+    text : `Rename “${oldName}” everywhere on the board, including past audit entries. They'll be told their name was changed the next time their page syncs.`,
+    input: { value: oldName, placeholder: "New display name", maxlength: 40 },
+    yes  : "Rename"
+  });
+  if(!next) return;                        // false (cancel) or empty
+  const clean = String(next).trim();
+  if(clean.length < 2)  { toast("Name needs at least two characters.", "bad"); return; }
+  if(clean.length > 40) { toast("That's too long (40 max).", "bad"); return; }
+  if(clean === oldName) return;
+
+  await commit(`Rename ${oldName}`, data => {
+    applyRename(data, oldName, clean);
+    // If they had a pending request, it's moot now.
+    data.requests = (data.requests || []).filter(r => r.from !== oldName);
+    return { action:"person.rename", subject: clean };
+  });
+  render();
+  renderAdmin();
+  flash("Renamed");
+}
+
+/* ────────────────────────────── approvals ──────────────────────────────── */
+
+function renderApprovals(){
+  const reqs = state.data.requests || [];
+  $("apprCount").textContent = reqs.length;
+  $("apprDot").hidden = reqs.length === 0;
+
+  const box = $("admApprovals");
+  if(!reqs.length){
+    box.innerHTML = `<div class="adm-empty">No pending name-change requests.</div>`;
+    return;
+  }
+
+  box.innerHTML = reqs.map(r => `
+<div class="adm-row">
+  <div class="am">
+    <div class="adm-t">${escHtml(r.from)} → ${escHtml(r.to)}</div>
+    <div class="adm-s">Requested ${escHtml(relTime(r.at))}</div>
+  </div>
+  <button class="mini" data-approve="${r.id}">Approve</button>
+  <button class="mini red" data-reject="${r.id}">Reject</button>
+</div>`).join("");
+}
+
+async function approveRequest(id){
+  const req = (state.data.requests || []).find(r => r.id === id);
+  if(!req) return;
+
+  await commit(`Approve name change to ${req.to}`, data => {
+    const r = (data.requests || []).find(x => x.id === id);
+    if(!r) return null;
+    applyRename(data, r.from, r.to);
+    data.requests = (data.requests || []).filter(x => x.id !== id);
+    return { action:"request.approve", subject: r.to };
+  });
+  render();
+  renderAdmin();
+  flash("Approved");
+}
+
+async function rejectRequest(id){
+  const req = (state.data.requests || []).find(r => r.id === id);
+  if(!req) return;
+
+  const ok = await askConfirm({
+    title: "Reject this request?",
+    text : `“${req.from}” stays as they are. They'll see the request is gone next time they open their name panel.`,
+    facts: [["Requested", `${req.from} → ${req.to}`]],
+    yes  : "Reject", danger: true
+  });
+  if(!ok) return;
+
+  await commit("Reject name change", data => {
+    const r = (data.requests || []).find(x => x.id === id);
+    if(!r) return null;
+    data.requests = (data.requests || []).filter(x => x.id !== id);
+    return { action:"request.reject", subject: r.to };
+  });
+  renderAdmin();
+  flash("Rejected");
 }
 
 /* ────────────────────────────── quick add ──────────────────────────────── */
@@ -318,6 +430,7 @@ function renderAdminPeople(){
     <div class="adm-s">${escHtml(sub)}</div>
   </div>
   ${isBlocked ? '<span class="pill bad">Blocked</span>' : ""}
+  <button class="mini" data-rename="${escHtml(p.name)}" title="Edit display name">${svg(ICON.pencil)}</button>
   <button class="mini ${isBlocked ? "" : "red"}"
           data-block="${escHtml(p.name)}"
           data-action="${isBlocked ? "unblock" : "block"}">${isBlocked ? "Restore" : "Block"}</button>
@@ -778,6 +891,11 @@ function auditPhrase(r){
     case "plate.unlock":   return `unlocked plate ${s}`;
     case "person.block":   return `blocked ${s} from editing`;
     case "person.unblock": return `restored edit access for ${s}`;
+    case "person.rename":  return `renamed a teammate to “${s}”`;
+    case "request.open":   return `requested the name “${s}”`;
+    case "request.cancel": return `withdrew a name-change request`;
+    case "request.approve":return `approved a name change to “${s}”`;
+    case "request.reject": return `rejected a name-change request`;
     case "board.reset":    return `reset the board`;
     case "audit.clear":    return `cleared the audit log`;
     case "board.wipe":     return `deleted all tasks and plates`;
@@ -1068,8 +1186,17 @@ function exportAuditCsv(){
 
   $("forceAssign").addEventListener("click", forceAssignPlate);
   $("admPeople").addEventListener("click", e => {
+    const rn = e.target.closest("[data-rename]");
+    if(rn) return renamePerson(rn.dataset.rename);
     const block = e.target.closest("[data-block]");
     if(block) return setBlocked(block.dataset.block, block.dataset.action === "block");
+  });
+
+  $("admApprovals").addEventListener("click", e => {
+    const ap = e.target.closest("[data-approve]");
+    if(ap) return approveRequest(ap.dataset.approve);
+    const rj = e.target.closest("[data-reject]");
+    if(rj) return rejectRequest(rj.dataset.reject);
   });
 
   $("adminRail").addEventListener("click", e => {

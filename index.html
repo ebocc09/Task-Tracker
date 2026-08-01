@@ -15,7 +15,7 @@
 <!-- ?v= is a cache-buster. GitHub Pages serves assets with a 10-minute max-age,
      so without it a browser keeps running old JS after a deploy while happily
      showing fresh HTML. Bump these on every release. -->
-<link rel="stylesheet" href="styles.css?v=13">
+<link rel="stylesheet" href="styles.css?v=14">
 </head>
 <body>
 
@@ -177,7 +177,18 @@
     <div class="field">
       <label for="userInput">Display name</label>
       <input class="inp" id="userInput" maxlength="40" placeholder="e.g. Marisol R." autocomplete="off" spellcheck="false">
-      <div class="hint">Attached to every action you take — task completions, plate checkouts, and the audit log. Stored in this browser only.</div>
+      <div class="hint" id="userHint">Attached to every action you take — task completions, plate checkouts, and the audit log. Choose carefully: once saved, your name is locked and only an admin can change it.</div>
+    </div>
+
+    <!-- Request a different name — shown only once a name is locked in. -->
+    <div id="reqBlock" hidden>
+      <div class="field">
+        <label for="reqNameInput">Request a different name</label>
+        <input class="inp" id="reqNameInput" maxlength="40" placeholder="Desired name" autocomplete="off" spellcheck="false">
+        <div class="hint">Your name is locked. Enter what you'd like instead and an admin will review it.</div>
+      </div>
+      <div class="reqPending" id="reqPending" hidden></div>
+      <button class="btn-block" id="reqChange">Request change</button>
     </div>
 
     <!-- Shown only when this device has no team code yet. -->
@@ -194,7 +205,7 @@
     <div class="err" id="userErr" hidden></div>
 
     <div class="row2">
-      <button class="btn-block" data-close="userModal">Cancel</button>
+      <button class="btn-block" id="userCancel" data-close="userModal">Cancel</button>
       <button class="btn-block solid" id="userSave">Save</button>
     </div>
   </div>
@@ -250,6 +261,11 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         People
         <span class="warn" id="peopleDot" hidden></span>
+      </button>
+      <button class="rail-item" data-sec="approvals">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Approvals
+        <span class="warn" id="apprDot" hidden></span>
       </button>
       <button class="rail-item" data-sec="audit">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
@@ -365,6 +381,17 @@
         </p>
       </section>
 
+      <!-- Approvals -->
+      <section class="sec" data-sec="approvals">
+        <h4 class="sec-h">Approvals <span class="count" id="apprCount">0</span></h4>
+        <p class="sec-p">
+          Name-change requests from the team. Names lock once set, so this is how
+          someone fixes a typo — or how you clean up a name that shouldn't be
+          there. Approving renames them everywhere, including past audit entries.
+        </p>
+        <div class="adm-list" id="admApprovals"></div>
+      </section>
+
       <!-- Audit -->
       <section class="sec" data-sec="audit">
         <h4 class="sec-h">Audit log <span class="count" id="auditCount">0</span></h4>
@@ -460,6 +487,9 @@
   </div>
   <h3 id="confirmTitle">Are you sure?</h3>
   <p class="confirm-t" id="confirmText"></p>
+  <div class="confirm-field" id="confirmField" hidden>
+    <input class="inp" id="confirmInput" maxlength="40" autocomplete="off" spellcheck="false">
+  </div>
   <div class="confirm-facts" id="confirmFacts" hidden></div>
   <div class="confirm-btns">
     <button class="btn-block" id="confirmNo">Cancel</button>
@@ -470,9 +500,9 @@
 <!-- Toasts -->
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="config.js?v=13"></script>
-<script src="sync.js?v=13"></script>
-<script src="app.js?v=13"></script>
-<script src="admin.js?v=13"></script>
+<script src="config.js?v=14"></script>
+<script src="sync.js?v=14"></script>
+<script src="app.js?v=14"></script>
+<script src="admin.js?v=14"></script>
 </body>
 </html>

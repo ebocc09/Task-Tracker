@@ -431,6 +431,12 @@ code{font-size:12px;font-weight:500;letter-spacing:.04em;font-variant-numeric:ta
   background:var(--paper);outline:none;transition:border-color .15s;
 }
 .inp:focus{border-color:var(--ink)}
+.inp.locked,.inp[readonly]{background:var(--paper-alt);color:var(--ink-mute);cursor:not-allowed}
+.reqPending{
+  margin:0 0 12px;padding:10px 13px;border-radius:var(--r-md);
+  background:var(--t-warm-bg);color:var(--t-warm-fg);
+  font-size:12px;line-height:1.45;
+}
 .inp.ta{height:auto;padding:11px 13px;resize:vertical;line-height:1.5}
 select.inp{cursor:pointer}
 .hint{margin-top:6px;font-size:11.5px;color:var(--ink-mute);line-height:1.45}
@@ -629,6 +635,7 @@ select.inp{cursor:pointer}
 .confirm-ic.calm{background:var(--paper-alt);color:var(--ink-mute)}
 .confirm h3{margin:0 0 7px;text-align:center;font-size:16px;font-weight:600;letter-spacing:-.01em}
 .confirm-t{margin:0;text-align:center;font-size:13px;color:var(--ink-mute);line-height:1.55}
+.confirm-field{margin:16px 0 0;text-align:left}
 .confirm-facts{margin:16px 0 0;border:1px solid var(--line-soft);border-radius:var(--r-md);overflow:hidden}
 .confirm-facts .cf{display:flex;justify-content:space-between;gap:12px;padding:9px 13px;font-size:12.5px}
 .confirm-facts .cf+.cf{border-top:1px solid var(--line-soft)}
