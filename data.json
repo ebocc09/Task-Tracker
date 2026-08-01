@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T21:39:11.158Z",
+  "updatedAt": "2026-08-01T21:39:12.489Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -157,6 +157,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msaw95ux1q",
+      "at": "2026-08-01T21:39:12.489Z",
+      "who": "Enzo",
+      "action": "schedule.set",
+      "subject": "",
+      "detail": "off"
+    },
     {
       "id": "a_msaw94ty1o",
       "at": "2026-08-01T21:39:11.158Z",
@@ -1083,7 +1091,7 @@
   "requests": [],
   "reopenRequests": [],
   "schedule": {
-    "enabled": true,
+    "enabled": false,
     "time": "16:40",
     "days": [
       5,
