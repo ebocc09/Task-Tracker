@@ -145,6 +145,122 @@ async function copyTeamCode(){
   }
 }
 
+/* Probe each layer separately. A 403 on write has four distinct causes and
+   the failing request alone can't distinguish them, so check identity, repo
+   visibility, read access, and write access as separate steps. */
+async function testConnection(){
+  const box = $("connDiag");
+  const btn = $("connTest");
+  const rows = [];
+
+  const ICONS = {
+    ok  : '<path d="M20 6 9 17l-5-5"/>',
+    bad : '<path d="M18 6 6 18M6 6l12 12"/>',
+    wait: '<circle cx="12" cy="12" r="9"/>'
+  };
+  const draw = () => {
+    box.hidden = false;
+    box.innerHTML = rows.map(r =>
+      `<div class="diag-row ${r.state}">${svg(ICONS[r.state], "diag-ic")}<span>${escHtml(r.text)}` +
+      `${r.fix ? `<span class="diag-fix">${r.fix}</span>` : ""}</span></div>`).join("");
+  };
+  const step = text => { const r = { state:"wait", text }; rows.push(r); draw(); return r; };
+
+  btn.disabled = true;
+  btn.textContent = "Testing…";
+  box.innerHTML = "";
+
+  // 1 — is the code itself accepted?
+  const s1 = step("Checking the code…");
+  let login = null;
+  try{
+    const u = await (await gh("https://api.github.com/user")).json();
+    login = u.login;
+    s1.state = "ok"; s1.text = `Code accepted — signed in as ${login}`;
+  }catch(e){
+    s1.state = "bad";
+    s1.text = "Code rejected by GitHub";
+    s1.fix  = "It may have expired or been copied incompletely. Generate a new one.";
+    draw(); btn.disabled = false; btn.textContent = "Test connection"; return;
+  }
+  draw();
+
+  // 2 — can the token see this specific repository?
+  const s2 = step("Looking for the repository…");
+  let repo = null;
+  try{
+    repo = await (await gh(`https://api.github.com/repos/${REPO.owner}/${REPO.name}`)).json();
+    s2.state = "ok";
+    s2.text  = `Repository found: ${repo.full_name} (${repo.private ? "private" : "public"})`;
+  }catch(e){
+    s2.state = "bad";
+    s2.text  = `Can't see ${REPO.owner}/${REPO.name}`;
+    s2.fix   = "On the token page, Repository access must be <strong>Only select repositories</strong> " +
+               "with this repo ticked. <strong>Public repositories (read-only)</strong> — often the default — cannot write.";
+    draw(); btn.disabled = false; btn.textContent = "Test connection"; return;
+  }
+  draw();
+
+  // 3 — does the ACCOUNT have push rights, separately from the token?
+  if(repo.permissions){
+    const s3 = step("Checking account access…");
+    if(repo.permissions.push){
+      s3.state = "ok"; s3.text = `${login} has write access to the repository`;
+    }else{
+      s3.state = "bad";
+      s3.text  = `${login} has no write access to this repository`;
+      s3.fix   = "Ask the repo owner to add you under Settings → Collaborators. " +
+                 "No token can grant more than the account behind it.";
+    }
+    draw();
+  }
+
+  // 4 — can it read the data file?
+  const s4 = step("Reading data.json…");
+  let sha = null;
+  try{
+    const r = await pull();
+    sha = r.sha;
+    s4.state = "ok"; s4.text = "data.json is readable";
+  }catch(e){
+    s4.state = "bad";
+    s4.text  = "Can't read data.json";
+    s4.fix   = escHtml(explainError(e, "read"));
+    draw(); btn.disabled = false; btn.textContent = "Test connection"; return;
+  }
+  draw();
+
+  // 5 — the real question. Rewriting the file byte-for-byte proves write
+  //     access without altering anything; it does create one commit.
+  const s5 = step("Testing write access…");
+  try{
+    const fresh = await pull();
+    await putFile(fresh.data, fresh.sha, `Connection test — ${me() || "unknown"}`);
+    state.lastError = null;
+    s5.state = "ok";
+    s5.text  = "Write access confirmed — you can change the board";
+    s5.fix   = "This left one no-op commit in the repository history.";
+    await refresh({ quiet:true });
+  }catch(e){
+    s5.state = "bad";
+    if(e.status === 403){
+      s5.text = "Write refused";
+      s5.fix  = `GitHub said: “${escHtml(e.message || "no detail")}”.<br>` +
+                "On the token page, under <strong>Permissions → Repository permissions</strong>, " +
+                "set <strong>Contents</strong> to <strong>Read and write</strong>. " +
+                "Read-only is the default and is not enough.";
+    }else{
+      s5.text = "Write failed";
+      s5.fix  = escHtml(explainError(e, "write"));
+    }
+  }
+  draw();
+
+  btn.disabled = false;
+  btn.textContent = "Test connection";
+  renderChrome();
+}
+
 async function disconnectConnection(){
   const ok = await askConfirm({
     title: "Remove the team code from this device?",
@@ -600,6 +716,7 @@ function exportAuditCsv(){
   $("connSave").addEventListener("click", saveConnection);
   $("connInput").addEventListener("keydown", e => { if(e.key === "Enter") saveConnection(); });
   $("connCopy").addEventListener("click", copyTeamCode);
+  $("connTest").addEventListener("click", testConnection);
   $("connReveal").addEventListener("click", () => { codeRevealed = !codeRevealed; renderConnection(); });
   $("connDisconnect").addEventListener("click", disconnectConnection);
 

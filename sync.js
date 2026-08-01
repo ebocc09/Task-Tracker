@@ -364,7 +364,14 @@ function explainError(err, verb){
   if(s === 0)   return "Couldn't reach api.github.com. Check your connection — or whether a network policy is blocking it.";
   if(s === 408) return "api.github.com didn't respond. On a managed network it may be blocked by a proxy or firewall.";
   if(s === 401) return "Your token was rejected. Click the status chip in the top bar to reconnect.";
-  if(s === 403) return "That token can't write to this repo. It needs Contents: Read and write.";
+  if(s === 403){
+    const m = (err && err.message) || "";
+    if(/rate limit/i.test(m)) return "GitHub rate limit reached. Wait a few minutes and try again.";
+    // Pass GitHub's own wording through — it is usually more specific than
+    // anything we could guess, and Admin → Connection can test each cause.
+    return `GitHub refused that write: “${m}”. The team code needs Contents: ` +
+           `Read and write on this repository. Run Admin → Connection → Test connection to find which step fails.`;
+  }
   if(s === 404){
     // 404 here is ambiguous on purpose from GitHub's side: a private repo looks
     // exactly like a missing one to an anonymous reader. Name both.

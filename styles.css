@@ -523,6 +523,19 @@ select.inp{cursor:pointer}
 .code-row .inp{flex:2 1 0;min-width:0;font-variant-numeric:tabular-nums;letter-spacing:.04em}
 .code-row .btn-block{flex:0 0 auto;width:auto;padding:0 18px;margin-bottom:0}
 
+/* Connection diagnostic */
+.diag{
+  margin:0 0 9px;border:1px solid var(--line-soft);border-radius:var(--r-md);overflow:hidden;
+}
+.diag-row{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;font-size:12.5px;line-height:1.45}
+.diag-row+.diag-row{border-top:1px solid var(--line-soft)}
+.diag-ic{width:16px;height:16px;flex:none;margin-top:1px}
+.diag-row.ok   .diag-ic{color:var(--t-good-fg)}
+.diag-row.bad  .diag-ic{color:var(--red)}
+.diag-row.wait .diag-ic{color:var(--ink-mute);animation:blink 1.2s ease-in-out infinite}
+.diag-row.bad{background:var(--t-bad-bg);color:var(--t-bad-fg)}
+.diag-fix{display:block;margin-top:4px;font-size:11.5px;opacity:.9}
+
 /* Admin lists */
 .adm-list{display:flex;flex-direction:column;gap:8px}
 .adm-row{
