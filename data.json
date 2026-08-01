@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T03:35:33.425Z",
+  "updatedAt": "2026-08-01T03:35:41.787Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -16,10 +16,25 @@
       "note": "",
       "checkedOutBy": null,
       "checkedOutAt": null
+    },
+    {
+      "id": "p_ms9tjr52g",
+      "label": "6UE-688",
+      "note": "",
+      "checkedOutBy": null,
+      "checkedOutAt": null
     }
   ],
   "tasks": [],
   "audit": [
+    {
+      "id": "a_ms9tjra3i",
+      "at": "2026-08-01T03:35:41.787Z",
+      "who": "Enzo",
+      "action": "plate.add",
+      "subject": "6UE-688",
+      "detail": ""
+    },
     {
       "id": "a_ms9tjkttf",
       "at": "2026-08-01T03:35:33.425Z",
