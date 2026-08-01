@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T21:38:20.837Z",
+  "updatedAt": "2026-08-01T21:38:21.672Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -157,6 +157,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msaw82nbi",
+      "at": "2026-08-01T21:38:21.671Z",
+      "who": "Enzo",
+      "action": "schedule.set",
+      "subject": "",
+      "detail": "16:41 TWTFS America/Chicago"
+    },
     {
       "id": "a_msaw8205g",
       "at": "2026-08-01T21:38:20.837Z",
@@ -927,7 +935,6 @@
     "enabled": true,
     "time": "16:41",
     "days": [
-      1,
       2,
       3,
       4,
