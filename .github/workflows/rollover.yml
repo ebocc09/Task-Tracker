@@ -12,16 +12,14 @@ name: Daily rollover
 # a couple of times first; the cron line goes in once it's proven.
 
 on:
-  # ── Uncomment to go live ──────────────────────────────────────────────────
-  # Run it by hand from the Actions tab a couple of times first. Once that
-  # looks right, uncomment these two lines and push.
-  #
   # Twice an hour, deliberately off the hour: GitHub's queue peaks at :00 and
   # delayed runs are commonest there. Each tick just asks "is anything due?"
-  # and almost always answers no, which costs one API call.
+  # and almost always answers no, which costs one API call and no commit.
   #
-  # schedule:
-  #   - cron: "13,43 * * * *"
+  # This is only a heartbeat. The actual time, days and timezone live in
+  # data.json and are edited in Quick add — see the README.
+  schedule:
+    - cron: "13,43 * * * *"
 
   workflow_dispatch:
     inputs:
