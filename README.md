@@ -169,6 +169,33 @@ audit log tells an admin the story, not to gate the change.
 Click anywhere outside, or press `Esc`, to collapse. **Reopen** is different: it
 sends a request to an admin for approval rather than changing the task itself.
 
+### Staged tasks
+
+A task can optionally be broken into ordered **stages** — add them when you create
+the task (Admin → Tasks → **Add stage**). Leave it empty and the task behaves
+exactly like any other.
+
+On a staged task the card shows one bubble per stage, and **Complete** advances one
+stage at a time rather than finishing the whole thing:
+
+```
+  ●──●──○   Stage 3 of 3
+  ▲  ▲  ▲
+  │  │  └── not started
+  │  └───── done
+  └──────── done
+```
+
+- While stages remain, the task stays in the **Pending** bucket — but the pill reads
+  *Stage 2 of 3* rather than *Pending*, so the board still tells you where it is.
+- The final stage completing is the task completing.
+- **Partial** and **Could not complete** apply to the *current stage* and stop the
+  task there. Finished stages are kept, and the audit log records which stage it
+  stalled on.
+- **Reopen** starts the whole task over from stage 1.
+- Saving a staged task to **Quick add** keeps its stages, so you can re-add the
+  whole sequence in one click.
+
 **Progress bar** — the share of tasks that are no longer Pending. Turns green at
 100%.
 
@@ -266,7 +293,8 @@ on `file://`, and double-clicking `index.html` should work.
       "createdBy": "Danny", "createdAt": "2026-07-30T15:00:00Z",
       "status": "complete",        // pending | complete | partial | blocked
       "statusBy": "Marisol", "statusAt": "2026-07-31T19:40:00Z",
-      "statusNote": null }
+      "statusNote": null,
+      "stages": [] }               // empty = an ordinary one-step task
   ],
   "audit": [
     { "id": "a_b3", "at": "2026-07-31T19:40:00Z", "who": "Marisol",

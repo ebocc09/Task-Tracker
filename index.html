@@ -15,7 +15,7 @@
 <!-- ?v= is a cache-buster. GitHub Pages serves assets with a 10-minute max-age,
      so without it a browser keeps running old JS after a deploy while happily
      showing fresh HTML. Bump these on every release. -->
-<link rel="stylesheet" href="styles.css?v=16">
+<link rel="stylesheet" href="styles.css?v=17">
 </head>
 <body>
 
@@ -297,6 +297,14 @@
           <label for="taskDesc">Description <span class="opt">optional</span></label>
           <textarea class="inp ta" id="taskDesc" maxlength="400" rows="3" placeholder="What does done look like?"></textarea>
         </div>
+
+        <div class="field">
+          <label>Stages <span class="opt">optional</span></label>
+          <div id="stageList"></div>
+          <button class="btn-block" id="stageAdd">Add stage</button>
+          <div class="hint">Break a task into steps the team completes in order. Leave empty for a normal one-step task.</div>
+        </div>
+
         <div class="row2">
           <button class="btn-block solid" id="taskAdd">Submit task</button>
           <button class="btn-block" id="taskSave">Save task</button>
@@ -500,9 +508,9 @@
 <!-- Toasts -->
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="config.js?v=16"></script>
-<script src="sync.js?v=16"></script>
-<script src="app.js?v=16"></script>
-<script src="admin.js?v=16"></script>
+<script src="config.js?v=17"></script>
+<script src="sync.js?v=17"></script>
+<script src="app.js?v=17"></script>
+<script src="admin.js?v=17"></script>
 </body>
 </html>

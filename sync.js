@@ -60,7 +60,12 @@ function normalize(raw){
   board.templates = Array.isArray(d.templates) ? d.templates.filter(t => t && t.id && t.title).map(t => ({
     id         : String(t.id),
     title      : String(t.title),
-    description: t.description ? String(t.description) : ""
+    description: t.description ? String(t.description) : "",
+    // Blueprint only — no status/by/at. taskFromTemplate mints those fresh.
+    stages     : Array.isArray(t.stages) ? t.stages.filter(s => s && s.title).map(s => ({
+      title      : String(s.title),
+      description: s.description ? String(s.description) : ""
+    })) : []
   })) : [];
 
   // Rename breadcrumbs. A browser can't reach into another's localStorage, so
@@ -94,6 +99,24 @@ function normalize(raw){
   })) : [];
 
   const OK = ["pending","complete","partial","blocked"];
+
+  /* A task is optionally broken into ordered stages. An empty array means an
+     ordinary single-step task, which is what every task created before this
+     existed normalizes to — so old data needs no migration. */
+  const stagesOf = t => Array.isArray(t.stages) ? t.stages.filter(s => s && s.title).map((s, i) => ({
+    /* Derived from position rather than uid() so a hand-edited file without
+       stage ids normalizes to the *same* ids every read. A random id here would
+       differ between the optimistic apply and the replay, and the stage-advance
+       guard — which matches on id — would reject its own retry. */
+    id         : s.id ? String(s.id) : `${t.id}_s${i}`,
+    title      : String(s.title),
+    description: s.description ? String(s.description) : "",
+    status     : OK.includes(s.status) ? s.status : "pending",
+    by         : s.by ? String(s.by) : null,
+    at         : s.at ? String(s.at) : null,
+    note       : s.note ? String(s.note) : null
+  })) : [];
+
   board.tasks = Array.isArray(d.tasks) ? d.tasks.filter(t => t && t.id && t.title).map(t => ({
     id         : String(t.id),
     title      : String(t.title),
@@ -103,7 +126,8 @@ function normalize(raw){
     status     : OK.includes(t.status) ? t.status : "pending",
     statusBy   : t.statusBy ? String(t.statusBy) : null,
     statusAt   : t.statusAt ? String(t.statusAt) : null,
-    statusNote : t.statusNote ? String(t.statusNote) : null
+    statusNote : t.statusNote ? String(t.statusNote) : null,
+    stages     : stagesOf(t)
   })) : [];
 
   board.audit = Array.isArray(d.audit) ? d.audit.filter(a => a && a.action).slice(0, AUDIT_CAP).map(a => ({

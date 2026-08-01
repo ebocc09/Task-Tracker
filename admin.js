@@ -139,10 +139,20 @@ function renderAdmin(){
    a breadcrumb so the affected browser updates itself (see applyIdentityRenames
    in sync.js). Shared by the People pencil and by approving a request. Runs
    inside a commit mutator, so it must be a pure function of `data`. */
+/* Reopen and Reset both put a staged task back to stage 1 rather than to
+   wherever it stopped — both mean "start this over", so finished stages are
+   cleared along with everything else. */
+const resetStages = t => (t.stages || []).forEach(s => {
+  s.status = "pending"; s.by = null; s.at = null; s.note = null;
+});
+
 function applyRename(data, oldName, newName){
   (data.tasks || []).forEach(t => {
     if(t.statusBy  === oldName) t.statusBy  = newName;
     if(t.createdBy === oldName) t.createdBy = newName;
+    // Per-stage attribution counts as history too — the whole point of a
+    // rename is that the old name survives nowhere.
+    (t.stages || []).forEach(s => { if(s.by === oldName) s.by = newName; });
   });
   (data.plates || []).forEach(p => {
     if(p.checkedOutBy === oldName) p.checkedOutBy = newName;
@@ -239,6 +249,7 @@ async function approveReopen(id){
     const task = data.tasks.find(t => t.id === req.taskId);
     if(!task) return null;                  // task deleted meanwhile — just drop the request
     task.status = "pending"; task.statusBy = null; task.statusAt = null; task.statusNote = null;
+    resetStages(task);
     return { action:"reopen.approve", subject: task.title, detail: req.reason };
   });
   render();
@@ -320,21 +331,72 @@ function renderQuickAdd(){
     return;
   }
 
-  box.innerHTML = tpls.map(tp => `
+  box.innerHTML = tpls.map(tp => {
+    const n = (tp.stages || []).length;
+    return `
 <div class="adm-row">
   <div class="am">
     <div class="adm-t">${escHtml(tp.title)}</div>
     <div class="adm-s">${tp.description ? escHtml(tp.description) : "No description"}</div>
   </div>
+  ${n ? `<span class="pill info">${n} stages</span>` : ""}
   <button class="mini" data-qaadd="${tp.id}">Add to board</button>
   <button class="mini red" data-qadel="${tp.id}">Delete</button>
+</div>`;
+  }).join("");
+}
+
+/* ── stage rows in the Add-a-task form ──
+   These are pure DOM until Submit or Save reads them. There's nothing to put
+   on the board until the task itself is created, so nothing to sync and no
+   state to keep anywhere else. Rows are re-rendered from their own current
+   values on every add/remove, which is what keeps typed text from being lost. */
+function readStageRows(){
+  return [...document.querySelectorAll("#stageList .stage-row")].map(row => ({
+    title      : row.querySelector(".stage-row-t").value.trim(),
+    description: row.querySelector(".stage-row-d").value.trim()
+  }));
+}
+
+/* An admin who adds a row and changes their mind shouldn't get a blank stage
+   on the board, so untitled rows are dropped rather than rejected. */
+const stagesToSave = () => readStageRows().filter(s => s.title);
+
+function renderStageRows(rows){
+  $("stageList").innerHTML = rows.map((s, i) => `
+<div class="stage-row">
+  <div class="stage-row-h">
+    <span class="stage-row-n">Stage ${i + 1}</span>
+    <button class="mini red" data-stagedel="${i}">Remove</button>
+  </div>
+  <input class="inp stage-row-t" maxlength="90" autocomplete="off"
+         placeholder="e.g. Photograph every plate" value="${escHtml(s.title)}">
+  <textarea class="inp ta stage-row-d" maxlength="400" rows="2"
+            placeholder="What does this stage involve? (optional)">${escHtml(s.description)}</textarea>
 </div>`).join("");
 }
+
+function addStageRow(){
+  const rows = readStageRows();
+  rows.push({ title:"", description:"" });
+  renderStageRows(rows);
+  const inputs = document.querySelectorAll("#stageList .stage-row-t");
+  if(inputs.length) inputs[inputs.length - 1].focus();
+}
+
+function removeStageRow(i){
+  const rows = readStageRows();
+  rows.splice(i, 1);
+  renderStageRows(rows);
+}
+
+const clearStageRows = () => renderStageRows([]);
 
 async function saveTaskTemplate(){
   const titleEl = $("taskTitle"), descEl = $("taskDesc");
   const title = titleEl.value.trim();
   const desc  = descEl.value.trim();
+  const stages = stagesToSave();
 
   if(!title){ toast("Give the task a title to save it.", "bad"); titleEl.focus(); return; }
   if((state.data.templates || []).some(t => t.title.toLowerCase() === title.toLowerCase())){
@@ -345,25 +407,32 @@ async function saveTaskTemplate(){
   const id = uid("q");
   const ok = await commit(`Save task template "${title}"`, data => {
     data.templates = data.templates || [];
-    data.templates.push({ id, title, description: desc });
+    data.templates.push({ id, title, description: desc, stages });
     return { action:"template.save", subject: title };
   });
 
   if(ok){
     // Clear like Submit does, so building a library is a fast type-Save-repeat.
     titleEl.value = ""; descEl.value = "";
+    clearStageRows();
     titleEl.focus();
     flash("Saved to Quick add");
     renderAdmin();
   }
 }
 
-/* Build a fresh board task from a stored template. */
+/* Build a fresh board task from a stored template. The template holds only the
+   blueprint — titles and descriptions — so every stage starts pending with a
+   new id and no attribution. */
 function taskFromTemplate(tp){
   return {
     id: uid("t"), title: tp.title, description: tp.description,
     createdBy: me(), createdAt: nowIso(),
-    status: "pending", statusBy: null, statusAt: null, statusNote: null
+    status: "pending", statusBy: null, statusAt: null, statusNote: null,
+    stages: (tp.stages || []).map(s => ({
+      id: uid("s"), title: s.title, description: s.description || "",
+      status: "pending", by: null, at: null, note: null
+    }))
   };
 }
 
@@ -843,8 +912,11 @@ function renderAdminTasks(){
 
   box.innerHTML = tasks.map((t, i) => {
     const st = STATUS[t.status];
+    // Mirror the board: a staged task in flight says where it is, not "Pending".
+    const staged = hasStages(t);
+    const label  = staged && t.status === "pending" ? stageLabel(t) : st.label;
     const sub = t.statusBy
-      ? `${st.label} · ${escHtml(t.statusBy)} · ${escHtml(relTime(t.statusAt))}`
+      ? `${label} · ${escHtml(t.statusBy)} · ${escHtml(relTime(t.statusAt))}`
       : (t.description ? escHtml(t.description) : "No description");
     return `
 <div class="adm-row">
@@ -856,7 +928,7 @@ function renderAdminTasks(){
     <div class="adm-t">${escHtml(t.title)}</div>
     <div class="adm-s">${sub}</div>
   </div>
-  <span class="pill ${st.pill}">${escHtml(st.label)}</span>
+  <span class="pill ${staged && t.status === "pending" ? "info" : st.pill}">${escHtml(label)}</span>
   <button class="mini red" data-deltask="${t.id}">Delete</button>
 </div>`;
   }).join("");
@@ -936,6 +1008,9 @@ function auditPhrase(r){
   const s = r.subject;
   switch(r.action){
     case "task.complete":  return `completed “${s}”`;
+    // A stage landing that didn't finish the whole task. The stage number is
+    // carried in the subject, so this reads "completed X · stage 2 of 3".
+    case "task.stage":     return `completed “${s}”`;
     case "task.partial":   return `partially completed “${s}”`;
     case "task.blocked":   return `could not complete “${s}”`;
     case "task.pending":   return `reopened “${s}”`;
@@ -975,6 +1050,7 @@ async function addTask(){
   const titleEl = $("taskTitle"), descEl = $("taskDesc");
   const title = titleEl.value.trim();
   const desc  = descEl.value.trim();
+  const stages = stagesToSave();
 
   if(!title){ toast("Give the task a title.", "bad"); titleEl.focus(); return; }
   if(state.data.tasks.some(t => t.title.toLowerCase() === title.toLowerCase())){
@@ -991,15 +1067,24 @@ async function addTask(){
     data.tasks.push({
       id, title, description: desc,
       createdBy: me(), createdAt: nowIso(),
-      status: "pending", statusBy: null, statusAt: null, statusNote: null
+      status: "pending", statusBy: null, statusAt: null, statusNote: null,
+      stages: stages.map(s => ({
+        id: uid("s"), title: s.title, description: s.description,
+        status: "pending", by: null, at: null, note: null
+      }))
     });
-    return { action:"task.add", subject: title };
+    return {
+      action : "task.add",
+      subject: title,
+      detail : stages.length ? `${stages.length} stages` : ""
+    };
   });
 
   if(ok){
     titleEl.value = ""; descEl.value = "";
+    clearStageRows();
     titleEl.focus();
-    flash("Task added");
+    flash(stages.length ? `Task added with ${stages.length} stages` : "Task added");
     renderAdmin();
   }
 }
@@ -1140,8 +1225,9 @@ async function resetBoard(){
   const ok = await commit("Reset board", data => {
     let cleared = 0, released = 0;
     data.tasks.forEach(t => {
-      if(t.status !== "pending") cleared++;
+      if(t.status !== "pending" || (t.stages || []).some(s => s.status !== "pending")) cleared++;
       t.status = "pending"; t.statusBy = null; t.statusAt = null; t.statusNote = null;
+      resetStages(t);
     });
     data.plates.forEach(p => {
       if(p.checkedOutBy) released++;
@@ -1276,6 +1362,19 @@ function exportAuditCsv(){
   $("taskAdd").addEventListener("click", addTask);
   $("taskSave").addEventListener("click", saveTaskTemplate);
   $("taskTitle").addEventListener("keydown", e => { if(e.key === "Enter") addTask(); });
+
+  $("stageAdd").addEventListener("click", addStageRow);
+  $("stageList").addEventListener("click", e => {
+    const del = e.target.closest("[data-stagedel]");
+    if(del) removeStageRow(Number(del.dataset.stagedel));
+  });
+  // Enter in a stage title adds the next stage rather than submitting the task.
+  $("stageList").addEventListener("keydown", e => {
+    if(e.key === "Enter" && e.target.classList.contains("stage-row-t")){
+      e.preventDefault();
+      addStageRow();
+    }
+  });
 
   $("qaAddAll").addEventListener("click", addAllTemplates);
   $("admQuick").addEventListener("click", e => {

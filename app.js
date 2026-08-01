@@ -174,6 +174,35 @@ const counts = () => {
 
 const doneCount = () => state.data.tasks.filter(t => t.status !== "pending").length;
 
+/* ── stages ──
+   A staged task carries an ordered list of steps. The "current" stage is the
+   first one that isn't complete, derived rather than stored: a stored cursor
+   could drift out of step with the stage statuses under concurrent edits, a
+   derived one can't. A stage left partial or blocked stays current, which is
+   exactly the halt we want — the task stops there until it's reopened. */
+const hasStages = t => Array.isArray(t.stages) && t.stages.length > 0;
+
+const currentStageIndex = t => {
+  const i = t.stages.findIndex(s => s.status !== "complete");
+  return i === -1 ? t.stages.length : i;      // === length once every stage is done
+};
+
+const currentStage = t => t.stages[currentStageIndex(t)] || null;
+
+// "Stage 2 of 3" — clamped so a finished task doesn't read "Stage 4 of 3".
+const stageLabel = t =>
+  `Stage ${Math.min(currentStageIndex(t) + 1, t.stages.length)} of ${t.stages.length}`;
+
+/* Where a task's status lands once its stages say so. Stage state is the
+   source of truth; the task-level status is kept in step with it so that
+   counts(), the filter, the hero bar and the admin list all keep working
+   unchanged off t.status alone. */
+function statusFromStages(stages){
+  const halted = stages.find(s => s.status === "partial" || s.status === "blocked");
+  if(halted) return halted.status;
+  return stages.every(s => s.status === "complete") ? "complete" : "pending";
+}
+
 function myPlate(){
   const n = me();
   if(!n) return null;
@@ -312,11 +341,17 @@ function renderList(){
 }
 
 function taskCard(t, readOnly){
-  const st   = STATUS[t.status];
-  const open = state.openTaskId === t.id;
+  const st     = STATUS[t.status];
+  const open   = state.openTaskId === t.id;
+  const staged = hasStages(t);
+
+  /* A staged task in flight is still "pending" as far as the stat strip and
+     the board bar are concerned — but "Pending" tells the team nothing useful
+     when two of three stages are done, so the card says where it actually is. */
+  const headline = staged && t.status === "pending" ? stageLabel(t) : st.label;
 
   const meta = t.statusBy
-    ? `${st.label} · ${escHtml(t.statusBy)} · <span title="${escHtml(fullTime(t.statusAt))}">${escHtml(relTime(t.statusAt))}</span>`
+    ? `${headline} · ${escHtml(t.statusBy)} · <span title="${escHtml(fullTime(t.statusAt))}">${escHtml(relTime(t.statusAt))}</span>`
     : `Added by ${escHtml(t.createdBy || "—")} · <span title="${escHtml(fullTime(t.createdAt))}">${escHtml(relTime(t.createdAt))}</span>`;
 
   const noteBlock = t.statusNote
@@ -328,14 +363,22 @@ function taskCard(t, readOnly){
       ? `<button class="act ghost" disabled>${svg(ICON.undo)}Reopen requested</button>`
       : `<button class="act ghost" data-act="reopen" data-id="${t.id}">${svg(ICON.undo)}Reopen</button>`;
 
+  /* On a staged task the buttons act on the current stage, not the whole task,
+     so say so — "Complete" on a 3-stage task would read as "finish all of it". */
+  const done      = staged && currentStageIndex(t) >= t.stages.length;
+  const doneLabel = staged && !done ? `Complete stage ${currentStageIndex(t) + 1}` : "Complete";
+
   const actions = readOnly
     ? `<div class="dw-meta">Connect a token to change this task.</div>`
     : `<div class="acts">
-         <button class="act good ${t.status === "complete" ? "on" : ""}" data-act="complete" data-id="${t.id}">
-           ${svg(ICON.check)}Complete</button>
-         <button class="act warm ${t.status === "partial" ? "on" : ""}" data-act="partial" data-id="${t.id}">
+         <button class="act good ${t.status === "complete" ? "on" : ""}" data-act="complete" data-id="${t.id}"
+                 ${done ? "disabled" : ""}>
+           ${svg(ICON.check)}${escHtml(doneLabel)}</button>
+         <button class="act warm ${t.status === "partial" ? "on" : ""}" data-act="partial" data-id="${t.id}"
+                 ${done ? "disabled" : ""}>
            ${svg(ICON.half)}Partial</button>
-         <button class="act bad ${t.status === "blocked" ? "on" : ""}" data-act="blocked" data-id="${t.id}">
+         <button class="act bad ${t.status === "blocked" ? "on" : ""}" data-act="blocked" data-id="${t.id}"
+                 ${done ? "disabled" : ""}>
            ${svg(ICON.slash)}Could not complete</button>
          ${reopenBtn}
        </div>`;
@@ -347,19 +390,55 @@ function taskCard(t, readOnly){
     <span class="task-main">
       <span class="task-title">${escHtml(t.title)}</span>
       ${t.description ? `<span class="task-desc">${escHtml(t.description)}</span>` : ""}
+      ${staged ? stageBubbles(t) : ""}
     </span>
     <span class="task-right">
-      <span class="pill ${st.pill}">${escHtml(st.label)}</span>
+      <span class="pill ${staged && t.status === "pending" ? "info" : st.pill}">${escHtml(headline)}</span>
       ${svg(ICON.down, "task-chev")}
     </span>
   </button>
   <div class="task-drawer"><div class="dw"><div class="dw-inner">
     ${t.description ? `<p class="dw-desc">${escHtml(t.description)}</p>` : ""}
+    ${staged ? stageList(t) : ""}
     ${actions}
-    ${noteBlock}
+    ${staged ? "" : noteBlock}
     <div class="dw-meta">${meta}</div>
   </div></div></div>
 </article>`;
+}
+
+/* Collapsed-card progress: one dot per stage, filled as they land. These live
+   inside .task-head, which is a <button>, so they must stay plain spans — no
+   nested interactive elements. .task-by is an existing styled slot in exactly
+   the right place. */
+function stageBubbles(t){
+  const cur = currentStageIndex(t);
+  return `
+<span class="task-by stage-track" role="img" aria-label="${escHtml(stageLabel(t))}">
+  ${t.stages.map((s, i) =>
+    `<span class="stage-dot s-${s.status}${i === cur ? " now" : ""}"></span>`
+  ).join('<span class="stage-link"></span>')}
+  <span class="stage-count">${escHtml(stageLabel(t))}</span>
+</span>`;
+}
+
+/* The same progress spelled out in the drawer, where there's room for each
+   stage's title, its note, and who finished it. */
+function stageList(t){
+  const cur = currentStageIndex(t);
+  return `
+<ol class="stages">
+  ${t.stages.map((s, i) => `
+  <li class="stage s-${s.status}${i === cur ? " now" : ""}">
+    <span class="stage-mark">${svg(ICON[s.status])}</span>
+    <span class="stage-body">
+      <span class="stage-title">${escHtml(s.title)}</span>
+      ${s.description ? `<span class="stage-desc">${escHtml(s.description)}</span>` : ""}
+      ${s.note ? `<span class="stage-note">${escHtml(s.note)}</span>` : ""}
+      ${s.by ? `<span class="stage-who">${escHtml(STATUS[s.status].label)} · ${escHtml(s.by)} · <span title="${escHtml(fullTime(s.at))}">${escHtml(relTime(s.at))}</span></span>` : ""}
+    </span>
+  </li>`).join("")}
+</ol>`;
 }
 
 /* ───────────────────────────── plate menu ──────────────────────────────── */
@@ -419,6 +498,7 @@ function closePlateMenu(){
 function setTaskStatus(taskId, status, note){
   const task = state.data.tasks.find(t => t.id === taskId);
   if(!task) return;
+  if(hasStages(task)) return setStageStatus(taskId, status, note);
   const title = task.title;
 
   return commit(`${STATUS[status].label} "${title}"`, data => {
@@ -431,6 +511,53 @@ function setTaskStatus(taskId, status, note){
     return {
       action : "task." + status,
       subject: t.title,
+      detail : note || ""
+    };
+  });
+}
+
+/* The staged equivalent. Complete advances one stage at a time and only flips
+   the whole task once the last one lands; Partial and Could-not-complete halt
+   the task at whichever stage it reached, keeping the ones already done. */
+function setStageStatus(taskId, status, note){
+  const task  = state.data.tasks.find(t => t.id === taskId);
+  const stage = currentStage(task);
+  if(!stage) return;                       // already finished — nothing current
+  const n     = currentStageIndex(task) + 1;
+  const label = status === "complete" && n === task.stages.length
+    ? `Complete "${task.title}"`
+    : `${STATUS[status].label} stage ${n} of "${task.title}"`;
+
+  return commit(label, data => {
+    const t = data.tasks.find(x => x.id === taskId);
+    if(!t) throw new Error("That task was deleted by someone else.");
+
+    /* Re-find by id rather than by position. The mutator runs again on freshly
+       pulled data for every replay attempt, and someone else may have advanced
+       this task in between — in which case our stage is already done and the
+       right move is to abort rather than silently skip ahead. */
+    const s = (t.stages || []).find(x => x.id === stage.id);
+    if(!s) throw new Error("That stage no longer exists.");
+    if(s.status === "complete") throw new Error("Someone already completed that stage.");
+
+    s.status = status;
+    s.by     = me();
+    s.at     = nowIso();
+    s.note   = note || null;
+
+    const idx  = t.stages.indexOf(s) + 1;
+    const of   = t.stages.length;
+    const next = statusFromStages(t.stages);
+    t.status     = next;
+    t.statusBy   = me();
+    t.statusAt   = nowIso();
+    t.statusNote = next === "pending" ? null : (note || null);
+
+    // The final stage completing is the task completing — log it as such.
+    const done = next === "complete";
+    return {
+      action : done ? "task.complete" : (status === "complete" ? "task.stage" : "task." + status),
+      subject: done ? t.title : `${t.title} · stage ${idx} of ${of}`,
       detail : note || ""
     };
   });
@@ -459,9 +586,18 @@ async function markWithNote(taskId, status){
   if(!task) return;
   const p = NOTE_PROMPT[status];
 
+  /* On a staged task this halts one stage, so ask about that stage by name —
+     asking "how much of Plate Audit was completed?" when the team is three
+     stages in would be asking the wrong question. */
+  const staged = hasStages(task);
+  const stage  = staged ? currentStage(task) : null;
+  if(staged && !stage) return;
+  const subject = stage ? stage.title : task.title;
+  const where   = stage ? ` (${stageLabel(task).toLowerCase()} of “${task.title}”)` : "";
+
   const answer = await askConfirm({
-    title: p.title,
-    text : `${p.ask(task.title)} A note is required — it goes in the audit log.`,
+    title: staged ? `${p.title} — ${stageLabel(task)}` : p.title,
+    text : `${p.ask(subject)}${where} A note is required — it goes in the audit log.`,
     input: { value: "", placeholder: p.ph, maxlength: 200, required: true },
     yes  : p.yes
   });
