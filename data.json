@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T21:39:12.489Z",
+  "updatedAt": "2026-08-01T21:39:13.987Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -157,6 +157,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msaw970j1t",
+      "at": "2026-08-01T21:39:13.987Z",
+      "who": "Enzo",
+      "action": "schedule.set",
+      "subject": "",
+      "detail": "16:40 FS America/Chicago"
+    },
     {
       "id": "a_msaw95ux1q",
       "at": "2026-08-01T21:39:12.489Z",
@@ -1091,7 +1099,7 @@
   "requests": [],
   "reopenRequests": [],
   "schedule": {
-    "enabled": false,
+    "enabled": true,
     "time": "16:40",
     "days": [
       5,
