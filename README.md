@@ -196,8 +196,10 @@ stage at a time rather than finishing the whole thing:
 - Saving a staged task to **Quick add** keeps its stages, so you can re-add the
   whole sequence in one click.
 
-**Progress bar** — the share of tasks that are no longer Pending. Turns green at
-100%.
+**Progress bar** — how much of the board is done, in task-equivalents. A plain
+task counts once it's addressed; a staged one earns partial credit as its stages
+land, so finishing 2 of 3 moves the bar by two thirds of a task. Turns green when
+every task is addressed.
 
 **Stat strip** — click any cell to filter the board. Click again to clear.
 

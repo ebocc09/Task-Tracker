@@ -345,20 +345,25 @@ code{font-size:12px;font-weight:500;letter-spacing:.04em;font-variant-numeric:ta
    Progress bubbles on the collapsed card, and the spelled-out list in the
    drawer. State is carried by fill and colour, never by motion alone — the
    reduced-motion query at the bottom of this file kills every transition. */
-.stage-track{gap:0}
+.stage-track{gap:0;margin-top:7px}
 .stage-dot{
-  width:8px;height:8px;border-radius:50%;flex:none;
-  background:var(--paper);border:1.5px solid var(--line);
-  transition:background .25s,border-color .25s;
+  width:13px;height:13px;border-radius:50%;flex:none;
+  background:var(--paper);border:2px solid var(--line);
+  transition:background .3s var(--e-move),border-color .3s var(--e-move);
 }
-.stage-link{width:14px;height:2px;flex:none;background:var(--line-soft)}
+.stage-link{
+  width:22px;height:3px;flex:none;border-radius:2px;background:var(--line-soft);
+  transition:background .3s var(--e-move);
+}
+.stage-link.done{background:var(--green)}
 .stage-dot.s-complete{background:var(--green);border-color:var(--green)}
 .stage-dot.s-partial {background:var(--amber);border-color:var(--amber)}
 .stage-dot.s-blocked {background:var(--red);border-color:var(--red)}
 /* The stage the team is on: ink ring, hollow centre — reads as "you are here". */
-.stage-dot.now:not(.s-complete){border-color:var(--ink);border-width:2px}
+.stage-dot.now:not(.s-complete){border-color:var(--ink);border-width:3px}
 .stage-count{
-  margin-left:9px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  margin-left:11px;font-size:11px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;
   color:var(--ink-mute);font-variant-numeric:tabular-nums;
 }
 
@@ -885,8 +890,8 @@ select.inp{cursor:pointer}
   .act{justify-content:center}
 
   /* Tighter connectors so a 5-stage track still fits one line on a phone. */
-  .stage-link{width:9px}
-  .stage-count{margin-left:7px}
+  .stage-link{width:13px}
+  .stage-count{margin-left:8px}
   .stage{padding:8px 9px}
 
   .audit-row{flex-wrap:wrap;gap:4px 11px}

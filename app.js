@@ -174,6 +174,15 @@ const counts = () => {
 
 const doneCount = () => state.data.tasks.filter(t => t.status !== "pending").length;
 
+/* Board progress in task-equivalents rather than whole tasks. A plain task is
+   worth 1 once it's addressed; a staged one earns its stages as they land, so
+   finishing 2 of 3 moves the bar by two thirds of a task instead of nothing. */
+const progressSum = () => state.data.tasks.reduce((sum, t) => {
+  if(!hasStages(t)) return sum + (t.status !== "pending" ? 1 : 0);
+  if(t.status !== "pending") return sum + 1;          // halted or finished: whole task
+  return sum + t.stages.filter(s => s.status === "complete").length / t.stages.length;
+}, 0);
+
 /* ── stages ──
    A staged task carries an ordered list of steps. The "current" stage is the
    first one that isn't complete, derived rather than stored: a stored cursor
@@ -291,7 +300,8 @@ function renderChrome(){
 function renderHero(){
   const total = state.data.tasks.length;
   const done  = doneCount();
-  const pct   = total ? Math.round((done / total) * 100) : 0;
+  const sum   = progressSum();
+  const pct   = total ? Math.round((sum / total) * 100) : 0;
 
   $("heroPct").innerHTML = `${pct}<small>%</small>`;
   const fill = $("heroBarFill");
@@ -306,7 +316,10 @@ function renderHero(){
     const who  = state.data.updatedBy;
     const when = state.data.updatedAt ? relTime(state.data.updatedAt) : null;
     const tail = who && when ? ` · last change ${when} by ${who}` : "";
-    sub.textContent = `${done} of ${total} addressed · ${left} still pending${tail}`;
+    /* Say so when the percentage is running ahead of the task count, otherwise
+       "1 of 3 addressed" next to 56% just looks like a bug. */
+    const partial = sum - done > 0.001 ? " · plus stage progress" : "";
+    sub.textContent = `${done} of ${total} addressed · ${left} still pending${partial}${tail}`;
   }
 }
 
@@ -334,10 +347,97 @@ function renderList(){
     ? "Active board"
     : STATUS[state.filter].label;
 
-  if(!shown.length){ list.innerHTML = ""; return; }
+  if(!shown.length){ list.replaceChildren(); return; }
 
   const readOnly = state.mode === "viewer" || amBlocked();
-  list.innerHTML = shown.map(t => taskCard(t, readOnly)).join("");
+  reconcileChildren(list, shown.map(t => ensureCard(t, readOnly)));
+}
+
+/* ── Keyed rendering ────────────────────────────────────────────────────
+   The list is reconciled, never rebuilt. Each task keeps its own DOM node
+   across refreshes, and only what actually changed is written. This is what
+   makes the board stop juddering:
+
+     · rebuilding every card meant the rowIn entrance animation replayed on
+       every 20-second poll — that was the flicker;
+     · .task-drawer now survives a render, so its grid-template-rows
+       transition finally fires and the drawer glides open instead of
+       appearing fully formed;
+     · a card whose data didn't change is not touched at all.
+
+   Open/closed is a class toggle on a node that persists — never a rebuild.
+   Same approach as the charging tracker's vehicle list. */
+
+// Everything that affects a card's markup. Same signature → don't touch it.
+const cardSig = (t, readOnly) => JSON.stringify([
+  t.title, t.description, t.status, t.statusBy, t.statusAt, t.statusNote,
+  t.createdBy, t.createdAt, readOnly,
+  (state.data.reopenRequests || []).some(r => r.taskId === t.id),
+  (t.stages || []).map(s => [s.title, s.description, s.status, s.by, s.at, s.note])
+]);
+
+const cardNode = html => {
+  const tpl = document.createElement("template");
+  tpl.innerHTML = html.trim();
+  return tpl.content.firstElementChild;
+};
+
+function makeCard(t, readOnly){
+  const node = cardNode(taskCard(t, readOnly));
+  node.__sig = cardSig(t, readOnly);       // markup is already current
+  return node;
+}
+
+function patchCard(node, t, readOnly){
+  const open = state.openTaskId === t.id;
+  node.classList.toggle("open", open);
+  node.querySelector(".task-head").setAttribute("aria-expanded", open);
+
+  const sig = cardSig(t, readOnly);
+  if(node.__sig === sig) return node;      // nothing changed — leave it alone
+  node.__sig = sig;
+
+  // Toggle the status token rather than reassigning className, so .open and
+  // any transient class survive.
+  Object.keys(STATUS).forEach(s => node.classList.toggle("s-" + s, t.status === s));
+
+  /* Swap only the subtrees that can change. .task-drawer itself is deliberately
+     left in place — replacing it would restart the open/close transition. */
+  const src = cardNode(taskCard(t, readOnly));
+
+  /* The stage track is the one part of the head that moves, and the one part
+     carrying transitions, so patch its classes in place. Swapping the nodes
+     out would give the new dot no previous state to animate from and it would
+     snap to green instead of fading. */
+  const cur = [...node.querySelectorAll(".stage-track > span")];
+  const want = [...src.querySelectorAll(".stage-track > span")];
+  if(cur.length && cur.length === want.length){
+    cur.forEach((n, i) => {
+      if(n.className !== want[i].className) n.className = want[i].className;
+      if(n.classList.contains("stage-count")) n.textContent = want[i].textContent;
+    });
+  }else{
+    node.querySelector(".task-main").replaceWith(src.querySelector(".task-main"));
+  }
+
+  node.querySelector(".task-right").replaceWith(src.querySelector(".task-right"));
+  node.querySelector(".dw-inner").replaceWith(src.querySelector(".dw-inner"));
+  return node;
+}
+
+const ensureCard = (t, readOnly) => {
+  const existing = $("list").querySelector(`.task[data-task="${t.id}"]`);
+  return existing ? patchCard(existing, t, readOnly) : makeCard(t, readOnly);
+};
+
+/* Make container's children exactly `desired`, in order, with minimal moves.
+   Moving an existing node does not replay its entrance animation. */
+function reconcileChildren(container, desired){
+  const keep = new Set(desired);
+  [...container.children].forEach(ch => { if(!keep.has(ch)) ch.remove(); });
+  desired.forEach((node, i) => {
+    if(container.children[i] !== node) container.insertBefore(node, container.children[i] || null);
+  });
 }
 
 function taskCard(t, readOnly){
@@ -413,11 +513,15 @@ function taskCard(t, readOnly){
    the right place. */
 function stageBubbles(t){
   const cur = currentStageIndex(t);
+  // The connector out of a finished stage fills in too, so the track reads as
+  // one continuous bar rather than a row of unrelated dots.
+  const parts = t.stages.map((s, i) => {
+    const link = i ? `<span class="stage-link${t.stages[i - 1].status === "complete" ? " done" : ""}"></span>` : "";
+    return `${link}<span class="stage-dot s-${s.status}${i === cur ? " now" : ""}"></span>`;
+  });
   return `
 <span class="task-by stage-track" role="img" aria-label="${escHtml(stageLabel(t))}">
-  ${t.stages.map((s, i) =>
-    `<span class="stage-dot s-${s.status}${i === cur ? " now" : ""}"></span>`
-  ).join('<span class="stage-link"></span>')}
+  ${parts.join("")}
   <span class="stage-count">${escHtml(stageLabel(t))}</span>
 </span>`;
 }
