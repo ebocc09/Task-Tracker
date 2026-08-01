@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T04:24:35.170Z",
-  "updatedBy": "Hibert",
+  "updatedAt": "2026-08-01T04:24:57.293Z",
+  "updatedBy": "Enzo",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -25,7 +25,7 @@
       "id": "p_ms9tjr52g",
       "label": "6UE-688",
       "note": "",
-      "checkedOutBy": "Hibert",
+      "checkedOutBy": "Bob",
       "checkedOutAt": "2026-08-01T03:45:23.941Z",
       "forcedBy": null,
       "forcedAt": null
@@ -64,9 +64,17 @@
   ],
   "audit": [
     {
+      "id": "a_ms9vb3rh8",
+      "at": "2026-08-01T04:24:57.293Z",
+      "who": "Enzo",
+      "action": "request.approve",
+      "subject": "Bob",
+      "detail": ""
+    },
+    {
       "id": "a_ms9vamoy4",
       "at": "2026-08-01T04:24:35.170Z",
-      "who": "Hibert",
+      "who": "Bob",
       "action": "request.open",
       "subject": "Bob",
       "detail": ""
@@ -90,7 +98,7 @@
     {
       "id": "a_ms9tw8h1c",
       "at": "2026-08-01T03:45:23.941Z",
-      "who": "Hibert",
+      "who": "Bob",
       "action": "plate.checkout",
       "subject": "6UE-688",
       "detail": ""
@@ -98,7 +106,7 @@
     {
       "id": "a_ms9tw6m0a",
       "at": "2026-08-01T03:45:21.528Z",
-      "who": "Hibert",
+      "who": "Bob",
       "action": "plate.release",
       "subject": "6EU-300",
       "detail": ""
@@ -106,7 +114,7 @@
     {
       "id": "a_ms9tw2kp8",
       "at": "2026-08-01T03:45:16.297Z",
-      "who": "Hibert",
+      "who": "Bob",
       "action": "plate.checkout",
       "subject": "6EU-300",
       "detail": ""
@@ -114,7 +122,7 @@
     {
       "id": "a_ms9tw2kp7",
       "at": "2026-08-01T03:45:16.297Z",
-      "who": "Hibert",
+      "who": "Bob",
       "action": "plate.release",
       "subject": "6UE-688",
       "detail": ""
@@ -146,7 +154,7 @@
     {
       "id": "a_ms9tv43y2",
       "at": "2026-08-01T03:44:31.630Z",
-      "who": "Hibert",
+      "who": "Bob",
       "action": "identity.rename",
       "subject": "Robert",
       "detail": "was Enzo"
@@ -241,14 +249,14 @@
       "by": "Enzo",
       "from": "Robert",
       "to": "Hibert"
-    }
-  ],
-  "requests": [
+    },
     {
-      "id": "req_ms9vamoy3",
-      "at": "2026-08-01T04:24:35.170Z",
+      "id": "r_ms9vb3rh7",
+      "at": "2026-08-01T04:24:57.293Z",
+      "by": "Enzo",
       "from": "Hibert",
       "to": "Bob"
     }
-  ]
+  ],
+  "requests": []
 }
