@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T04:24:57.293Z",
+  "updatedAt": "2026-08-01T04:26:20.530Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -63,6 +63,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_ms9vcvzmb",
+      "at": "2026-08-01T04:26:20.530Z",
+      "who": "Enzo",
+      "action": "template.save",
+      "subject": "Plate Audit",
+      "detail": ""
+    },
     {
       "id": "a_ms9vb3rh8",
       "at": "2026-08-01T04:24:57.293Z",
@@ -241,7 +249,13 @@
     }
   ],
   "blocked": [],
-  "templates": [],
+  "templates": [
+    {
+      "id": "q_ms9vcvus9",
+      "title": "Plate Audit",
+      "description": "Gather all plates and send a photo in the teams chat"
+    }
+  ],
   "renames": [
     {
       "id": "r_ms9va2ex3",
