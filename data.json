@@ -1,14 +1,14 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T04:40:58.162Z",
+  "updatedAt": "2026-08-01T15:34:18.804Z",
   "updatedBy": "Enzo",
   "plates": [
     {
       "id": "p_ms9tjbasa",
       "label": "6EX-831",
       "note": "",
-      "checkedOutBy": null,
-      "checkedOutAt": null,
+      "checkedOutBy": "Enzo",
+      "checkedOutAt": "2026-08-01T15:34:18.804Z",
       "forcedBy": null,
       "forcedAt": null
     },
@@ -43,8 +43,8 @@
       "id": "p_ms9tk9unm",
       "label": "6EY-464",
       "note": "",
-      "checkedOutBy": "Enzo",
-      "checkedOutAt": "2026-08-01T03:45:04.500Z",
+      "checkedOutBy": null,
+      "checkedOutAt": null,
       "forcedBy": null,
       "forcedAt": null
     }
@@ -63,6 +63,22 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msaj7wl04",
+      "at": "2026-08-01T15:34:18.804Z",
+      "who": "Enzo",
+      "action": "plate.checkout",
+      "subject": "6EX-831",
+      "detail": ""
+    },
+    {
+      "id": "a_msaj7wl03",
+      "at": "2026-08-01T15:34:18.804Z",
+      "who": "Enzo",
+      "action": "plate.release",
+      "subject": "6EY-464",
+      "detail": ""
+    },
     {
       "id": "a_ms9vvp6a2",
       "at": "2026-08-01T04:40:58.162Z",
