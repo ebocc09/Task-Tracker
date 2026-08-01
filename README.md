@@ -1,0 +1,279 @@
+# Task Tracker
+
+A shared task board for a small team. Everyone sees the same tasks, marks them
+**Complete**, **Partial**, or **Could Not Complete**, and can check out a license
+plate so nobody doubles up. Every action is attributed by name in an audit log.
+
+No server, no database, no build step, no dependencies. The board data lives in
+`data.json` in this repository, and the page reads and writes it through the
+GitHub API.
+
+---
+
+## Contents
+
+- [How it works](#how-it-works)
+- [Setup (repo owner)](#setup-repo-owner)
+- [Setup (each teammate)](#setup-each-teammate)
+- [Using the board](#using-the-board)
+- [The admin menu](#the-admin-menu)
+- [What's honest about the limits](#whats-honest-about-the-limits)
+- [Project layout](#project-layout)
+- [Troubleshooting](#troubleshooting)
+
+---
+
+## How it works
+
+```
+  Marisol's browser ─┐
+                     ├──►  data.json  (this repo)  ◄── the single source of truth
+  Danny's browser  ──┘         ▲
+                               │
+  Anyone with the link ────────┘   (read-only, no setup)
+```
+
+Three roles, picked automatically:
+
+| Role | When | Can do |
+|---|---|---|
+| **Viewer** | no token saved | Read the board. Refreshes every 2 min. |
+| **Member** | valid token saved | Everything. Refreshes every 20 s. |
+| **Local** | no repo configured, or GitHub unreachable | Everything, but only in their own browser. |
+
+Local mode is the graceful fallback — open `index.html` with no setup at all and
+the whole app still works against `localStorage`. A banner says so plainly.
+
+### Concurrent edits
+
+Two people finishing two different tasks at the same second is normal, so writes
+are **replayed rather than overwritten**. Each change is a function applied to
+whatever the file currently contains. If someone else saved first, GitHub returns
+a conflict, the page re-reads the file, re-applies your change on top, and retries
+(up to four times). Both changes survive.
+
+Two people editing *the same* task resolves last-write-wins, which is the right
+answer for this kind of board.
+
+---
+
+## Setup (repo owner)
+
+**1. Create the repository and push this folder.**
+
+```bash
+git remote add origin https://github.com/YOUR-USERNAME/task-tracker.git
+git branch -M main
+git push -u origin main
+```
+
+**2. Point the app at your repo.** Edit `config.js`:
+
+```js
+const REPO = {
+  owner : "YOUR-GITHUB-USERNAME",   // ← your GitHub username or org
+  name  : "task-tracker",
+  branch: "main",
+  path  : "data.json"
+};
+```
+
+**3. Change the admin passcode.** Also in `config.js`:
+
+```js
+const ADMIN_PASSCODE = "226565";   // ← change this
+```
+
+Read [the limits section](#whats-honest-about-the-limits) before you pick one.
+
+**4. Turn on GitHub Pages.** Settings → Pages → Source: `Deploy from a branch`,
+branch `main`, folder `/ (root)`. Your board appears at
+`https://YOUR-USERNAME.github.io/task-tracker/` in a minute or two.
+
+**5. Give teammates write access.** Settings → Collaborators → Add people.
+Without this their token will be rejected no matter what the page lets them click.
+
+**6. Commit and push those config changes.**
+
+---
+
+## Setup (each teammate)
+
+Viewing needs nothing — just open the link.
+
+To **make changes**, each person does this once, in their own browser:
+
+1. Open the board, click **USERNAME**, type your name, Save.
+2. Click the status chip in the top bar (it reads `READ ONLY`).
+3. Click **Create a token on GitHub**. On that page:
+   - **Token name**: anything, e.g. `task-tracker`
+   - **Expiration**: your call — you'll need to redo this when it lapses
+   - **Repository access**: *Only select repositories* → pick `task-tracker`
+   - **Permissions** → *Repository permissions* → **Contents: Read and write**
+     *(this is the only permission needed — leave everything else alone)*
+4. Generate it, copy it, paste it into the board, click **Connect**.
+
+The token is stored in that browser's `localStorage` and nowhere else. It is
+never written into `data.json` and never committed. Each person has their own.
+
+The chip turns green and reads `SYNCED`.
+
+---
+
+## Using the board
+
+**Username** — click it any time to change your name. Every completion, checkout,
+and admin action is stamped with it.
+
+**Select Plate** — opens the list of plates. Pick one and it's yours; it greys out
+on everyone else's screen with *"Checked out by …"* within one refresh. Click your
+own plate again to release it. One plate per person — taking a second releases the
+first automatically.
+
+**Tasks** — click a card to open it. Three actions:
+
+| Action | Card border turns | Prompts for a note |
+|---|---|---|
+| Complete | green | no |
+| Partial | amber | yes, optional |
+| Could not complete | red | yes, optional |
+
+Click anywhere outside, or press `Esc`, to collapse. **Reopen** puts a task back
+to Pending.
+
+**Progress bar** — the share of tasks that are no longer Pending. Turns green at
+100%.
+
+**Stat strip** — click any cell to filter the board. Click again to clear.
+
+---
+
+## The admin menu
+
+Unlock with the passcode. Stays unlocked for that tab only.
+
+- **Tasks** — add a task (title + optional description), reorder with the arrows,
+  delete.
+- **Plates** — add a plate (with an optional note like *"Model Y — bay 3"*),
+  delete, or **force release** one somebody forgot to hand back.
+- **Audit log** — everything that has happened, newest first, filterable by person
+  and by action. Hover a timestamp for the exact time. **Export CSV** downloads it.
+- **Reset** — see below.
+
+### Reset board
+
+Sets every task back to **Pending** and releases every plate.
+
+**Tasks, plates, and the audit log are all kept.** Resetting starts a new round;
+it does not erase history. That's deliberate — an audit log you can wipe with one
+button isn't much of an audit log.
+
+Two separate, separately-confirmed destructive actions live below it:
+**Clear audit log**, and **Delete all tasks and plates**.
+
+---
+
+## What's honest about the limits
+
+**The admin passcode is not security.** In a public repo anyone can read
+`config.js` and see it. It stops a teammate wandering into Admin by accident. It
+stops nothing else. Don't reuse a passcode from any other system here.
+
+**The real access control is GitHub's.** Only people you've granted repository
+write access can actually save anything. Someone without it can type the passcode,
+click Reset Board, and watch it fail with a 403 — because the API rejects their
+token. That's the boundary that actually holds.
+
+**Changes are not instant.** Members see each other's changes within ~20 seconds,
+viewers within ~2 minutes. It's a polling loop against a file, not a live socket.
+
+**Anonymous viewers share a rate limit.** GitHub allows 60 unauthenticated API
+requests per hour *per IP*. A whole office behind one IP can exhaust that; the app
+then falls back to the raw file CDN, which can be up to 5 minutes stale. It says so
+when this happens. Anyone with a token is unaffected (5,000/hr, per person).
+
+**Every save is a commit.** Your repo history will fill with `Complete "…" — Name`
+commits. That's a feature for auditing and noise for browsing. `data.json` also
+grows with the audit log, which is capped at the most recent 500 entries.
+
+**Don't put anything sensitive on a public board.** Plate numbers and task text in
+a public repo are readable by anyone, and git history keeps them even after
+deletion. `data.json` ships empty for exactly this reason. Use a private repo if
+the content is sensitive — note that Pages on a private repo needs a paid plan, so
+teammates would open the file locally or you'd host it elsewhere.
+
+---
+
+## Project layout
+
+| File | What's in it |
+|---|---|
+| `index.html` | markup only |
+| `styles.css` | the ZO-1 house theme |
+| `config.js` | **the only file you need to edit** — repo, passcode, poll rates |
+| `sync.js` | state, GitHub read/write, conflict replay |
+| `app.js` | rendering, overlays, the board |
+| `admin.js` | the admin panel |
+| `data.json` | the shared board data |
+
+Plain `<script>` tags, deliberately not ES modules — modules are blocked by CORS
+on `file://`, and double-clicking `index.html` should work.
+
+### Data shape
+
+```jsonc
+{
+  "version": 1,
+  "updatedAt": "2026-07-31T20:14:02Z",
+  "updatedBy": "Marisol",
+  "plates": [
+    { "id": "p_x1", "label": "8ABC123", "note": "Model Y — bay 3",
+      "checkedOutBy": "Marisol", "checkedOutAt": "2026-07-31T19:02:00Z" }
+  ],
+  "tasks": [
+    { "id": "t_a2", "title": "Pre-delivery inspection",
+      "description": "Panel gaps, paint, badge alignment.",
+      "createdBy": "Danny", "createdAt": "2026-07-30T15:00:00Z",
+      "status": "complete",        // pending | complete | partial | blocked
+      "statusBy": "Marisol", "statusAt": "2026-07-31T19:40:00Z",
+      "statusNote": null }
+  ],
+  "audit": [
+    { "id": "a_b3", "at": "2026-07-31T19:40:00Z", "who": "Marisol",
+      "action": "task.complete", "subject": "Pre-delivery inspection", "detail": "" }
+  ]
+}
+```
+
+The app re-validates this on every read, so a hand-edited or malformed file
+degrades gracefully instead of breaking the page.
+
+---
+
+## Troubleshooting
+
+**Chip says `READ ONLY` and I have a token** — it was rejected. Click the chip and
+reconnect. Most often the token expired, or it wasn't scoped to this repository.
+
+**"That token can't write to this repo"** — either the token is missing
+**Contents: Read and write**, or you haven't been added as a collaborator.
+
+**"Repository or data.json not found"** — `REPO` in `config.js` doesn't match
+reality, or `data.json` was never pushed.
+
+**My change vanished a few seconds later** — the save failed and the page rolled
+back to the server's version. A toast explains why.
+
+**Board is empty for everyone after a reset** — Reset Board keeps tasks. If they're
+actually gone, someone used *Delete all tasks and plates*. Check the audit log for
+a `board.wipe` entry, and recover `data.json` from the repo history:
+`git log -- data.json`.
+
+**Nothing works and there's a yellow banner** — you're in local mode. Either
+`config.js` still has the placeholder owner, or GitHub couldn't be reached.
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).

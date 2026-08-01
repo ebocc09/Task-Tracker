@@ -1,0 +1,15 @@
+# Task Tracker keeps no secrets in the repo — access tokens live only in each
+# person's browser localStorage and are never written to a file here.
+# This list is just editor and OS noise.
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+.vscode/
+.idea/
+*.swp
+*~
+
+node_modules/
+npm-debug.log*

@@ -1,0 +1,10 @@
+# Normalise line endings so Windows and macOS teammates don't produce
+# whole-file diffs every time they save. Text is stored LF in the repo and
+# checked out native on each machine.
+* text=auto eol=lf
+
+*.html  text eol=lf
+*.css   text eol=lf
+*.js    text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf
