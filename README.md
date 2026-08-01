@@ -229,7 +229,6 @@ Unlock with the passcode. Stays unlocked for that tab only.
   stages or leaderboard flag, and **Delete** removes it. Editing a saved task
   changes the template only — tasks already on the board are untouched.
 - **Leaderboard** — see below.
-- **Daily rollover** — lives at the bottom of Quick add. See below.
 - **Plates** — add a plate (with an optional note like *"Model Y — bay 3"*),
   delete, or **force release** one somebody forgot to hand back.
 - **Audit log** — everything that has happened, newest first, filterable by person
@@ -273,88 +272,6 @@ What does and doesn't affect it:
 History is bounded: completions older than the start of the previous quarter are
 dropped, with a hard ceiling of `SCORE_CAP` (2,000) entries. Quarter-to-date is
 therefore always complete.
-
-### Daily rollover
-
-Rebuilds the board every morning so nobody has to clear it and re-add the same
-tasks by hand. A rollover **deletes every task**, recreates the ones you've
-marked **Daily** in Quick add, and releases every plate.
-
-Set it up in two places, both in **Quick add**:
-
-1. Mark the saved tasks you want each morning — the **Make daily** button on each
-   row. Anything not marked stays in the library without appearing daily.
-2. Turn on **Roll the board over automatically**, then pick a time, timezone and
-   days.
-
-```
-  Roll the board over automatically   [✓]
-
-  Time  [ 06:00 ]      Timezone [ Pacific ▾ ]
-  Days  [S][M][T][W][T][F][S]
-          ▔  ██ ██ ██ ██ ██  ▔
-
-  Next rollover tomorrow at 06:00 2026-08-04.
-```
-
-**It ships off.** Turning it on never rolls over immediately — the first
-occurrence is the next one due, the way setting an alarm works. Changing the
-time or days re-seeds the same way, so editing at noon can't fire a 06:00 slot
-that's already passed.
-
-**Where it runs.** A GitHub Actions workflow, not your browser, so it happens
-whether or not anyone has the page open. The schedule is stored in `data.json`
-rather than in the workflow file because GitHub's cron only understands UTC and
-would drift an hour at each daylight-saving change; the script compares
-wall-clock time in the timezone you picked.
-
-**Timing is approximate.** GitHub runs scheduled workflows on a best-effort
-basis — usually a few minutes late, occasionally much worse, and under heavy
-load a run can be skipped entirely. Two consequences, both handled:
-
-- A rollover fires up to **two hours** after its scheduled time, then gives up
-  for that day. That window is deliberate — without it, a run that finally
-  arrived at 23:50 would wipe the board ten minutes before midnight.
-- If a day is missed entirely, the board simply stays as it was. Use **Roll over
-  now** to do it by hand.
-
-**What it won't do:**
-
-| Situation | Behaviour |
-|---|---|
-| No saved tasks marked Daily | **Skips.** Emptying the board and leaving it empty is indistinguishable from someone having unticked the boxes by mistake. |
-| No days selected | Never runs. The panel says so. |
-| Already rolled over today | Nothing. Safe to run twice. |
-| Someone saving a change at the same moment | The write is retried against the fresh file, same as any other change. |
-
-Scores, the audit log, plates and saved tasks all survive. Each rollover writes
-**one** audit entry — `12 tasks removed (3 still pending), 8 rebuilt, 2 plates
-released` — attributed to *Daily rollover*. The count of unfinished tasks is
-there deliberately; it's the first thing anyone asks the morning after a board
-they didn't expect to be empty.
-
-#### Setting it up on GitHub, once
-
-1. **Settings → Actions → General → Workflow permissions → Read and write.**
-   Without this the job can't commit and every run fails.
-2. **Actions tab → Daily rollover → Run workflow** to test it by hand. Tick
-   *Decide and print, but write nothing* for a dry run first; tick *Roll over
-   now, ignoring the schedule* to force one.
-3. The cron is live — the workflow checks twice an hour. To change when it fires,
-   use the Quick add panel, not the workflow file.
-
-
-#### If it stops firing
-
-GitHub **disables scheduled workflows after 60 days with no repository
-activity**, silently, with only an email to the repo owner. Normal board use
-commits constantly so the clock keeps resetting, but a genuinely quiet stretch
-can trip it. Re-enable from the Actions tab.
-
-Otherwise: open the newest run in the Actions tab. The script prints exactly one
-line explaining its decision — `too early — 05:30, scheduled 06:00`, `already
-rolled over today (2026-08-04)`, `no days selected`, `missed the window`. That
-line is the answer to "why didn't it run".
 
 ### Reset board
 
@@ -408,9 +325,6 @@ teammates would open the file locally or you'd host it elsewhere.
 | `index.html` | markup only |
 | `styles.css` | the ZO-1 house theme |
 | `config.js` | **the only file you need to edit** — repo, passcode, poll rates |
-| `rollover-core.js` | daily-rollover logic, loaded by both the page and the Action |
-| `.github/workflows/rollover.yml` | the scheduled job |
-| `.github/scripts/rollover.js` | what that job runs |
 | `sync.js` | state, GitHub read/write, conflict replay |
 | `app.js` | rendering, overlays, the board |
 | `admin.js` | the admin panel |
@@ -451,17 +365,7 @@ on `file://`, and double-clicking `index.html` should work.
     { "id": "sc_c4", "at": "2026-07-31T19:40:00Z", "who": "Marisol",
       "taskId": "t_a2", "stageId": null,
       "title": "Pre-delivery inspection", "value": 1 }
-  ],
-  "schedule": {
-    // Read by the GitHub Action, edited in Quick add. Stored here rather than
-    // in the workflow file so the time can follow daylight saving.
-    "enabled": true,
-    "time": "06:00",              // must be zero-padded HH:MM
-    "days": [1, 2, 3, 4, 5],      // 0=Sunday .. 6=Saturday; [] means never
-    "tz": "America/Los_Angeles",
-    "lastRunKey": "2026-08-03",   // local date of the last rollover — the idempotency key
-    "lastRunAt": "2026-08-03T13:00:11Z"
-  }
+  ]
 }
 ```
 

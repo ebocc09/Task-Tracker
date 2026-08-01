@@ -15,7 +15,7 @@
 <!-- ?v= is a cache-buster. GitHub Pages serves assets with a 10-minute max-age,
      so without it a browser keeps running old JS after a deploy while happily
      showing fresh HTML. Bump these on every release. -->
-<link rel="stylesheet" href="styles.css?v=22">
+<link rel="stylesheet" href="styles.css?v=23">
 </head>
 <body>
 
@@ -350,55 +350,6 @@
         </p>
         <button class="btn-block solid" id="qaAddAll" hidden>Add all to board</button>
         <div class="adm-list" id="admQuick"></div>
-
-        <div class="sep"></div>
-        <h4 class="sec-h">Daily rollover</h4>
-        <p class="sec-p">
-          Clears the board and rebuilds it from the saved tasks marked
-          <strong>Daily</strong> above, releasing every plate. Runs on GitHub, so
-          it happens whether or not anyone has this page open. Completed work
-          stays in the audit log and on the leaderboard.
-        </p>
-
-        <div class="field">
-          <label class="check" for="schedOn">
-            <input type="checkbox" id="schedOn">
-            <span>Roll the board over automatically</span>
-          </label>
-        </div>
-
-        <div id="schedBody">
-          <div class="row2">
-            <div class="field">
-              <label for="schedTime">Time</label>
-              <input class="inp" type="time" id="schedTime" value="06:00" step="60">
-            </div>
-            <div class="field">
-              <label for="schedTz">Timezone</label>
-              <!-- A fixed list, not free text: an unknown zone makes Intl throw,
-                   which in a scheduled job means a failing run twice an hour. -->
-              <select class="inp" id="schedTz">
-                <option value="America/Los_Angeles">Pacific</option>
-                <option value="America/Denver">Mountain</option>
-                <option value="America/Phoenix">Arizona</option>
-                <option value="America/Chicago">Central</option>
-                <option value="America/New_York">Eastern</option>
-                <option value="UTC">UTC</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Days</label>
-            <div class="daypick" id="schedDays"></div>
-          </div>
-
-          <div class="sched-next" id="schedNext"></div>
-          <div class="reqPending" id="schedWarn" hidden></div>
-
-          <button class="btn-block" id="schedRunNow">Roll over now</button>
-          <div class="hint">Does the same thing by hand, straight away, and counts as today's rollover.</div>
-        </div>
       </section>
 
       <!-- Plates -->
@@ -605,10 +556,9 @@
 <!-- Toasts -->
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="config.js?v=22"></script>
-<script src="rollover-core.js?v=22"></script>
-<script src="sync.js?v=22"></script>
-<script src="app.js?v=22"></script>
-<script src="admin.js?v=22"></script>
+<script src="config.js?v=23"></script>
+<script src="sync.js?v=23"></script>
+<script src="app.js?v=23"></script>
+<script src="admin.js?v=23"></script>
 </body>
 </html>
