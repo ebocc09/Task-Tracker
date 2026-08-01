@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T15:54:38.697Z",
+  "updatedAt": "2026-08-01T15:55:57.125Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -63,6 +63,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msajzqdhb",
+      "at": "2026-08-01T15:55:57.125Z",
+      "who": "Enzo",
+      "action": "template.save",
+      "subject": "Service Loaner Audit",
+      "detail": ""
+    },
     {
       "id": "a_msajy1ux8",
       "at": "2026-08-01T15:54:38.697Z",
@@ -382,6 +390,11 @@
       "id": "q_ms9vcvus9",
       "title": "Plate Audit",
       "description": "Gather all plates and send a photo in the teams chat"
+    },
+    {
+      "id": "q_msajzptn9",
+      "title": "Service Loaner Audit",
+      "description": "Via mission control, filter for service loaners at Cypress, ensure no loaners are being held at offsite, post a photo in the teams chat of all loaners actively at Cypress before completing;"
     }
   ],
   "renames": [
