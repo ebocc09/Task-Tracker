@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Task Tracker</title>
+<meta name="description" content="Shared team task board. No server, no build step.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ───────────────────────────── NAV ───────────────────────────── -->
+<nav class="nav">
+  <div class="wordmark">TASK TRACKER</div>
+  <div class="nav-div"></div>
+  <div class="sync-chip" id="syncChip" title="Sync status">
+    <span class="sync-dot" id="syncDot"></span>
+    <span id="syncLabel">LOCAL</span>
+  </div>
+
+  <div class="nav-spacer"></div>
+
+  <button class="nav-btn" id="userBtn" title="Set your name">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+    </svg>
+    <span id="userBtnLabel">USERNAME</span>
+  </button>
+
+  <div class="nav-anchor">
+    <button class="nav-btn" id="plateBtn" title="Check out a license plate" aria-haspopup="true" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10v4M10 10v4M14 10v4M18 10v4"/>
+      </svg>
+      <span id="plateBtnLabel">SELECT PLATE</span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+
+    <!-- Floating plate picker -->
+    <div class="menu" id="plateMenu" role="menu" aria-labelledby="plateBtn">
+      <div class="menu-head">Available plates</div>
+      <div class="menu-body" id="plateMenuBody"></div>
+    </div>
+  </div>
+
+  <button class="nav-btn" id="adminBtn" title="Admin">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+    <span>ADMIN</span>
+  </button>
+
+  <button class="nav-btn icon-only" id="refreshBtn" title="Refresh now">
+    <svg id="refreshIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/>
+    </svg>
+  </button>
+</nav>
+
+<div class="sweep" id="sweep"><div class="sweep-fill" id="sweepFill"></div></div>
+
+<!-- ───────────────────────────── HERO ──────────────────────────── -->
+<header class="hero">
+  <svg class="hero-art" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g class="ha-grid">
+      <!-- abstract field of task tiles, some ticked -->
+      <g transform="translate(60,40)">
+        <rect x="0"   y="0"  width="54" height="54" rx="10"/>
+        <rect x="74"  y="0"  width="54" height="54" rx="10"/>
+        <rect x="148" y="0"  width="54" height="54" rx="10"/>
+        <rect x="0"   y="74" width="54" height="54" rx="10"/>
+        <rect x="74"  y="74" width="54" height="54" rx="10"/>
+        <rect x="0"   y="148" width="54" height="54" rx="10"/>
+      </g>
+      <g transform="translate(940,60)">
+        <rect x="0"   y="0"  width="54" height="54" rx="10"/>
+        <rect x="74"  y="0"  width="54" height="54" rx="10"/>
+        <rect x="0"   y="74" width="54" height="54" rx="10"/>
+        <rect x="74"  y="74" width="54" height="54" rx="10"/>
+        <rect x="148" y="74" width="54" height="54" rx="10"/>
+      </g>
+      <g transform="translate(430,26)">
+        <rect x="0"  y="0"   width="44" height="44" rx="8"/>
+        <rect x="0"  y="210" width="44" height="44" rx="8"/>
+      </g>
+      <g transform="translate(700,20)">
+        <rect x="0"  y="0"   width="44" height="44" rx="8"/>
+        <rect x="0"  y="216" width="44" height="44" rx="8"/>
+      </g>
+    </g>
+    <g class="ha-tick">
+      <path d="M74 62 l12 12 l22 -24"/>
+      <path d="M148 62 l12 12 l22 -24"/>
+      <path d="M954 84 l12 12 l22 -24"/>
+      <path d="M1028 158 l12 12 l22 -24"/>
+    </g>
+  </svg>
+
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Board progress</div>
+    <h1 id="heroPct">0<small>%</small></h1>
+    <div class="hero-bar"><div class="hero-bar-fill" id="heroBarFill"></div></div>
+    <p id="heroSub">No tasks on the board yet.</p>
+  </div>
+</header>
+
+<!-- ──────────────────────────── STATS ──────────────────────────── -->
+<section class="strip">
+  <div class="stat" data-filter="all"      tabindex="0" role="button"><div class="stat-k">All tasks</div><div class="stat-v" id="sAll">0</div></div>
+  <div class="stat" data-filter="complete" tabindex="0" role="button"><div class="stat-k">Complete</div><div class="stat-v" id="sComplete">0</div></div>
+  <div class="stat" data-filter="partial"  tabindex="0" role="button"><div class="stat-k">Partial</div><div class="stat-v" id="sPartial">0</div></div>
+  <div class="stat" data-filter="blocked"  tabindex="0" role="button"><div class="stat-k">Could not complete</div><div class="stat-v" id="sBlocked">0</div></div>
+  <div class="stat" data-filter="pending"  tabindex="0" role="button"><div class="stat-k">Pending</div><div class="stat-v" id="sPending">0</div></div>
+</section>
+
+<!-- Mode / connection banner -->
+<div class="banner" id="banner" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+  </svg>
+  <span id="bannerText"></span>
+  <button class="banner-btn" id="bannerBtn" hidden></button>
+</div>
+
+<!-- ──────────────────────────── BOARD ──────────────────────────── -->
+<main class="wrap">
+  <div class="list-head">
+    <h2 id="listTitle">Active board</h2>
+    <button class="btn-ghost" id="clearFilterBtn" hidden>Clear filter</button>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <div class="filter-empty" id="filterEmpty" hidden>Nothing to show</div>
+
+  <div class="empty" id="empty">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+      <rect x="8" y="2" width="8" height="4" rx="1"/>
+      <path d="M9 12h6M9 16h4"/>
+    </svg>
+    <h3>No tasks yet</h3>
+    <p>Open <strong>Admin</strong> to add the first task to the board.</p>
+  </div>
+</main>
+
+<footer class="foot">
+  <span>Task Tracker</span> ·
+  <span id="footMode">Local mode</span> ·
+  <span id="footSync">Never synced</span>
+</footer>
+
+<!-- ─────────────────────────── OVERLAYS ────────────────────────── -->
+<div class="scrim" id="scrim"></div>
+
+<!-- Username modal -->
+<div class="modal" id="userModal" role="dialog" aria-modal="true" aria-labelledby="userModalTitle">
+  <div class="modal-head">
+    <h3 id="userModalTitle">Your name</h3>
+    <button class="btn-x" data-close="userModal" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="field">
+      <label for="userInput">Display name</label>
+      <input class="inp" id="userInput" maxlength="40" placeholder="e.g. Marisol R." autocomplete="off" spellcheck="false">
+      <div class="hint">Attached to every action you take — task completions, plate checkouts, and the audit log. Stored in this browser only.</div>
+      <div class="err" id="userErr" hidden></div>
+    </div>
+    <div class="row2">
+      <button class="btn-block" data-close="userModal">Cancel</button>
+      <button class="btn-block solid" id="userSave">Save name</button>
+    </div>
+  </div>
+</div>
+
+<!-- Token / connection modal -->
+<div class="modal" id="tokenModal" role="dialog" aria-modal="true" aria-labelledby="tokenModalTitle">
+  <div class="modal-head">
+    <h3 id="tokenModalTitle">Connect to GitHub</h3>
+    <button class="btn-x" data-close="tokenModal" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="repo-line" id="repoLine"></div>
+
+    <div id="tokenConnected" hidden>
+      <div class="field">
+        <label>Connected as</label>
+        <div class="kv"><span id="tokenUser">—</span><span class="pill ok">Can edit</span></div>
+        <div class="hint">Token <code id="tokenMask">—</code>, stored in this browser only.</div>
+      </div>
+      <button class="btn-block red" id="tokenDisconnect">Disconnect</button>
+    </div>
+
+    <div id="tokenSetup">
+      <div class="field">
+        <label for="tokenInput">Personal access token</label>
+        <input class="inp" id="tokenInput" type="password" placeholder="github_pat_… or ghp_…" autocomplete="off" spellcheck="false">
+        <div class="hint">
+          Needed only to <strong>make changes</strong>. Viewing works without one.
+          Create a <em>fine-grained</em> token with <strong>Contents: Read and write</strong> on this repository only.
+        </div>
+        <div class="err" id="tokenErr" hidden></div>
+      </div>
+      <a class="btn-block" id="tokenLink" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">Create a token on GitHub</a>
+      <button class="btn-block solid" id="tokenSave">Connect</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin modal -->
+<div class="modal" id="adminModal" role="dialog" aria-modal="true" aria-labelledby="adminModalTitle">
+  <div class="modal-head">
+    <h3 id="adminModalTitle">Admin</h3>
+    <span class="flash" id="adminFlash"></span>
+    <button class="btn-x" data-close="adminModal" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <!-- Passcode gate -->
+  <div class="modal-body" id="adminGate">
+    <div class="gate-ic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <div class="field">
+      <label for="gateInput">Passcode</label>
+      <input class="inp" id="gateInput" type="password" inputmode="numeric" placeholder="••••••" autocomplete="off">
+      <div class="err" id="gateErr" hidden></div>
+    </div>
+    <button class="btn-block solid" id="gateSubmit">Unlock</button>
+  </div>
+
+  <!-- Unlocked workspace -->
+  <div class="admin" id="adminBody" hidden>
+    <div class="admin-rail" id="adminRail">
+      <button class="rail-item on" data-sec="tasks">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Tasks
+      </button>
+      <button class="rail-item" data-sec="plates">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10v4M10 10v4M14 10v4M18 10v4"/></svg>
+        Plates
+      </button>
+      <button class="rail-item" data-sec="audit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        Audit log
+      </button>
+      <button class="rail-item" data-sec="danger">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+        Reset
+      </button>
+      <div class="rail-foot" id="railFoot"></div>
+    </div>
+
+    <div class="admin-pane" id="adminPane">
+
+      <!-- Tasks -->
+      <section class="sec on" data-sec="tasks">
+        <h4 class="sec-h">Add a task</h4>
+        <p class="sec-p">Appears on the active board for everyone as soon as it saves.</p>
+        <div class="field">
+          <label for="taskTitle">Title</label>
+          <input class="inp" id="taskTitle" maxlength="90" placeholder="e.g. Pre-delivery inspection" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="taskDesc">Description <span class="opt">optional</span></label>
+          <textarea class="inp ta" id="taskDesc" maxlength="400" rows="3" placeholder="What does done look like?"></textarea>
+        </div>
+        <button class="btn-block solid" id="taskAdd">Submit task</button>
+
+        <div class="sep"></div>
+        <h4 class="sec-h">Board <span class="count" id="taskCount">0</span></h4>
+        <p class="sec-p">Reorder with the arrows. Deleting a task removes it for everyone.</p>
+        <div class="adm-list" id="admTasks"></div>
+      </section>
+
+      <!-- Plates -->
+      <section class="sec" data-sec="plates">
+        <h4 class="sec-h">Add a plate</h4>
+        <p class="sec-p">Plates listed here appear in the Select Plate menu.</p>
+        <div class="field">
+          <label for="plateLabel">Plate</label>
+          <input class="inp" id="plateLabel" maxlength="16" placeholder="e.g. 8ABC123" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="field">
+          <label for="plateNote">Note <span class="opt">optional</span></label>
+          <input class="inp" id="plateNote" maxlength="60" placeholder="e.g. Model Y — bay 3" autocomplete="off">
+        </div>
+        <button class="btn-block solid" id="plateAdd">Add plate</button>
+
+        <div class="sep"></div>
+        <h4 class="sec-h">Plates <span class="count" id="plateCount">0</span></h4>
+        <p class="sec-p">Force-release returns a plate to the pool if someone forgot to.</p>
+        <div class="adm-list" id="admPlates"></div>
+      </section>
+
+      <!-- Audit -->
+      <section class="sec" data-sec="audit">
+        <h4 class="sec-h">Audit log <span class="count" id="auditCount">0</span></h4>
+        <p class="sec-p">Every task completion, plate checkout, and board change, newest first.</p>
+        <div class="row2 filters">
+          <select class="inp" id="auditWho"><option value="">Everyone</option></select>
+          <select class="inp" id="auditAct"><option value="">All actions</option></select>
+        </div>
+        <div class="audit-list" id="auditList"></div>
+        <div class="sep"></div>
+        <button class="btn-block" id="auditExport">Export CSV</button>
+      </section>
+
+      <!-- Danger -->
+      <section class="sec" data-sec="danger">
+        <h4 class="sec-h">Reset board</h4>
+        <p class="sec-p">
+          Returns every task to <strong>Pending</strong> and releases every plate.
+          Tasks, plates, and the audit log are kept — this starts a new round, it
+          does not erase history.
+        </p>
+        <button class="btn-block red" id="resetBoard">Reset board</button>
+
+        <div class="sep"></div>
+        <h4 class="sec-h danger-h">Destructive</h4>
+        <p class="sec-p">These cannot be undone.</p>
+        <button class="btn-block red" id="clearAudit">Clear audit log</button>
+        <button class="btn-block red" id="wipeAll">Delete all tasks and plates</button>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- Confirm dialog -->
+<div class="scrim top" id="confirmScrim"></div>
+<div class="confirm" id="confirm" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="confirm-ic" id="confirmIc">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+    </svg>
+  </div>
+  <h3 id="confirmTitle">Are you sure?</h3>
+  <p class="confirm-t" id="confirmText"></p>
+  <div class="confirm-facts" id="confirmFacts" hidden></div>
+  <div class="confirm-btns">
+    <button class="btn-block" id="confirmNo">Cancel</button>
+    <button class="btn-block solid" id="confirmYes">Confirm</button>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="sync.js"></script>
+<script src="app.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
