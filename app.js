@@ -107,7 +107,9 @@ document.addEventListener("keydown", e => {
 /* Promise-based confirm, replacing window.confirm. */
 let confirmResolve = null;
 
-function askConfirm({ title, text, facts = [], yes = "Confirm", no = "Cancel", danger = false } = {}){
+/* solo:true turns this into an acknowledgement — one button, no choice. Used
+   where the answer is "you may not do that" rather than "are you sure?". */
+function askConfirm({ title, text, facts = [], yes = "Confirm", no = "Cancel", danger = false, solo = false } = {}){
   if(confirmResolve) closeConfirm(false);
   $("confirmTitle").textContent = title || "Are you sure?";
   $("confirmText").textContent  = text || "";
@@ -122,6 +124,7 @@ function askConfirm({ title, text, facts = [], yes = "Confirm", no = "Cancel", d
   yesBtn.textContent = yes;
   yesBtn.className = "btn-block " + (danger ? "red" : "solid");
   $("confirmNo").textContent = no;
+  $("confirmNo").hidden = solo;
 
   $("confirm").classList.add("on");
   $("confirmScrim").classList.add("on");
@@ -202,6 +205,9 @@ function renderChrome(){
     show = { cls:"", msg:"Local mode — changes stay in this browser. Set REPO in config.js to share with your team.", action:null };
   }else if(state.mode === "local"){
     show = { cls:"bad", msg:"Couldn't reach the shared board. Working locally for now.", action:"Retry", fn: () => location.reload() };
+  }else if(amBlocked()){
+    show = { cls:"bad", msg:`An admin has removed edit access for ${me()}. You can still read the board.`,
+             action:null };
   }else if(state.mode === "viewer"){
     show = { cls:"info", msg:"You're viewing the board. Enter your team code to complete tasks and check out plates.",
              action:"Enter code", fn: openUserModal };
@@ -279,7 +285,7 @@ function renderList(){
 
   if(!shown.length){ list.innerHTML = ""; return; }
 
-  const readOnly = state.mode === "viewer";
+  const readOnly = state.mode === "viewer" || amBlocked();
   list.innerHTML = shown.map(t => taskCard(t, readOnly)).join("");
 }
 
@@ -358,21 +364,31 @@ function renderPlateMenu(){
   }
 
   body.innerHTML = plates.map(p => {
-    const mine  = name && p.checkedOutBy === name;
-    const taken = p.checkedOutBy && !mine;
+    const mine   = name && p.checkedOutBy === name;
+    const taken  = p.checkedOutBy && !mine;
+    const locked = !!p.forcedBy;
     // Keep these short — the pill already says Yours/Taken, so repeating it
     // here just crowds the row and forces the plate number to truncate.
-    const sub = mine  ? "Click to release"
-              : taken ? `With ${p.checkedOutBy}`
+    const sub = locked && mine ? "Locked to you by an admin"
+              : locked        ? `Locked to ${p.checkedOutBy}`
+              : mine          ? "Click to release"
+              : taken         ? `With ${p.checkedOutBy}`
               : (p.note || "Available");
+
+    const pill = locked && mine ? '<span class="pill warm">Locked</span>'
+               : locked         ? '<span class="pill idle">Locked</span>'
+               : mine           ? '<span class="pill ok">Yours</span>'
+               : taken          ? '<span class="pill idle">Taken</span>'
+               : "";
+
     return `
-<button class="menu-item ${mine ? "mine" : taken ? "taken" : ""}" role="menuitem"
-        data-plate="${p.id}" ${taken ? "disabled" : ""}>
+<button class="menu-item ${mine ? "mine" : taken || locked ? "taken" : ""}" role="menuitem"
+        data-plate="${p.id}" ${(taken && !mine) || (locked && !mine) ? "disabled" : ""}>
   <span class="mi-main">
     <span class="mi-plate">${escHtml(p.label)}</span>
     <span class="mi-sub">${escHtml(sub)}</span>
   </span>
-  ${mine ? '<span class="pill ok">Yours</span>' : taken ? '<span class="pill idle">Taken</span>' : ""}
+  ${pill}
 </button>`;
   }).join("");
 }
@@ -414,13 +430,16 @@ function checkoutPlate(plateId){
   return commit("Check out plate", data => {
     const p = data.plates.find(x => x.id === plateId);
     if(!p) throw new Error("That plate no longer exists.");
+    if(p.forcedBy && p.checkedOutBy !== name){
+      throw new Error(`${p.label} is locked to ${p.checkedOutBy} by an admin.`);
+    }
     if(p.checkedOutBy && p.checkedOutBy !== name){
       throw new Error(`${p.label} was just checked out by ${p.checkedOutBy}.`);
     }
-    // One plate per person — release any other first.
+    // One plate per person — release any other first, unless an admin locked it.
     const entries = [];
     data.plates.forEach(other => {
-      if(other.id !== plateId && other.checkedOutBy === name){
+      if(other.id !== plateId && other.checkedOutBy === name && !other.forcedBy){
         other.checkedOutBy = null;
         other.checkedOutAt = null;
         entries.push({ action:"plate.release", subject: other.label });
@@ -433,11 +452,24 @@ function checkoutPlate(plateId){
   });
 }
 
-function releasePlate(plateId){
+async function releasePlate(plateId){
   const name = me();
+  const plate = state.data.plates.find(p => p.id === plateId);
+
+  // An admin-locked plate can only be handed back by an admin.
+  if(plate && plate.forcedBy){
+    await askConfirm({
+      title: "This plate is locked to you",
+      text : `An admin has forcibly assigned ${plate.label} to you. You can't hand it back — ask ${plate.forcedBy} to unlock it in Admin.`,
+      yes  : "OK", solo: true, danger: true
+    });
+    return false;
+  }
+
   return commit("Release plate", data => {
     const p = data.plates.find(x => x.id === plateId);
     if(!p) return null;
+    if(p.forcedBy) throw new Error(`An admin has forcibly assigned ${p.label} to you.`);
     if(p.checkedOutBy !== name) throw new Error("That plate isn't checked out to you.");
     p.checkedOutBy = null;
     p.checkedOutAt = null;

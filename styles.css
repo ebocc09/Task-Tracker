@@ -484,12 +484,38 @@ select.inp{cursor:pointer}
   font-size:12px;color:var(--ink-mute);word-break:break-all;
 }
 .repo-line strong{color:var(--ink);font-weight:600}
-.gate-ic{
-  width:46px;height:46px;border-radius:50%;margin:6px auto 18px;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--paper-alt);color:var(--ink-mute);
+.lock-ic{
+  width:46px;height:46px;margin:6px auto 14px;border-radius:50%;
+  background:var(--paper-alt);display:flex;align-items:center;justify-content:center;
 }
-.gate-ic svg{width:22px;height:22px}
+.lock-ic svg{width:21px;height:21px;color:var(--ink-soft)}
+.gate-t{text-align:center;font-size:13px;color:var(--ink-mute);margin-bottom:18px}
+
+/* Six-digit code entry, styled like a 2FA prompt. */
+.otp{display:flex;gap:9px;justify-content:center;margin-bottom:2px}
+.otp-box{
+  width:46px;height:56px;padding:0;
+  border:1px solid var(--line);border-radius:var(--r-md);
+  background:var(--paper);
+  text-align:center;font-size:22px;font-weight:600;
+  font-variant-numeric:tabular-nums;
+  outline:none;transition:border-color .15s,box-shadow .15s,background .15s;
+  -webkit-text-security:disc;
+}
+.otp-box::-webkit-outer-spin-button,.otp-box::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.otp-box:focus{border-color:var(--ink);box-shadow:0 0 0 3px rgba(23,26,32,.10)}
+.otp-box.filled{background:var(--paper-alt);border-color:#A9ABAD}
+.otp.bad .otp-box{border-color:var(--t-bad-fg);background:#FDF2F2}
+.otp.bad{animation:otpShake .38s cubic-bezier(.36,.07,.19,.97)}
+@keyframes otpShake{
+  10%,90%{transform:translateX(-2px)} 20%,80%{transform:translateX(4px)}
+  30%,50%,70%{transform:translateX(-7px)} 40%,60%{transform:translateX(7px)}
+}
+@media (max-width:420px){ .otp{gap:6px} .otp-box{width:40px;height:50px;font-size:19px} }
+.gate-err{
+  margin-top:10px;font-size:12.5px;color:var(--t-bad-fg);text-align:center;
+  height:17px;
+}
 
 /* Admin rail + pane */
 .admin{display:grid;grid-template-columns:218px 1fr;min-height:0;flex:1}

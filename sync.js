@@ -30,7 +30,7 @@ const state = {
 };
 
 function emptyBoard(){
-  return { version:1, updatedAt:null, updatedBy:null, plates:[], tasks:[], audit:[] };
+  return { version:1, updatedAt:null, updatedBy:null, plates:[], tasks:[], audit:[], blocked:[] };
 }
 
 /* Defensive: never trust the shape of a file other people can edit. */
@@ -46,8 +46,15 @@ function normalize(raw){
     label        : String(p.label),
     note         : p.note ? String(p.note) : "",
     checkedOutBy : p.checkedOutBy ? String(p.checkedOutBy) : null,
-    checkedOutAt : p.checkedOutAt ? String(p.checkedOutAt) : null
+    checkedOutAt : p.checkedOutAt ? String(p.checkedOutAt) : null,
+    // Set to the admin's name when locked. Only an admin can clear it.
+    forcedBy     : p.forcedBy ? String(p.forcedBy) : null,
+    forcedAt     : p.forcedAt ? String(p.forcedAt) : null
   })) : [];
+
+  board.blocked = Array.isArray(d.blocked)
+    ? [...new Set(d.blocked.filter(n => typeof n === "string" && n.trim()).map(n => n.trim()))]
+    : [];
 
   const OK = ["pending","complete","partial","blocked"];
   board.tasks = Array.isArray(d.tasks) ? d.tasks.filter(t => t && t.id && t.title).map(t => ({
@@ -137,7 +144,14 @@ function maskToken(t){
 const repoConfigured = () =>
   REPO.owner && !/^YOUR-GITHUB-USERNAME$/i.test(REPO.owner) && REPO.name;
 
-const canWrite = () => state.mode === "member" || state.mode === "local";
+const canWrite = () => (state.mode === "member" || state.mode === "local") && !amBlocked();
+
+/* Blocked is advisory — the team code is shared, so this stops a cooperative
+   person, not a determined one. Admin → People says as much. */
+function amBlocked(){
+  const n = me();
+  return !!n && Array.isArray(state.data.blocked) && state.data.blocked.includes(n);
+}
 
 /* UTF-8 safe base64 — btoa alone mangles anything non-ASCII. */
 function b64encode(str){
@@ -299,7 +313,12 @@ async function commit(label, mutator){
   if(!me()){ openUserModal(); return false; }
 
   if(state.mode === "viewer"){
-    toast("Read-only — click the status chip in the top bar to connect a token.", "bad");
+    toast("Read-only — enter your team code to make changes.", "bad");
+    return false;
+  }
+
+  if(amBlocked()){
+    toast(`An admin has removed edit access for ${me()}. Ask them to restore it.`, "bad");
     return false;
   }
 

@@ -19,28 +19,92 @@ function openAdminModal(){
   $("adminGate").hidden = unlocked;
   $("adminBody").hidden = !unlocked;
   $("adminModal").classList.toggle("wide", unlocked);
-  $("gateInput").value = "";
-  $("gateErr").hidden = true;
-  if(unlocked) renderAdmin();
+  $("gateErr").textContent = "";
+  $("otp").classList.remove("bad");
+  if(unlocked){
+    renderAdmin();
+  }else{
+    otpClear(false);
+    setTimeout(() => otpBoxes[0].focus(), 60);
+  }
   openModal("adminModal");
 }
 
+/* ── six-digit gate ─────────────────────────────────────────────────────── */
+
+const otpBoxes = Array.from(document.querySelectorAll("#otp .otp-box"));
+const otpValue = () => otpBoxes.map(b => b.value).join("");
+
+function otpClear(focus){
+  otpBoxes.forEach(b => { b.value = ""; b.classList.remove("filled"); });
+  if(focus) otpBoxes[0].focus();
+}
+
+function otpFill(digits){
+  otpBoxes.forEach((b, i) => {
+    b.value = digits[i] || "";
+    b.classList.toggle("filled", Boolean(b.value));
+  });
+  const nextEmpty = otpBoxes.findIndex(b => !b.value);
+  (nextEmpty === -1 ? otpBoxes[5] : otpBoxes[nextEmpty]).focus();
+  if(digits.length >= 6) submitGate();
+}
+
+otpBoxes.forEach((box, i) => {
+  box.addEventListener("input", () => {
+    // Keep digits only; a fast typist can land two characters in one box.
+    const digits = box.value.replace(/\D/g, "");
+    box.value = digits.slice(0, 1);
+    box.classList.toggle("filled", Boolean(box.value));
+    $("gateErr").textContent = "";
+    $("otp").classList.remove("bad");
+
+    if(digits.length > 1){ otpFill(otpValue().slice(0, i) + digits); return; }
+    if(box.value && i < 5) otpBoxes[i + 1].focus();
+    if(otpValue().length === 6) submitGate();
+  });
+
+  box.addEventListener("keydown", e => {
+    if(e.key === "Backspace" && !box.value && i > 0){
+      e.preventDefault();
+      otpBoxes[i - 1].value = "";
+      otpBoxes[i - 1].classList.remove("filled");
+      otpBoxes[i - 1].focus();
+    }
+    if(e.key === "ArrowLeft"  && i > 0){ e.preventDefault(); otpBoxes[i - 1].focus(); }
+    if(e.key === "ArrowRight" && i < 5){ e.preventDefault(); otpBoxes[i + 1].focus(); }
+    if(e.key === "Enter") submitGate();
+  });
+
+  box.addEventListener("paste", e => {
+    e.preventDefault();
+    const digits = (e.clipboardData.getData("text") || "").replace(/\D/g, "").slice(0, 6);
+    if(digits) otpFill(digits);
+  });
+
+  box.addEventListener("focus", () => box.select());
+});
+
 function submitGate(){
-  const input = $("gateInput");
-  const err   = $("gateErr");
-  if(input.value.trim() !== String(ADMIN_PASSCODE)){
-    err.textContent = "Incorrect passcode.";
-    err.hidden = false;
-    input.value = "";
-    input.focus();
+  const code = otpValue();
+  if(code.length < 6){
+    $("gateErr").textContent = "Enter all six digits.";
     return;
   }
-  sessionStorage.setItem(UNLOCK_KEY, "1");
-  $("adminGate").hidden = true;
-  $("adminBody").hidden = false;
-  $("adminModal").classList.add("wide");
-  renderAdmin();
-  showSection("tasks");
+  if(code === String(ADMIN_PASSCODE)){
+    sessionStorage.setItem(UNLOCK_KEY, "1");
+    otpClear(false);
+    $("gateErr").textContent = "";
+    $("adminGate").hidden = true;
+    $("adminBody").hidden = false;
+    $("adminModal").classList.add("wide");
+    renderAdmin();
+    showSection("tasks");
+  }else{
+    $("otp").classList.add("bad");
+    $("gateErr").textContent = "Incorrect code.";
+    setTimeout(() => { $("otp").classList.remove("bad"); otpClear(true); }, 420);
+  }
 }
 
 function showSection(name){
@@ -61,9 +125,195 @@ function flash(message){
 function renderAdmin(){
   renderAdminTasks();
   renderAdminPlates();
+  renderAdminPeople();
   renderAdminAudit();
   renderConnection();
   renderRailFoot();
+}
+
+/* ─────────────────────────────── people ────────────────────────────────── */
+
+/* There are no sessions to enumerate — no server, no logins. The honest
+   equivalent is everyone the board has heard from, newest first. */
+function knownPeople(){
+  const seen = new Map();      // name -> { name, lastAt, actions }
+  const note = (name, at) => {
+    if(!name) return;
+    const e = seen.get(name) || { name, lastAt: null, actions: 0 };
+    e.actions++;
+    if(at && (!e.lastAt || Date.parse(at) > Date.parse(e.lastAt))) e.lastAt = at;
+    seen.set(name, e);
+  };
+
+  state.data.audit.forEach(a => note(a.who, a.at));
+  state.data.plates.forEach(p => note(p.checkedOutBy, p.checkedOutAt));
+  const mine = me();
+  if(mine && !seen.has(mine)) seen.set(mine, { name: mine, lastAt: null, actions: 0 });
+
+  return [...seen.values()].sort((a, b) => {
+    if(!a.lastAt) return 1;
+    if(!b.lastAt) return -1;
+    return Date.parse(b.lastAt) - Date.parse(a.lastAt);
+  });
+}
+
+function renderAdminPeople(){
+  const people = knownPeople();
+  const blocked = state.data.blocked || [];
+  $("peopleCount").textContent = people.length;
+
+  const dot = $("peopleDot");
+  dot.hidden = blocked.length === 0;
+
+  // Keep the force-assign controls in step with who exists.
+  $("knownPeople").innerHTML = people.map(p => `<option value="${escHtml(p.name)}">`).join("");
+  const sel = $("forcePlate");
+  const keep = sel.value;
+  sel.innerHTML = state.data.plates.length
+    ? state.data.plates.map(p =>
+        `<option value="${escHtml(p.id)}">${escHtml(p.label)}${p.forcedBy ? " — locked" : p.checkedOutBy ? ` — with ${escHtml(p.checkedOutBy)}` : ""}</option>`).join("")
+    : `<option value="">No plates yet</option>`;
+  if([...sel.options].some(o => o.value === keep)) sel.value = keep;
+
+  const box = $("admPeople");
+  if(!people.length){
+    box.innerHTML = `<div class="adm-empty">Nobody has used the board yet.</div>`;
+    return;
+  }
+
+  box.innerHTML = people.map(p => {
+    const isBlocked = blocked.includes(p.name);
+    const plate = state.data.plates.find(x => x.checkedOutBy === p.name);
+    const isMe  = p.name === me();
+    const sub = [
+      p.lastAt ? `Last active ${relTime(p.lastAt)}` : "No activity yet",
+      plate ? `holding ${plate.label}${plate.forcedBy ? " (locked)" : ""}` : null,
+      `${p.actions} action${p.actions === 1 ? "" : "s"}`
+    ].filter(Boolean).join(" · ");
+
+    return `
+<div class="adm-row">
+  <div class="am">
+    <div class="adm-t">${escHtml(p.name)}${isMe ? ' <span class="pill info">You</span>' : ""}</div>
+    <div class="adm-s">${escHtml(sub)}</div>
+  </div>
+  ${isBlocked ? '<span class="pill bad">Blocked</span>' : ""}
+  <button class="mini ${isBlocked ? "" : "red"}"
+          data-block="${escHtml(p.name)}"
+          data-action="${isBlocked ? "unblock" : "block"}">${isBlocked ? "Restore" : "Block"}</button>
+</div>`;
+  }).join("");
+}
+
+async function setBlocked(name, block){
+  if(block){
+    const ok = await askConfirm({
+      title: `Block ${name}?`,
+      text : "The board goes read-only for anyone using that name, and any plate they hold is released. They could rename themselves and carry on — the team code is shared — so this is a firm request rather than a lock.",
+      facts: [["Name", name]],
+      yes  : "Block", danger: true
+    });
+    if(!ok) return;
+  }
+
+  await commit(block ? `Block ${name}` : `Restore ${name}`, data => {
+    data.blocked = data.blocked || [];
+    const entries = [];
+
+    if(block){
+      if(!data.blocked.includes(name)) data.blocked.push(name);
+      // Don't leave a blocked person holding a plate nobody can reclaim.
+      data.plates.forEach(p => {
+        if(p.checkedOutBy === name){
+          p.checkedOutBy = null; p.checkedOutAt = null; p.forcedBy = null; p.forcedAt = null;
+          entries.push({ action:"plate.force", subject: p.label, detail:`released from ${name}` });
+        }
+      });
+      entries.push({ action:"person.block", subject: name });
+    }else{
+      data.blocked = data.blocked.filter(n => n !== name);
+      entries.push({ action:"person.unblock", subject: name });
+    }
+    return entries;
+  });
+
+  render();
+  renderAdmin();
+  flash(block ? "Blocked" : "Restored");
+}
+
+/* ───────────────────────────── force assign ────────────────────────────── */
+
+async function forceAssignPlate(){
+  const plateId = $("forcePlate").value;
+  const who     = $("forceWho").value.trim();
+
+  if(!plateId){ toast("Add a plate first.", "bad"); return; }
+  if(!who){ toast("Who should it go to?", "bad"); $("forceWho").focus(); return; }
+
+  const plate = state.data.plates.find(p => p.id === plateId);
+  if(!plate) return;
+
+  if((state.data.blocked || []).includes(who)){
+    toast(`${who} is blocked. Restore them first.`, "bad");
+    return;
+  }
+
+  const facts = [["Plate", plate.label], ["Assign to", who]];
+  if(plate.checkedOutBy && plate.checkedOutBy !== who) facts.push(["Taking from", plate.checkedOutBy]);
+
+  const ok = await askConfirm({
+    title: "Lock this plate?",
+    text : `${who} won't be able to hand it back — only an admin can unlock it. They'll see a message saying it was assigned by an admin.`,
+    facts, yes: "Assign and lock"
+  });
+  if(!ok) return;
+
+  const admin = me();
+  const done = await commit(`Force assign ${plate.label} to ${who}`, data => {
+    const p = data.plates.find(x => x.id === plateId);
+    if(!p) throw new Error("That plate no longer exists.");
+    const from = p.checkedOutBy;
+    p.checkedOutBy = who;
+    p.checkedOutAt = nowIso();
+    p.forcedBy = admin || "an admin";
+    p.forcedAt = nowIso();
+    return {
+      action : "plate.assign",
+      subject: p.label,
+      detail : from && from !== who ? `to ${who}, taken from ${from}` : `to ${who}`
+    };
+  });
+
+  if(done){
+    $("forceWho").value = "";
+    render();
+    renderAdmin();
+    flash("Assigned");
+  }
+}
+
+async function unlockPlate(plateId){
+  const plate = state.data.plates.find(p => p.id === plateId);
+  if(!plate || !plate.forcedBy) return;
+
+  const ok = await askConfirm({
+    title: "Unlock this plate?",
+    text : `${plate.checkedOutBy} will be able to release it themselves again. It stays checked out to them.`,
+    facts: [["Plate", plate.label], ["Locked to", plate.checkedOutBy || "—"], ["Locked by", plate.forcedBy]],
+    yes  : "Unlock"
+  });
+  if(!ok) return;
+
+  await commit(`Unlock ${plate.label}`, data => {
+    const p = data.plates.find(x => x.id === plateId);
+    if(!p) return null;
+    p.forcedBy = null; p.forcedAt = null;
+    return { action:"plate.unlock", subject: p.label };
+  });
+  render();
+  renderAdmin();
+  flash("Unlocked");
 }
 
 /* ───────────────────────────── connection ──────────────────────────────── */
@@ -328,18 +578,22 @@ function renderAdminPlates(){
   }
 
   box.innerHTML = plates.map(p => {
-    const out = !!p.checkedOutBy;
-    const sub = out
-      ? `Checked out by ${escHtml(p.checkedOutBy)} · ${escHtml(relTime(p.checkedOutAt))}`
-      : (p.note ? escHtml(p.note) : "Available");
+    const out    = !!p.checkedOutBy;
+    const locked = !!p.forcedBy;
+    const sub = locked
+      ? `Locked to ${escHtml(p.checkedOutBy)} by ${escHtml(p.forcedBy)} · ${escHtml(relTime(p.forcedAt))}`
+      : out
+        ? `Checked out by ${escHtml(p.checkedOutBy)} · ${escHtml(relTime(p.checkedOutAt))}`
+        : (p.note ? escHtml(p.note) : "Available");
     return `
 <div class="adm-row">
   <div class="am">
     <div class="adm-t">${escHtml(p.label)}</div>
     <div class="adm-s">${sub}</div>
   </div>
-  <span class="pill ${out ? "warm" : "idle"}">${out ? "Out" : "Free"}</span>
-  ${out ? `<button class="mini" data-freeplate="${p.id}">Force release</button>` : ""}
+  <span class="pill ${locked ? "bad" : out ? "warm" : "idle"}">${locked ? "Locked" : out ? "Out" : "Free"}</span>
+  ${locked ? `<button class="mini" data-unlockplate="${p.id}">Unlock</button>` : ""}
+  ${out && !locked ? `<button class="mini" data-freeplate="${p.id}">Force release</button>` : ""}
   <button class="mini red" data-delplate="${p.id}">Delete</button>
 </div>`;
   }).join("");
@@ -398,6 +652,10 @@ function auditPhrase(r){
     case "plate.add":      return `added plate ${s}`;
     case "plate.delete":   return `deleted plate ${s}`;
     case "plate.force":    return `force-released plate ${s}`;
+    case "plate.assign":   return `force-assigned plate ${s}`;
+    case "plate.unlock":   return `unlocked plate ${s}`;
+    case "person.block":   return `blocked ${s} from editing`;
+    case "person.unblock": return `restored edit access for ${s}`;
     case "board.reset":    return `reset the board`;
     case "audit.clear":    return `cleared the audit log`;
     case "board.wipe":     return `deleted all tasks and plates`;
@@ -685,7 +943,12 @@ function exportAuditCsv(){
 
 (function wireAdmin(){
   $("gateSubmit").addEventListener("click", submitGate);
-  $("gateInput").addEventListener("keydown", e => { if(e.key === "Enter") submitGate(); });
+
+  $("forceAssign").addEventListener("click", forceAssignPlate);
+  $("admPeople").addEventListener("click", e => {
+    const block = e.target.closest("[data-block]");
+    if(block) return setBlocked(block.dataset.block, block.dataset.action === "block");
+  });
 
   $("adminRail").addEventListener("click", e => {
     const btn = e.target.closest(".rail-item");
@@ -711,6 +974,8 @@ function exportAuditCsv(){
     if(del) return deletePlate(del.dataset.delplate);
     const free = e.target.closest("[data-freeplate]");
     if(free) return forceReleasePlate(free.dataset.freeplate);
+    const unlock = e.target.closest("[data-unlockplate]");
+    if(unlock) return unlockPlate(unlock.dataset.unlockplate);
   });
 
   $("connSave").addEventListener("click", saveConnection);
