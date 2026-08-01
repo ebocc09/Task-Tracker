@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T04:35:57.995Z",
+  "updatedAt": "2026-08-01T04:36:19.481Z",
   "updatedBy": "Bob",
   "plates": [
     {
@@ -63,6 +63,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_ms9vpq554",
+      "at": "2026-08-01T04:36:19.481Z",
+      "who": "Bob",
+      "action": "reopen.request",
+      "subject": "Plate Audit",
+      "detail": "Completed by mistake"
+    },
     {
       "id": "a_ms9vp9kbe",
       "at": "2026-08-01T04:35:57.995Z",
@@ -312,5 +320,15 @@
       "to": "Bob"
     }
   ],
-  "requests": []
+  "requests": [],
+  "reopenRequests": [
+    {
+      "id": "ro_ms9vpq553",
+      "at": "2026-08-01T04:36:19.481Z",
+      "by": "Bob",
+      "taskId": "t_ms9ugrio1",
+      "taskTitle": "Plate Audit",
+      "reason": "Completed by mistake"
+    }
+  ]
 }
