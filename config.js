@@ -5,6 +5,11 @@
    ========================================================================== */
 "use strict";
 
+/* Bump on every deploy, and match the ?v= on the script tags in index.html.
+   Shown in the footer and logged at boot, so "which build am I actually
+   running?" is answerable at a glance instead of by guesswork. */
+const BUILD = "5";
+
 /* Which repository holds the shared board data.
    Point this at your own repo, then commit and push. */
 const REPO = {

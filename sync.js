@@ -229,7 +229,20 @@ async function pull(){
 
 async function pullRawFallback(){
   const url = `https://raw.githubusercontent.com/${REPO.owner}/${REPO.name}/${REPO.branch}/${REPO.path}?t=${Date.now()}`;
-  const res = await fetch(url, { cache: "no-store" });
+
+  // Same timeout discipline as gh(). This runs on the failure path, so a stall
+  // here would hang boot at exactly the moment something is already wrong.
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+  let res;
+  try{
+    res = await fetch(url, { cache: "no-store", signal: ctrl.signal });
+  }catch(e){
+    throw new GhError(e && e.name === "AbortError" ? "Backup route timed out" : "Backup route unreachable", 0, null);
+  }finally{
+    clearTimeout(timer);
+  }
+
   if(!res.ok) throw new GhError("Raw fetch failed", res.status, null);
   return { data: normalize(await res.json()), sha: null };  // no sha → read-only
 }

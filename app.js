@@ -218,9 +218,9 @@ function renderChrome(){
     state.mode === "member" ? `Connected as ${state.user || me() || "—"}`
     : state.mode === "viewer" ? "Read-only"
     : "Local mode";
-  $("footSync").textContent = state.lastSync
+  $("footSync").textContent = (state.lastSync
     ? "Last synced " + relTime(new Date(state.lastSync).toISOString())
-    : (state.mode === "local" ? "Not syncing" : "Never synced");
+    : (state.mode === "local" ? "Not syncing" : "Never synced")) + " · build " + BUILD;
 }
 
 function renderHero(){
@@ -726,6 +726,11 @@ function wireEvents(){
 /* ──────────────────────────────── boot ─────────────────────────────────── */
 
 (async function boot(){
+  console.log(
+    `[Task Tracker] build ${BUILD} · repo ${REPO.owner}/${REPO.name}@${REPO.branch} · ` +
+    `token ${token() ? "present" : "none"}`
+  );
+
   wireEvents();
   render();                      // paint the empty shell straight away
 
