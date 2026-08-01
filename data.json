@@ -1,14 +1,14 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T03:36:22.949Z",
+  "updatedAt": "2026-08-01T03:36:25.727Z",
   "updatedBy": "Enzo",
   "plates": [
     {
       "id": "p_ms9tjbasa",
       "label": "6EX-831",
       "note": "",
-      "checkedOutBy": "Enzo",
-      "checkedOutAt": "2026-08-01T03:36:22.948Z"
+      "checkedOutBy": null,
+      "checkedOutAt": null
     },
     {
       "id": "p_ms9tjkoid",
@@ -41,6 +41,14 @@
   ],
   "tasks": [],
   "audit": [
+    {
+      "id": "a_ms9tkp6ns",
+      "at": "2026-08-01T03:36:25.727Z",
+      "who": "Enzo",
+      "action": "plate.release",
+      "subject": "6EX-831",
+      "detail": ""
+    },
     {
       "id": "a_ms9tkn1hq",
       "at": "2026-08-01T03:36:22.949Z",
