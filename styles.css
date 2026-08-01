@@ -519,6 +519,9 @@ select.inp{cursor:pointer}
   font-size:11px;font-weight:700;letter-spacing:0;
 }
 .filters{margin-bottom:14px}
+.code-row{align-items:stretch}
+.code-row .inp{flex:2 1 0;min-width:0;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.code-row .btn-block{flex:0 0 auto;width:auto;padding:0 18px;margin-bottom:0}
 
 /* Admin lists */
 .adm-list{display:flex;flex-direction:column;gap:8px}

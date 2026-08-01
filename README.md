@@ -37,8 +37,8 @@ Three roles, picked automatically:
 
 | Role | When | Can do |
 |---|---|---|
-| **Viewer** | no token saved | Read the board. Refreshes every 2 min. |
-| **Member** | valid token saved | Everything. Refreshes every 20 s. |
+| **Viewer** | no team code saved | Read the board. Refreshes every 2 min. |
+| **Member** | valid team code saved | Everything. Refreshes every 20 s. |
 | **Local** | no repo configured, or GitHub unreachable | Everything, but only in their own browser. |
 
 Local mode is the graceful fallback — open `index.html` with no setup at all and
@@ -97,26 +97,50 @@ Without this their token will be rejected no matter what the page lets them clic
 
 ---
 
-## Setup (each teammate)
+## Setup (the team code)
 
-Viewing needs nothing — just open the link.
+There is **one code for the whole team**. You create it once; everyone else
+pastes it once per device.
 
-To **make changes**, each person does this once, in their own browser:
+### You, once
 
-1. Open the board, click **USERNAME**, type your name, Save.
-2. Click the status chip in the top bar (it reads `READ ONLY`).
-3. Click **Create a token on GitHub**. On that page:
+1. Open the board → **Admin** → passcode → **Connection**.
+2. Click **Create a token on GitHub**. On that page:
    - **Token name**: anything, e.g. `task-tracker`
-   - **Expiration**: your call — you'll need to redo this when it lapses
-   - **Repository access**: *Only select repositories* → pick `task-tracker`
+   - **Expiration**: your call — you'll redo this when it lapses
+   - **Repository access**: *Only select repositories* → pick your repo
    - **Permissions** → *Repository permissions* → **Contents: Read and write**
-     *(this is the only permission needed — leave everything else alone)*
-4. Generate it, copy it, paste it into the board, click **Connect**.
+     *(the only permission needed — leave everything else alone)*
+3. Generate, copy, paste it into **Team code**, click **Connect**.
+4. Hit **Copy** and send that code to your team.
 
-The token is stored in that browser's `localStorage` and nowhere else. It is
-never written into `data.json` and never committed. Each person has their own.
+### Each teammate, once per device
 
-The chip turns green and reads `SYNCED`.
+Open the link, type their name, paste the code, done. No GitHub account, no
+token page, nothing to configure.
+
+Viewing needs nothing at all — no code, no account.
+
+### Why the code can't just be built into the site
+
+Because GitHub would kill it. Secret scanning detects access tokens committed
+to public repositories and revokes them automatically, usually within minutes.
+Beyond that, anything in `config.js` is served publicly by Pages, so embedding
+it would hand write access to anyone who found the URL.
+
+So the code is distributed out-of-band — Slack, text, however you like — and
+lives only in each browser's `localStorage`. It is never written into
+`data.json` and never committed.
+
+### Treat the code like a door code
+
+Anyone holding it can change the board. If it leaks, revoke the token on GitHub
+(Settings → Developer settings → Personal access tokens), generate a new one,
+and redistribute. Everyone re-pastes once.
+
+If you'd rather each person be individually revocable, skip the shared code and
+have each teammate create their own token with the same settings — the app
+treats them identically.
 
 ---
 
@@ -252,8 +276,9 @@ degrades gracefully instead of breaking the page.
 
 ## Troubleshooting
 
-**Chip says `READ ONLY` and I have a token** — it was rejected. Click the chip and
-reconnect. Most often the token expired, or it wasn't scoped to this repository.
+**Chip says `READ ONLY` and I entered the code** — it was rejected. Re-enter it
+via **USERNAME**, or **Admin → Connection**. Most often the token expired, was
+copied incompletely, or wasn't scoped to this repository.
 
 **"That token can't write to this repo"** — either the token is missing
 **Contents: Read and write**, or you haven't been added as a collaborator.

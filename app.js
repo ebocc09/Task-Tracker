@@ -49,7 +49,7 @@ function toast(message, kind = ""){
 
 /* ────────────────────────── overlay plumbing ───────────────────────────── */
 
-const OVERLAYS = ["userModal","tokenModal","adminModal"];
+const OVERLAYS = ["userModal","adminModal"];
 let lastFocus = null;
 
 function anyOverlayOpen(){
@@ -189,9 +189,9 @@ function renderChrome(){
   else { label.textContent = "LOCAL"; }
   chip.title = state.lastError
     ? state.lastError
-    : state.mode === "member" ? `Connected as ${state.user || "—"} · click to manage`
-    : state.mode === "viewer" ? "Viewing only · click to connect a token"
-    : "Local mode · changes stay in this browser";
+    : state.mode === "member" ? `Connected as ${state.user || "—"}`
+    : state.mode === "viewer" ? "Viewing only — enter your team code to make changes"
+    : "Local mode — changes stay in this browser";
 
   // Banner
   const banner = $("banner"), text = $("bannerText"), btn = $("bannerBtn");
@@ -203,7 +203,8 @@ function renderChrome(){
   }else if(state.mode === "local"){
     show = { cls:"bad", msg:"Couldn't reach the shared board. Working locally for now.", action:"Retry", fn: () => location.reload() };
   }else if(state.mode === "viewer"){
-    show = { cls:"info", msg:"You're viewing the board. Connect a GitHub token to complete tasks and check out plates.", action:"Connect", fn: openTokenModal };
+    show = { cls:"info", msg:"You're viewing the board. Enter your team code to complete tasks and check out plates.",
+             action:"Enter code", fn: openUserModal };
   }
   banner.hidden = !show;
   if(show){
@@ -442,38 +443,102 @@ function releasePlate(plateId){
   });
 }
 
+/* ─────────────────────── team code (shared connect) ────────────────────── */
+
+/**
+ * Validate a team code and switch this device to member mode.
+ * Used by both the first-run modal and Admin → Connection, so the two can
+ * never drift apart in what they accept or how they report failure.
+ * @returns {Promise<{ok:boolean, error?:string, login?:string}>}
+ */
+async function connectTeamCode(value){
+  const code = String(value || "").trim();
+
+  if(!code)            return { ok:false, error:"Paste the code first." };
+  if(/\s/.test(code))  return { ok:false, error:"The code shouldn't contain spaces — check for a stray line break." };
+  if(code.length < 20) return { ok:false, error:"That doesn't look like a full code. Make sure you copied all of it." };
+
+  setToken(code);
+  try{
+    const res  = await gh("https://api.github.com/user");
+    const user = await res.json();
+    state.user = user.login;
+    state.mode = "member";
+    state.lastError = null;
+
+    await refresh({ quiet: true });
+    startPolling();
+    render();
+    return { ok:true, login:user.login };
+  }catch(e){
+    setToken(null);
+    state.user = null;
+    state.mode = repoConfigured() ? "viewer" : "local";
+    render();
+    return {
+      ok: false,
+      error: e.status === 401
+        ? "GitHub rejected that code. It may have expired, or been copied incompletely."
+        : explainError(e, "check the code")
+    };
+  }
+}
+
 /* ───────────────────────────── user modal ──────────────────────────────── */
 
 function openUserModal(){
+  const needsCode = repoConfigured() && !token();
+  const firstRun  = !me();
+
+  $("userModalTitle").textContent = firstRun ? "Welcome" : "Your details";
   $("userInput").value = me() || "";
+  $("teamCodeField").hidden = !needsCode;
+  $("teamCodeInput").value = "";
   $("userErr").hidden = true;
+  $("userSave").textContent = needsCode ? "Save and connect" : "Save";
   openModal("userModal");
 }
 
-function saveUserName(){
+async function saveUserName(){
   const input = $("userInput");
-  const next = input.value.trim();
-  const err  = $("userErr");
+  const codeEl = $("teamCodeInput");
+  const err   = $("userErr");
+  const btn   = $("userSave");
+  const next  = input.value.trim();
 
-  if(next.length < 2){
-    err.textContent = "Please enter at least two characters.";
+  const fail = (msg, focusEl) => {
+    err.textContent = msg;
     err.hidden = false;
-    input.focus();
-    return;
-  }
-  if(next.length > 40){
-    err.textContent = "That's a bit long — 40 characters max.";
-    err.hidden = false;
-    return;
-  }
+    (focusEl || input).focus();
+  };
+
+  err.hidden = true;
+  if(next.length < 2)  return fail("Please enter at least two characters.");
+  if(next.length > 40) return fail("That's a bit long — 40 characters max.");
 
   const previous = me();
   setMe(next);
+
+  // Optional: a team code may also have been pasted on this first run.
+  const code = $("teamCodeField").hidden ? "" : codeEl.value.trim();
+  if(code){
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Connecting…";
+    const result = await connectTeamCode(code);
+    btn.disabled = false;
+    btn.textContent = label;
+    if(!result.ok){
+      render();                       // the name still saved; surface that
+      return fail(result.error, codeEl);
+    }
+  }
+
   closeOverlays();
   render();
 
   if(!previous){
-    toast(`You're set as ${next}.`, "good");
+    toast(code ? `Welcome, ${next}. You can make changes.` : `You're set as ${next}.`, "good");
   }else if(previous !== next){
     toast(`Name changed to ${next}.`, "good");
     // Keep history coherent: reattribute anything this browser still holds.
@@ -486,90 +551,6 @@ function saveUserName(){
   }
 }
 
-/* ──────────────────────────── token modal ──────────────────────────────── */
-
-function openTokenModal(){
-  const t = token();
-  const configured = repoConfigured();
-
-  $("repoLine").innerHTML = configured
-    ? `Board data lives in <strong>${escHtml(REPO.owner)}/${escHtml(REPO.name)}</strong> → <strong>${escHtml(REPO.path)}</strong> on <strong>${escHtml(REPO.branch)}</strong>.`
-    : `No repository configured yet. Edit <strong>config.js</strong> and set <strong>REPO.owner</strong> to share this board with your team.`;
-
-  $("tokenConnected").hidden = !t;
-  $("tokenSetup").hidden     = !!t;
-  if(t){
-    $("tokenUser").textContent = state.user || "—";
-    $("tokenMask").textContent = maskToken(t);
-  }else{
-    $("tokenInput").value = "";
-    $("tokenErr").hidden = true;
-    $("tokenLink").href = configured
-      ? `https://github.com/settings/personal-access-tokens/new`
-      : `https://github.com/settings/personal-access-tokens`;
-  }
-  openModal("tokenModal");
-}
-
-async function saveTokenFromInput(){
-  const input = $("tokenInput");
-  const err   = $("tokenErr");
-  const btn   = $("tokenSave");
-  const value = input.value.trim();
-
-  const fail = msg => { err.textContent = msg; err.hidden = false; input.focus(); };
-
-  err.hidden = true;
-  if(!value)               return fail("Paste a token first.");
-  if(value.length < 20)    return fail("That doesn't look like a GitHub token.");
-  if(/\s/.test(value))     return fail("The token shouldn't contain spaces.");
-
-  btn.disabled = true;
-  btn.textContent = "Checking…";
-  setToken(value);
-
-  try{
-    const res  = await gh("https://api.github.com/user");
-    const user = await res.json();
-    state.user = user.login;
-    state.mode = "member";
-    state.lastError = null;
-
-    await refresh({ quiet: true });
-    startPolling();
-    closeOverlays();
-    render();
-    toast(`Connected as ${user.login}. You can make changes now.`, "good");
-  }catch(e){
-    setToken(null);
-    state.user = null;
-    state.mode = repoConfigured() ? "viewer" : "local";
-    fail(e.status === 401
-      ? "GitHub rejected that token. Check it was copied in full and hasn't expired."
-      : explainError(e, "verify the token"));
-    render();
-  }finally{
-    btn.disabled = false;
-    btn.textContent = "Connect";
-  }
-}
-
-async function disconnectToken(){
-  const ok = await askConfirm({
-    title: "Disconnect token?",
-    text : "You'll still be able to view the board, but not change anything until you reconnect.",
-    yes  : "Disconnect", danger: true
-  });
-  if(!ok) return;
-  setToken(null);
-  state.user = null;
-  state.mode = repoConfigured() ? "viewer" : "local";
-  startPolling();
-  closeOverlays();
-  render();
-  toast("Token removed from this browser.", "");
-}
-
 /* ──────────────────────────────── events ───────────────────────────────── */
 
 function wireEvents(){
@@ -578,8 +559,9 @@ function wireEvents(){
   // Wrapped, not passed directly: openAdminModal lives in admin.js, which loads
   // after this file. An arrow defers the lookup until the click.
   $("adminBtn").addEventListener("click", () => openAdminModal());
-  $("syncChip").addEventListener("click", openTokenModal);
   $("refreshBtn").addEventListener("click", () => refresh());
+  // The chip is a status light now, not a control — connecting happens in the
+  // first-run modal for teammates and in Admin → Connection for the owner.
 
   $("plateBtn").addEventListener("click", e => {
     e.stopPropagation();
@@ -611,10 +593,7 @@ function wireEvents(){
   $("userSave").addEventListener("click", saveUserName);
   $("userInput").addEventListener("keydown", e => { if(e.key === "Enter") saveUserName(); });
 
-  // Token modal
-  $("tokenSave").addEventListener("click", saveTokenFromInput);
-  $("tokenInput").addEventListener("keydown", e => { if(e.key === "Enter") saveTokenFromInput(); });
-  $("tokenDisconnect").addEventListener("click", disconnectToken);
+  $("teamCodeInput").addEventListener("keydown", e => { if(e.key === "Enter") saveUserName(); });
 
   // Stat filters
   document.querySelectorAll(".strip .stat").forEach(cell => {

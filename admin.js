@@ -62,7 +62,105 @@ function renderAdmin(){
   renderAdminTasks();
   renderAdminPlates();
   renderAdminAudit();
+  renderConnection();
   renderRailFoot();
+}
+
+/* ───────────────────────────── connection ──────────────────────────────── */
+
+let codeRevealed = false;
+
+function renderConnection(){
+  const t = token();
+  const configured = repoConfigured();
+
+  $("repoLine").innerHTML = configured
+    ? `Board data lives in <strong>${escHtml(REPO.owner)}/${escHtml(REPO.name)}</strong> → ` +
+      `<strong>${escHtml(REPO.path)}</strong> on <strong>${escHtml(REPO.branch)}</strong>.`
+    : `No repository configured. Edit <strong>config.js</strong> and set <strong>REPO.owner</strong> ` +
+      `to share this board with your team.`;
+
+  // Rail dot: green when this device can write, red when it can't.
+  const dot = $("connDot");
+  dot.className = "warn" + (state.mode === "member" ? " ok" : "");
+
+  $("connActive").hidden = !t;
+  $("connSetup").hidden  = !!t;
+
+  if(t){
+    $("connUser").textContent = state.user ? `Connected as ${state.user}` : "Connected";
+    const field = $("connMask");
+    field.type  = codeRevealed ? "text" : "password";
+    field.value = codeRevealed ? t : maskToken(t);
+    $("connReveal").textContent = codeRevealed ? "Hide" : "Reveal";
+  }else{
+    $("connInput").value = "";
+    $("connErr").hidden = true;
+    codeRevealed = false;
+  }
+}
+
+async function saveConnection(){
+  const input = $("connInput");
+  const err   = $("connErr");
+  const btn   = $("connSave");
+
+  err.hidden = true;
+  btn.disabled = true;
+  btn.textContent = "Connecting…";
+
+  const result = await connectTeamCode(input.value);
+
+  btn.disabled = false;
+  btn.textContent = "Connect";
+
+  if(!result.ok){
+    err.textContent = result.error;
+    err.hidden = false;
+    input.focus();
+    renderConnection();
+    return;
+  }
+
+  codeRevealed = false;
+  renderAdmin();
+  flash("Connected");
+  toast(`Connected as ${result.login}. Share the team code so others can edit.`, "good");
+}
+
+async function copyTeamCode(){
+  const t = token();
+  if(!t) return;
+  try{
+    await navigator.clipboard.writeText(t);
+    flash("Copied");
+    toast("Team code copied. Send it to your team — treat it like a door code.", "");
+  }catch(e){
+    // Clipboard API needs a secure context and permission; reveal instead so
+    // the value can at least be selected by hand.
+    codeRevealed = true;
+    renderConnection();
+    $("connMask").select();
+    toast("Couldn't copy automatically — the code is shown, copy it manually.", "bad");
+  }
+}
+
+async function disconnectConnection(){
+  const ok = await askConfirm({
+    title: "Remove the team code from this device?",
+    text : "You'll still see the board, but you won't be able to change anything until you enter it again. Other people's devices are unaffected.",
+    yes  : "Remove", danger: true
+  });
+  if(!ok) return;
+
+  setToken(null);
+  state.user = null;
+  state.mode = repoConfigured() ? "viewer" : "local";
+  codeRevealed = false;
+  startPolling();
+  render();
+  renderAdmin();
+  toast("Team code removed from this device.", "");
 }
 
 function renderRailFoot(){
@@ -498,6 +596,12 @@ function exportAuditCsv(){
     const free = e.target.closest("[data-freeplate]");
     if(free) return forceReleasePlate(free.dataset.freeplate);
   });
+
+  $("connSave").addEventListener("click", saveConnection);
+  $("connInput").addEventListener("keydown", e => { if(e.key === "Enter") saveConnection(); });
+  $("connCopy").addEventListener("click", copyTeamCode);
+  $("connReveal").addEventListener("click", () => { codeRevealed = !codeRevealed; renderConnection(); });
+  $("connDisconnect").addEventListener("click", disconnectConnection);
 
   $("auditWho").addEventListener("change", renderAdminAudit);
   $("auditAct").addEventListener("change", renderAdminAudit);
