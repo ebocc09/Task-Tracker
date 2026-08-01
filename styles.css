@@ -85,6 +85,7 @@ code{font-size:12px;font-weight:500;letter-spacing:.04em;font-variant-numeric:ta
   color:var(--ink);text-indent:.42em;user-select:none;white-space:nowrap;
 }
 .nav-div{width:1px;height:20px;background:var(--line-soft);flex:none}
+.nav-title{font-weight:500;font-size:14px;color:var(--ink-soft);white-space:nowrap}
 .nav-spacer{flex:1}
 
 .sync-chip{
@@ -700,8 +701,9 @@ select.inp{cursor:pointer}
     padding-left:calc(14px + env(safe-area-inset-left,0px));
     padding-right:calc(14px + env(safe-area-inset-right,0px));
   }
+  /* The divider stays — it's what separates the wordmark from the app name. */
   .wordmark{font-size:13px;letter-spacing:.3em;text-indent:.3em}
-  .nav-div{display:none}
+  .nav-title{font-size:13px}
   .sync-chip{margin-left:auto}
 
   /* The spacer becomes the line break: everything after it moves to row two. */
@@ -817,6 +819,7 @@ select.inp{cursor:pointer}
 /* Very narrow — fold the nav's second row into two full-width halves. */
 @media (max-width:380px){
   .wordmark{font-size:12px;letter-spacing:.24em;text-indent:.24em}
+  .nav-title{font-size:12px}
   .sync-chip{font-size:9px;padding:0 8px}
   #userBtn span,#plateBtn span{font-size:11px}
   .stat-v{font-size:19px}
