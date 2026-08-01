@@ -534,6 +534,11 @@ select.inp{cursor:pointer}
 .rail-item:hover{background:rgba(23,26,32,.05);color:var(--ink)}
 .rail-item.on{background:var(--paper);color:var(--ink);font-weight:600}
 .rail-item.on::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:2px;background:var(--ink)}
+/* Status dot on a rail item (connection, people). Green = good, else amber. */
+.rail-item .warn{width:6px;height:6px;border-radius:50%;background:var(--amber);margin-left:auto;flex:none}
+.rail-item .warn.ok{background:var(--green)}
+.rail-item .rail-count{margin-left:auto}
+@media (max-width:860px){ .rail-item .rail-count{margin-left:6px} }
 .rail-foot{
   margin-top:auto;padding:14px 16px 6px;
   font-size:10.5px;line-height:1.5;color:var(--ink-mute);

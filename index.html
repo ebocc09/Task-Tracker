@@ -15,7 +15,7 @@
 <!-- ?v= is a cache-buster. GitHub Pages serves assets with a 10-minute max-age,
      so without it a browser keeps running old JS after a deploy while happily
      showing fresh HTML. Bump these on every release. -->
-<link rel="stylesheet" href="styles.css?v=12">
+<link rel="stylesheet" href="styles.css?v=13">
 </head>
 <body>
 
@@ -237,6 +237,11 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
         Tasks
       </button>
+      <button class="rail-item" data-sec="quickadd">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg>
+        Quick add
+        <span class="count rail-count" id="qaRailCount">0</span>
+      </button>
       <button class="rail-item" data-sec="plates">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10v4M10 10v4M14 10v4M18 10v4"/></svg>
         Plates
@@ -276,12 +281,28 @@
           <label for="taskDesc">Description <span class="opt">optional</span></label>
           <textarea class="inp ta" id="taskDesc" maxlength="400" rows="3" placeholder="What does done look like?"></textarea>
         </div>
-        <button class="btn-block solid" id="taskAdd">Submit task</button>
+        <div class="row2">
+          <button class="btn-block solid" id="taskAdd">Submit task</button>
+          <button class="btn-block" id="taskSave">Save task</button>
+        </div>
+        <div class="hint">Submit adds it to the board now. Save stores it in Quick add for one-click reuse later.</div>
 
         <div class="sep"></div>
         <h4 class="sec-h">Board <span class="count" id="taskCount">0</span></h4>
         <p class="sec-p">Reorder with the arrows. Deleting a task removes it for everyone.</p>
         <div class="adm-list" id="admTasks"></div>
+      </section>
+
+      <!-- Quick add -->
+      <section class="sec" data-sec="quickadd">
+        <h4 class="sec-h">Quick add <span class="count" id="qaCount">0</span></h4>
+        <p class="sec-p">
+          Saved tasks you can drop onto the board in one click — handy after a
+          reset. These are shared with the team and survive resets. Saving one
+          here does not put it on the board; use <strong>Add to board</strong> for that.
+        </p>
+        <button class="btn-block solid" id="qaAddAll" hidden>Add all to board</button>
+        <div class="adm-list" id="admQuick"></div>
       </section>
 
       <!-- Plates -->
@@ -449,9 +470,9 @@
 <!-- Toasts -->
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="config.js?v=12"></script>
-<script src="sync.js?v=12"></script>
-<script src="app.js?v=12"></script>
-<script src="admin.js?v=12"></script>
+<script src="config.js?v=13"></script>
+<script src="sync.js?v=13"></script>
+<script src="app.js?v=13"></script>
+<script src="admin.js?v=13"></script>
 </body>
 </html>

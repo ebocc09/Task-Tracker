@@ -124,11 +124,131 @@ function flash(message){
 
 function renderAdmin(){
   renderAdminTasks();
+  renderQuickAdd();
   renderAdminPlates();
   renderAdminPeople();
   renderAdminAudit();
   renderConnection();
   renderRailFoot();
+}
+
+/* ────────────────────────────── quick add ──────────────────────────────── */
+
+function renderQuickAdd(){
+  const tpls = state.data.templates || [];
+  $("qaCount").textContent = tpls.length;
+  $("qaRailCount").textContent = tpls.length;
+  $("qaAddAll").hidden = tpls.length === 0;
+
+  const box = $("admQuick");
+  if(!tpls.length){
+    box.innerHTML = `<div class="adm-empty">No saved tasks yet. In <strong>Tasks</strong>, fill one in and click <strong>Save task</strong>.</div>`;
+    return;
+  }
+
+  box.innerHTML = tpls.map(tp => `
+<div class="adm-row">
+  <div class="am">
+    <div class="adm-t">${escHtml(tp.title)}</div>
+    <div class="adm-s">${tp.description ? escHtml(tp.description) : "No description"}</div>
+  </div>
+  <button class="mini" data-qaadd="${tp.id}">Add to board</button>
+  <button class="mini red" data-qadel="${tp.id}">Delete</button>
+</div>`).join("");
+}
+
+async function saveTaskTemplate(){
+  const titleEl = $("taskTitle"), descEl = $("taskDesc");
+  const title = titleEl.value.trim();
+  const desc  = descEl.value.trim();
+
+  if(!title){ toast("Give the task a title to save it.", "bad"); titleEl.focus(); return; }
+  if((state.data.templates || []).some(t => t.title.toLowerCase() === title.toLowerCase())){
+    toast(`"${title}" is already in Quick add.`, "bad");
+    return;
+  }
+
+  const id = uid("q");
+  const ok = await commit(`Save task template "${title}"`, data => {
+    data.templates = data.templates || [];
+    data.templates.push({ id, title, description: desc });
+    return { action:"template.save", subject: title };
+  });
+
+  if(ok){
+    // Clear like Submit does, so building a library is a fast type-Save-repeat.
+    titleEl.value = ""; descEl.value = "";
+    titleEl.focus();
+    flash("Saved to Quick add");
+    renderAdmin();
+  }
+}
+
+/* Build a fresh board task from a stored template. */
+function taskFromTemplate(tp){
+  return {
+    id: uid("t"), title: tp.title, description: tp.description,
+    createdBy: me(), createdAt: nowIso(),
+    status: "pending", statusBy: null, statusAt: null, statusNote: null
+  };
+}
+
+async function addTemplateToBoard(id){
+  const tp = (state.data.templates || []).find(t => t.id === id);
+  if(!tp) return;
+
+  await commit(`Add task "${tp.title}"`, data => {
+    const t = (data.templates || []).find(x => x.id === id);
+    if(!t) return null;                       // deleted underneath us
+    data.tasks.push(taskFromTemplate(t));
+    return { action:"task.add", subject: t.title };
+  });
+
+  render();
+  renderAdmin();
+  flash("Added to board");
+}
+
+async function addAllTemplates(){
+  const tpls = state.data.templates || [];
+  if(!tpls.length){ toast("Nothing saved to add.", ""); return; }
+
+  const ok = await askConfirm({
+    title: `Add all ${tpls.length} saved task${tpls.length === 1 ? "" : "s"}?`,
+    text : "Each is added to the board as a new pending task. Duplicates of tasks already on the board are allowed.",
+    yes  : "Add all"
+  });
+  if(!ok) return;
+
+  // One commit for the whole batch, not one per task — reads from fresh data
+  // so a 409 replay re-adds against the current board correctly.
+  const done = await commit(`Add ${tpls.length} saved tasks`, data => {
+    const entries = [];
+    (data.templates || []).forEach(tp => {
+      data.tasks.push(taskFromTemplate(tp));
+      entries.push({ action:"task.add", subject: tp.title });
+    });
+    return entries;
+  });
+
+  if(done){
+    render();
+    renderAdmin();
+    flash("Added all to board");
+  }
+}
+
+async function deleteTemplate(id){
+  const tp = (state.data.templates || []).find(t => t.id === id);
+  if(!tp) return;
+
+  await commit(`Remove saved task "${tp.title}"`, data => {
+    const before = (data.templates || []).length;
+    data.templates = (data.templates || []).filter(t => t.id !== id);
+    if(data.templates.length === before) return null;
+    return { action:"template.delete", subject: tp.title };
+  });
+  renderAdmin();
 }
 
 /* ─────────────────────────────── people ────────────────────────────────── */
@@ -645,6 +765,8 @@ function auditPhrase(r){
     case "task.blocked":   return `could not complete “${s}”`;
     case "task.pending":   return `reopened “${s}”`;
     case "task.add":       return `added task “${s}”`;
+    case "template.save":  return `saved “${s}” to Quick add`;
+    case "template.delete":return `removed “${s}” from Quick add`;
     case "task.delete":    return `deleted task “${s}”`;
     case "task.move":      return `reordered “${s}”`;
     case "plate.checkout": return `checked out plate ${s}`;
@@ -956,7 +1078,16 @@ function exportAuditCsv(){
   });
 
   $("taskAdd").addEventListener("click", addTask);
+  $("taskSave").addEventListener("click", saveTaskTemplate);
   $("taskTitle").addEventListener("keydown", e => { if(e.key === "Enter") addTask(); });
+
+  $("qaAddAll").addEventListener("click", addAllTemplates);
+  $("admQuick").addEventListener("click", e => {
+    const add = e.target.closest("[data-qaadd]");
+    if(add) return addTemplateToBoard(add.dataset.qaadd);
+    const del = e.target.closest("[data-qadel]");
+    if(del) return deleteTemplate(del.dataset.qadel);
+  });
 
   $("plateAdd").addEventListener("click", addPlate);
   $("plateLabel").addEventListener("keydown", e => { if(e.key === "Enter") addPlate(); });

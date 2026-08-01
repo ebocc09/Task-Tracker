@@ -30,7 +30,7 @@ const state = {
 };
 
 function emptyBoard(){
-  return { version:1, updatedAt:null, updatedBy:null, plates:[], tasks:[], audit:[], blocked:[] };
+  return { version:1, updatedAt:null, updatedBy:null, plates:[], tasks:[], audit:[], blocked:[], templates:[] };
 }
 
 /* Defensive: never trust the shape of a file other people can edit. */
@@ -55,6 +55,14 @@ function normalize(raw){
   board.blocked = Array.isArray(d.blocked)
     ? [...new Set(d.blocked.filter(n => typeof n === "string" && n.trim()).map(n => n.trim()))]
     : [];
+
+  // Reusable task templates for the Quick add sidebar. Deliberately survive
+  // board resets and wipes — the point is re-adding common tasks fast.
+  board.templates = Array.isArray(d.templates) ? d.templates.filter(t => t && t.id && t.title).map(t => ({
+    id         : String(t.id),
+    title      : String(t.title),
+    description: t.description ? String(t.description) : ""
+  })) : [];
 
   const OK = ["pending","complete","partial","blocked"];
   board.tasks = Array.isArray(d.tasks) ? d.tasks.filter(t => t && t.id && t.title).map(t => ({
