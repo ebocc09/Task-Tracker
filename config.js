@@ -33,6 +33,10 @@ const POLL_SECONDS = { member: 20, viewer: 120 };
 /* Keep at most this many audit entries so data.json cannot grow forever. */
 const AUDIT_CAP = 500;
 
+/* Give up on any single request after this long. Guards against corporate
+   proxies that swallow a request without ever answering it. */
+const REQUEST_TIMEOUT_MS = 15000;
+
 /* localStorage keys. Namespaced so two dashboards on the same host don't clash. */
 const LS = {
   name : "tt.username",

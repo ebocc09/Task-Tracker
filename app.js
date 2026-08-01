@@ -728,9 +728,21 @@ function wireEvents(){
 (async function boot(){
   wireEvents();
   render();                      // paint the empty shell straight away
-  await determineMode();
-  render();
-  startPolling();
+
+  try{
+    await determineMode();
+  }catch(err){
+    // determineMode handles its own expected failures; anything reaching here
+    // is a genuine bug. Record it rather than leaving the UI mid-paint,
+    // insisting it's still "working locally".
+    console.error("[Task Tracker] Boot failed:", err);
+    state.mode = "local";
+    state.lastError = "Something went wrong starting up: " + (err && err.message || err) +
+                      " — see the browser console for details.";
+  }finally{
+    render();                    // must always run, whatever happened above
+    startPolling();
+  }
 
   if(!me()) setTimeout(openUserModal, 400);
 })();

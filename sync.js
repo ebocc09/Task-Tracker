@@ -192,11 +192,24 @@ async function gh(url, opts = {}){
   if(t) headers.Authorization = "Bearer " + t;
   if(opts.body) headers["Content-Type"] = "application/json";
 
+  /* Hard timeout. A corporate proxy that blackholes a request leaves fetch
+     pending forever, which would strand boot on an await and leave the UI
+     showing a stale banner. Better to fail loudly after 15s. */
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+
   let res;
   try{
-    res = await fetch(url, Object.assign({}, opts, { headers, cache: "no-store" }));
+    res = await fetch(url, Object.assign({}, opts, {
+      headers, cache: "no-store", signal: ctrl.signal
+    }));
   }catch(networkErr){
-    throw new GhError("Network unreachable", 0, null);
+    const timedOut = networkErr && networkErr.name === "AbortError";
+    throw new GhError(
+      timedOut ? `No response within ${Math.round(REQUEST_TIMEOUT_MS / 1000)}s` : "Network unreachable",
+      timedOut ? 408 : 0, null);
+  }finally{
+    clearTimeout(timer);
   }
 
   if(res.ok) return res;
@@ -335,7 +348,8 @@ async function pushWithReplay(mutator, label){
 
 function explainError(err, verb){
   const s = err && err.status;
-  if(s === 0)   return "No connection. Your change was not saved.";
+  if(s === 0)   return "Couldn't reach api.github.com. Check your connection — or whether a network policy is blocking it.";
+  if(s === 408) return "api.github.com didn't respond. On a managed network it may be blocked by a proxy or firewall.";
   if(s === 401) return "Your token was rejected. Click the status chip in the top bar to reconnect.";
   if(s === 403) return "That token can't write to this repo. It needs Contents: Read and write.";
   if(s === 404){
@@ -462,14 +476,20 @@ async function determineMode(){
       "  Open that URL in a new tab: JSON back = config is right; " +
       '{"message":"Not Found"} = wrong repo/branch/path, or the repo is private.'
     );
-    if(!token() && (err.status === 403 || err.status === 429)){
-      try{
-        const result = await pullRawFallback();
-        state.data = result.data;
-        state.lastSync = Date.now();
-        return;
-      }catch(e2){ /* fall through */ }
-    }
+    /* If the API is unusable for ANY reason — rate limit, proxy block, DNS —
+       the raw CDN is a different host and often still works. Read-only, since
+       raw gives us no blob sha to write against. */
+    try{
+      const result = await pullRawFallback();
+      state.data = result.data;
+      state.sha  = null;
+      state.mode = "viewer";
+      state.lastSync = Date.now();
+      state.lastError = null;
+      console.warn("[Task Tracker] API unreachable; serving read-only from raw.githubusercontent.com.");
+      toast("Read-only: reached the board via the backup route. Saving is unavailable.", "bad");
+      return;
+    }catch(e2){ /* both routes dead — fall through to local mode */ }
     // Can't reach the board at all — degrade to local so the page still works.
     state.mode = "local";
     state.data = loadLocal();
