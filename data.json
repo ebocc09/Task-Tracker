@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T17:08:14.027Z",
+  "updatedAt": "2026-08-01T17:08:19.121Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -56,33 +56,41 @@
       "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-01T16:43:36.539Z",
-      "status": "complete",
-      "statusBy": "Enzo",
-      "statusAt": "2026-08-01T17:08:01.904Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "stages": [
         {
           "id": "s_msalp0pn6",
           "title": "Plate Audit",
           "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
-          "status": "complete",
-          "by": "Enzo",
-          "at": "2026-08-01T16:43:50.274Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         },
         {
           "id": "s_msalp0pn7",
           "title": "Plate Audit (EoD)",
           "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task.",
-          "status": "complete",
-          "by": "Enzo",
-          "at": "2026-08-01T17:08:01.904Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         }
       ]
     }
   ],
   "audit": [
+    {
+      "id": "a_msamksoha",
+      "at": "2026-08-01T17:08:19.121Z",
+      "who": "Enzo",
+      "action": "reopen.approve",
+      "subject": "Plate Audit",
+      "detail": "need opened"
+    },
     {
       "id": "a_msamkoqz8",
       "at": "2026-08-01T17:08:14.027Z",
@@ -567,14 +575,5 @@
     }
   ],
   "requests": [],
-  "reopenRequests": [
-    {
-      "id": "ro_msamkoqz7",
-      "at": "2026-08-01T17:08:14.027Z",
-      "by": "Enzo",
-      "taskId": "t_msalp0pn5",
-      "taskTitle": "Plate Audit",
-      "reason": "need opened"
-    }
-  ]
+  "reopenRequests": []
 }
