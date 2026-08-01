@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T21:38:24.853Z",
+  "updatedAt": "2026-08-01T21:38:28.362Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -157,6 +157,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msaw87t6r",
+      "at": "2026-08-01T21:38:28.362Z",
+      "who": "Enzo",
+      "action": "schedule.set",
+      "subject": "",
+      "detail": "16:41 WTFS America/Chicago"
+    },
     {
       "id": "a_msaw853pp",
       "at": "2026-08-01T21:38:24.853Z",
@@ -951,7 +959,6 @@
     "enabled": true,
     "time": "16:41",
     "days": [
-      1,
       3,
       4,
       5,
