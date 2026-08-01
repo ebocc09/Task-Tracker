@@ -360,8 +360,10 @@ function renderPlateMenu(){
   body.innerHTML = plates.map(p => {
     const mine  = name && p.checkedOutBy === name;
     const taken = p.checkedOutBy && !mine;
-    const sub = mine  ? "Checked out by you — click to release"
-              : taken ? `Checked out by ${p.checkedOutBy}`
+    // Keep these short — the pill already says Yours/Taken, so repeating it
+    // here just crowds the row and forces the plate number to truncate.
+    const sub = mine  ? "Click to release"
+              : taken ? `With ${p.checkedOutBy}`
               : (p.note || "Available");
     return `
 <button class="menu-item ${mine ? "mine" : taken ? "taken" : ""}" role="menuitem"
