@@ -314,7 +314,6 @@ function renderList(){
 function taskCard(t, readOnly){
   const st   = STATUS[t.status];
   const open = state.openTaskId === t.id;
-  const drafting = state.noteDraft && state.noteDraft.taskId === t.id;
 
   const meta = t.statusBy
     ? `${st.label} · ${escHtml(t.statusBy)} · <span title="${escHtml(fullTime(t.statusAt))}">${escHtml(relTime(t.statusAt))}</span>`
@@ -331,17 +330,15 @@ function taskCard(t, readOnly){
 
   const actions = readOnly
     ? `<div class="dw-meta">Connect a token to change this task.</div>`
-    : drafting
-      ? noteForm(t, state.noteDraft.status)
-      : `<div class="acts">
-           <button class="act good ${t.status === "complete" ? "on" : ""}" data-act="complete" data-id="${t.id}">
-             ${svg(ICON.check)}Complete</button>
-           <button class="act warm ${t.status === "partial" ? "on" : ""}" data-act="partial" data-id="${t.id}">
-             ${svg(ICON.half)}Partial</button>
-           <button class="act bad ${t.status === "blocked" ? "on" : ""}" data-act="blocked" data-id="${t.id}">
-             ${svg(ICON.slash)}Could not complete</button>
-           ${reopenBtn}
-         </div>`;
+    : `<div class="acts">
+         <button class="act good ${t.status === "complete" ? "on" : ""}" data-act="complete" data-id="${t.id}">
+           ${svg(ICON.check)}Complete</button>
+         <button class="act warm ${t.status === "partial" ? "on" : ""}" data-act="partial" data-id="${t.id}">
+           ${svg(ICON.half)}Partial</button>
+         <button class="act bad ${t.status === "blocked" ? "on" : ""}" data-act="blocked" data-id="${t.id}">
+           ${svg(ICON.slash)}Could not complete</button>
+         ${reopenBtn}
+       </div>`;
 
   return `
 <article class="task s-${t.status}${open ? " open" : ""}" data-task="${t.id}">
@@ -363,18 +360,6 @@ function taskCard(t, readOnly){
     <div class="dw-meta">${meta}</div>
   </div></div></div>
 </article>`;
-}
-
-function noteForm(t, status){
-  const st = STATUS[status];
-  return `
-<div class="note-row">
-  <input class="inp" id="noteInput" maxlength="140" autocomplete="off"
-         placeholder="Why? (optional — press Enter to save)" value="${escHtml(state.noteDraft.text || "")}">
-  <button class="act ${status === "partial" ? "warm" : "bad"} on" data-act="note-save" data-id="${t.id}">Save</button>
-  <button class="act" data-act="note-cancel" data-id="${t.id}">Cancel</button>
-</div>
-<div class="dw-meta">Marking as <strong>${escHtml(st.label)}</strong>.</div>`;
 }
 
 /* ───────────────────────────── plate menu ──────────────────────────────── */
@@ -449,6 +434,42 @@ function setTaskStatus(taskId, status, note){
       detail : note || ""
     };
   });
+}
+
+/* Partial and Could-not-complete both take effect immediately — no approval,
+   unlike Reopen. But neither is much use to an admin reading the audit log
+   without the story behind it, so the note is required rather than optional. */
+const NOTE_PROMPT = {
+  partial: {
+    title: "Partially completed",
+    ask  : t => `How much of “${t}” was completed?`,
+    ph   : "What got done, and what's left?",
+    yes  : "Mark partial"
+  },
+  blocked: {
+    title: "Could not complete",
+    ask  : t => `Why couldn't “${t}” be completed?`,
+    ph   : "What's blocking it?",
+    yes  : "Mark could not complete"
+  }
+};
+
+async function markWithNote(taskId, status){
+  const task = state.data.tasks.find(t => t.id === taskId);
+  if(!task) return;
+  const p = NOTE_PROMPT[status];
+
+  const answer = await askConfirm({
+    title: p.title,
+    text : `${p.ask(task.title)} A note is required — it goes in the audit log.`,
+    input: { value: "", placeholder: p.ph, maxlength: 200, required: true },
+    yes  : p.yes
+  });
+  if(answer === false || answer == null) return;      // cancelled
+  const clean = String(answer).trim();
+  if(!clean){ toast("A note is required.", "bad"); return; }
+
+  setTaskStatus(taskId, status, clean);
 }
 
 async function requestReopen(taskId){
@@ -789,7 +810,6 @@ function wireEvents(){
     if(toggle){
       const id = toggle.dataset.toggle;
       state.openTaskId = state.openTaskId === id ? null : id;
-      state.noteDraft = null;
       renderList();
       return;
     }
@@ -800,47 +820,16 @@ function wireEvents(){
 
     switch(act.dataset.act){
       case "complete":
-        state.noteDraft = null;
         setTaskStatus(id, "complete");
         break;
       case "partial":
       case "blocked":
-        state.noteDraft = { taskId: id, status: act.dataset.act, text: "" };
-        renderList();
-        setTimeout(() => { const n = $("noteInput"); if(n) n.focus(); }, 40);
-        break;
-      case "note-save": {
-        const input = $("noteInput");
-        const status = state.noteDraft ? state.noteDraft.status : null;
-        const text = input ? input.value.trim() : "";
-        state.noteDraft = null;
-        if(status) setTaskStatus(id, status, text);
-        break;
-      }
-      case "note-cancel":
-        state.noteDraft = null;
-        renderList();
+        markWithNote(id, act.dataset.act);
         break;
       case "reopen":
-        state.noteDraft = null;
         requestReopen(id);
         break;
     }
-  });
-
-  // Enter inside the note field saves it
-  $("list").addEventListener("keydown", e => {
-    if(e.key !== "Enter" || e.target.id !== "noteInput") return;
-    e.preventDefault();
-    const draft = state.noteDraft;
-    if(!draft) return;
-    const text = e.target.value.trim();
-    state.noteDraft = null;
-    setTaskStatus(draft.taskId, draft.status, text);
-  });
-  // Keep the draft text if a poll re-renders underneath us
-  $("list").addEventListener("input", e => {
-    if(e.target.id === "noteInput" && state.noteDraft) state.noteDraft.text = e.target.value;
   });
 
   /* One dismissal rule for the whole page: a click that isn't inside an open
@@ -849,7 +838,6 @@ function wireEvents(){
     if(!e.target.closest(".nav-anchor")) closePlateMenu();
     if(!e.target.closest(".task") && state.openTaskId !== null){
       state.openTaskId = null;
-      state.noteDraft = null;
       renderList();
     }
   });
@@ -862,7 +850,6 @@ function wireEvents(){
     if($("plateMenu").classList.contains("on")){ closePlateMenu(); return; }
     if(state.openTaskId !== null){
       state.openTaskId = null;
-      state.noteDraft = null;
       renderList();
     }
   });

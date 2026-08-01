@@ -332,8 +332,6 @@ code{font-size:12px;font-weight:500;letter-spacing:.04em;font-variant-numeric:ta
 .act:disabled{opacity:.4;cursor:not-allowed}
 .act.ghost{border-style:dashed;color:var(--ink-mute)}
 
-.note-row{display:flex;gap:9px;margin-top:12px;align-items:center;animation:rowIn .22s var(--e-in)}
-.note-row .inp{height:38px;flex:1}
 .dw-meta{
   margin-top:13px;font-size:11px;color:var(--ink-mute);
   font-variant-numeric:tabular-nums;
@@ -819,8 +817,6 @@ select.inp{cursor:pointer}
   .dw-inner{padding:15px 14px 16px}
   .acts{flex-direction:column;align-items:stretch}
   .act{justify-content:center}
-  .note-row{flex-direction:column;align-items:stretch}
-  .note-row .inp{width:100%}
 
   .audit-row{flex-wrap:wrap;gap:4px 11px}
   .audit-row .aw{min-width:0}

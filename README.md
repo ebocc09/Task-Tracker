@@ -159,11 +159,15 @@ first automatically.
 | Action | Card border turns | Prompts for a note |
 |---|---|---|
 | Complete | green | no |
-| Partial | amber | yes, optional |
-| Could not complete | red | yes, optional |
+| Partial | amber | yes — *how much got completed*, required |
+| Could not complete | red | yes — *what's blocking it*, required |
 
-Click anywhere outside, or press `Esc`, to collapse. **Reopen** puts a task back
-to Pending.
+Partial and Could-not-complete open a dialog and won't let you confirm until
+you've typed something. Both take effect immediately — the note is there so the
+audit log tells an admin the story, not to gate the change.
+
+Click anywhere outside, or press `Esc`, to collapse. **Reopen** is different: it
+sends a request to an admin for approval rather than changing the task itself.
 
 **Progress bar** — the share of tasks that are no longer Pending. Turns green at
 100%.
@@ -181,7 +185,8 @@ Unlock with the passcode. Stays unlocked for that tab only.
 - **Plates** — add a plate (with an optional note like *"Model Y — bay 3"*),
   delete, or **force release** one somebody forgot to hand back.
 - **Audit log** — everything that has happened, newest first, filterable by person
-  and by action. Hover a timestamp for the exact time. **Export CSV** downloads it.
+  and by action. Hover a timestamp for the exact time. **Export CSV** downloads it,
+  and **Clear audit log** sits at the bottom of the same section.
 - **Reset** — see below.
 
 ### Reset board
@@ -192,8 +197,9 @@ Sets every task back to **Pending** and releases every plate.
 it does not erase history. That's deliberate — an audit log you can wipe with one
 button isn't much of an audit log.
 
-Two separate, separately-confirmed destructive actions live below it:
-**Clear audit log**, and **Delete all tasks and plates**.
+One separately-confirmed destructive action lives below it: **Delete all tasks
+and plates**. (**Clear audit log** lives in the Audit section, next to the log
+it clears.)
 
 ---
 

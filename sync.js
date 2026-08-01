@@ -25,8 +25,7 @@ const state = {
   lastSync: null,
   lastError: null,
   filter : "all",
-  openTaskId: null,
-  noteDraft : null         // {taskId, status} while typing a note
+  openTaskId: null
 };
 
 function emptyBoard(){
@@ -490,11 +489,10 @@ async function refresh({ quiet = false } = {}){
       }
     }
 
-    // Don't stomp a note the user is mid-way through typing.
-    const draft = state.noteDraft;
+    // A half-typed note lives in the confirm dialog now, not in the list, so a
+    // poll re-rendering underneath it can't stomp anything.
     state.data = result.data;
     if(result.sha) state.sha = result.sha;
-    state.noteDraft = draft;
 
     state.lastSync  = Date.now();
     state.lastError = null;
