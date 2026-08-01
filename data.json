@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T17:08:19.121Z",
+  "updatedAt": "2026-08-01T18:02:43.574Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -83,6 +83,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msaoirjq3",
+      "at": "2026-08-01T18:02:43.574Z",
+      "who": "Enzo",
+      "action": "template.save",
+      "subject": "Box Audit - Service",
+      "detail": ""
+    },
     {
       "id": "a_msamksoha",
       "at": "2026-08-01T17:08:19.121Z",
@@ -554,6 +562,25 @@
         {
           "title": "Plate Audit (EoD)",
           "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task."
+        }
+      ]
+    },
+    {
+      "id": "q_msaoir9m1",
+      "title": "Box Audit - Service",
+      "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
+      "stages": [
+        {
+          "title": "Box Audit - Service",
+          "description": "Remove any keys from the on-site drop off box and sort them into the key bin."
+        },
+        {
+          "title": "Box Audit - Washline",
+          "description": "Remove any of our keys (White envelops) from the service drop off box and sort them in the key bin."
+        },
+        {
+          "title": "Box Audit - Offsite",
+          "description": "Remove any keys in the offsite drop off box and sort them into the key bin."
         }
       ]
     }
