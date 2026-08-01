@@ -1,14 +1,14 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T15:40:52.973Z",
+  "updatedAt": "2026-08-01T15:49:45.616Z",
   "updatedBy": "Enzo",
   "plates": [
     {
       "id": "p_ms9tjbasa",
       "label": "6EX-831",
       "note": "",
-      "checkedOutBy": "Enzo",
-      "checkedOutAt": "2026-08-01T15:34:18.804Z",
+      "checkedOutBy": null,
+      "checkedOutAt": null,
       "forcedBy": null,
       "forcedAt": null
     },
@@ -25,8 +25,8 @@
       "id": "p_ms9tjr52g",
       "label": "6UE-688",
       "note": "",
-      "checkedOutBy": "Bob",
-      "checkedOutAt": "2026-08-01T03:45:23.941Z",
+      "checkedOutBy": null,
+      "checkedOutAt": null,
       "forcedBy": null,
       "forcedAt": null
     },
@@ -56,13 +56,21 @@
       "description": "",
       "createdBy": "Enzo",
       "createdAt": "2026-08-01T04:01:22.003Z",
-      "status": "blocked",
-      "statusBy": "Enzo",
-      "statusAt": "2026-08-01T15:40:52.973Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null
     }
   ],
   "audit": [
+    {
+      "id": "a_msajrrps2",
+      "at": "2026-08-01T15:49:45.616Z",
+      "who": "Enzo",
+      "action": "board.reset",
+      "subject": "",
+      "detail": "1 tasks cleared, 2 plates released"
+    },
     {
       "id": "a_msajgcq5e",
       "at": "2026-08-01T15:40:52.973Z",
