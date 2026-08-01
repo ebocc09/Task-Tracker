@@ -211,6 +211,13 @@ function renderChrome(){
     text.textContent = show.msg;
     btn.hidden = !show.action;
     if(show.action){ btn.textContent = show.action; btn.onclick = show.fn; }
+  }else{
+    // Clear rather than just hide. If the hidden attribute ever loses to a
+    // display rule again, an empty banner is a far cheaper failure than one
+    // confidently displaying a stale error.
+    text.textContent = "";
+    btn.hidden = true;
+    btn.onclick = null;
   }
 
   // Footer
