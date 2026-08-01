@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T15:54:35.520Z",
+  "updatedAt": "2026-08-01T15:54:38.697Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -49,8 +49,28 @@
       "forcedAt": null
     }
   ],
-  "tasks": [],
+  "tasks": [
+    {
+      "id": "t_msajy1ux7",
+      "title": "Plate Audit",
+      "description": "Gather all plates and send a photo in the teams chat",
+      "createdBy": "Enzo",
+      "createdAt": "2026-08-01T15:54:38.697Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
+      "statusNote": null
+    }
+  ],
   "audit": [
+    {
+      "id": "a_msajy1ux8",
+      "at": "2026-08-01T15:54:38.697Z",
+      "who": "Enzo",
+      "action": "task.add",
+      "subject": "Plate Audit",
+      "detail": ""
+    },
     {
       "id": "a_msajxzeo2",
       "at": "2026-08-01T15:54:35.520Z",
