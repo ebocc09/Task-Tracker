@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T23:14:00.278Z",
-  "updatedBy": "Bob",
+  "updatedAt": "2026-08-06T21:53:08.608Z",
+  "updatedBy": "Enzo",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -16,8 +16,8 @@
       "id": "p_ms9tjkoid",
       "label": "6EU-300",
       "note": "",
-      "checkedOutBy": "Not Malcolm",
-      "checkedOutAt": "2026-08-01T23:13:56.201Z",
+      "checkedOutBy": null,
+      "checkedOutAt": null,
       "forcedBy": null,
       "forcedAt": null
     },
@@ -25,8 +25,8 @@
       "id": "p_ms9tjr52g",
       "label": "6UE-688",
       "note": "",
-      "checkedOutBy": "Bob",
-      "checkedOutAt": "2026-08-01T23:14:00.278Z",
+      "checkedOutBy": null,
+      "checkedOutAt": null,
       "forcedBy": null,
       "forcedAt": null
     },
@@ -56,9 +56,9 @@
       "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
       "createdBy": "Daily rollover",
       "createdAt": "2026-08-01T21:59:37.565Z",
-      "status": "complete",
-      "statusBy": "Not Malcolm",
-      "statusAt": "2026-08-01T23:13:29.085Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "stages": [
@@ -66,18 +66,18 @@
           "id": "s_msawzfcw2",
           "title": "Plate Audit",
           "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
-          "status": "complete",
-          "by": "Enzo",
-          "at": "2026-08-01T22:11:55.757Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         },
         {
           "id": "s_msawzfcw3",
           "title": "Plate Audit (EoD)",
           "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task.",
-          "status": "complete",
-          "by": "Not Malcolm",
-          "at": "2026-08-01T23:13:29.085Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         }
       ]
@@ -89,8 +89,8 @@
       "createdBy": "Daily rollover",
       "createdAt": "2026-08-01T21:59:37.565Z",
       "status": "pending",
-      "statusBy": "Not Malcolm",
-      "statusAt": "2026-08-01T23:13:35.256Z",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "stages": [
@@ -98,9 +98,9 @@
           "id": "s_msawzfcw5",
           "title": "Box Audit - Service",
           "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
-          "status": "complete",
-          "by": "Not Malcolm",
-          "at": "2026-08-01T23:13:35.256Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         },
         {
@@ -157,6 +157,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msi1yccg2",
+      "at": "2026-08-06T21:53:08.608Z",
+      "who": "Enzo",
+      "action": "board.reset",
+      "subject": "",
+      "detail": "2 tasks cleared, 2 plates released"
+    },
     {
       "id": "a_msazn2l24",
       "at": "2026-08-01T23:14:00.278Z",
@@ -1176,7 +1184,6 @@
       "title": "Plate Audit",
       "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
       "leaderboard": true,
-      "auto": true,
       "stages": [
         {
           "title": "Plate Audit",
@@ -1193,7 +1200,6 @@
       "title": "Box Audit - Service",
       "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
       "leaderboard": true,
-      "auto": true,
       "stages": [
         {
           "title": "Box Audit - Service",
@@ -1214,7 +1220,6 @@
       "title": "Loaner Audit - Evening",
       "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
       "leaderboard": true,
-      "auto": true,
       "stages": [
         {
           "title": "Loaner Audit - Evening",
@@ -1244,16 +1249,5 @@
     }
   ],
   "requests": [],
-  "reopenRequests": [],
-  "schedule": {
-    "enabled": true,
-    "time": "17:18",
-    "days": [
-      5,
-      6
-    ],
-    "tz": "America/Chicago",
-    "lastRunKey": "2026-07-31",
-    "lastRunAt": "2026-08-01T21:59:37.565Z"
-  }
+  "reopenRequests": []
 }
