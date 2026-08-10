@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-10T20:31:39.258Z",
+  "updatedAt": "2026-08-10T21:04:10.783Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -61,6 +61,11 @@
       "statusAt": "2026-08-10T20:27:25.138Z",
       "statusNote": null,
       "leaderboard": true,
+      "timed": false,
+      "limitMinutes": null,
+      "startedAt": null,
+      "startedBy": null,
+      "failedAt": null,
       "stages": [
         {
           "id": "s_msnonfdki",
@@ -102,6 +107,11 @@
       "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
+      "timed": false,
+      "limitMinutes": null,
+      "startedAt": null,
+      "startedBy": null,
+      "failedAt": null,
       "stages": [
         {
           "id": "s_msawzfcw5",
@@ -143,6 +153,11 @@
       "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
+      "timed": false,
+      "limitMinutes": null,
+      "startedAt": null,
+      "startedBy": null,
+      "failedAt": null,
       "stages": [
         {
           "id": "s_msawzfcw9",
@@ -166,6 +181,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msnpys673",
+      "at": "2026-08-10T21:04:10.783Z",
+      "who": "Enzo",
+      "action": "template.save",
+      "subject": "Pull Keys",
+      "detail": ""
+    },
     {
       "id": "a_msnoniaao",
       "at": "2026-08-10T20:27:25.138Z",
@@ -1274,6 +1297,8 @@
       "title": "Plate Audit - Opening",
       "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
       "leaderboard": true,
+      "timed": false,
+      "limitMinutes": null,
       "stages": [
         {
           "title": "Plate Audit - Opening",
@@ -1294,6 +1319,8 @@
       "title": "Box Audit - Service",
       "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
       "leaderboard": true,
+      "timed": false,
+      "limitMinutes": null,
       "stages": [
         {
           "title": "Box Audit - Service",
@@ -1314,6 +1341,8 @@
       "title": "Loaner Audit - Evening",
       "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
       "leaderboard": true,
+      "timed": false,
+      "limitMinutes": null,
       "stages": [
         {
           "title": "Loaner Audit - Evening",
@@ -1324,6 +1353,15 @@
           "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete."
         }
       ]
+    },
+    {
+      "id": "q_msnpyrxy1",
+      "title": "Pull Keys",
+      "description": "Pull all keys for tomorrow and the following day.",
+      "leaderboard": true,
+      "stages": [],
+      "timed": true,
+      "limitMinutes": 30
     }
   ],
   "renames": [
