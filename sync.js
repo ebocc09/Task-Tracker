@@ -55,20 +55,37 @@ function normalize(raw){
     ? [...new Set(d.blocked.filter(n => typeof n === "string" && n.trim()).map(n => n.trim()))]
     : [];
 
+  /* A timer is a whole number of minutes, above zero. Anything else — a string,
+     a float, a negative, a hand-edited "60 mins" — becomes null, which reads
+     downstream as "not actually a timed task" rather than as a timer that
+     expires at a nonsense moment. */
+  const minutesOf = v => {
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : null;
+  };
+
   // Reusable task templates for the Quick add sidebar. Deliberately survive
   // board resets and wipes — the point is re-adding common tasks fast.
-  board.templates = Array.isArray(d.templates) ? d.templates.filter(t => t && t.id && t.title).map(t => ({
-    id         : String(t.id),
-    title      : String(t.title),
-    description: t.description ? String(t.description) : "",
-    // Carried so a saved task keeps scoring when it's re-added to the board.
-    leaderboard: t.leaderboard === true,
-    // Blueprint only — no status/by/at. taskFromTemplate mints those fresh.
-    stages     : Array.isArray(t.stages) ? t.stages.filter(s => s && s.title).map(s => ({
-      title      : String(s.title),
-      description: s.description ? String(s.description) : ""
-    })) : []
-  })) : [];
+  board.templates = Array.isArray(d.templates) ? d.templates.filter(t => t && t.id && t.title).map(t => {
+    // Same rule as a board task, for the same reason — a saved timed task must
+    // come back off Quick add still timed, and still without stages.
+    const timed = t.timed === true;
+    const limit = timed ? minutesOf(t.limitMinutes) : null;
+    return {
+      id         : String(t.id),
+      title      : String(t.title),
+      description: t.description ? String(t.description) : "",
+      // Carried so a saved task keeps scoring when it's re-added to the board.
+      leaderboard: t.leaderboard === true,
+      timed      : timed && limit != null,
+      limitMinutes: limit,
+      // Blueprint only — no status/by/at. taskFromTemplate mints those fresh.
+      stages     : (timed || !Array.isArray(t.stages)) ? [] : t.stages.filter(s => s && s.title).map(s => ({
+        title      : String(s.title),
+        description: s.description ? String(s.description) : ""
+      }))
+    };
+  }) : [];
 
   // Rename breadcrumbs. A browser can't reach into another's localStorage, so
   // when an admin renames someone the change is logged here; each client checks
@@ -100,7 +117,10 @@ function normalize(raw){
     reason   : r.reason ? String(r.reason) : ""
   })) : [];
 
-  const OK = ["pending","complete","partial","blocked"];
+  /* in_progress and failed belong to TIMED tasks only — see the timer helpers
+     in app.js. They are in the same list because task.status is one field and
+     every reader keys off it; nothing else distinguishes them here. */
+  const OK = ["pending","complete","partial","blocked","in_progress","failed"];
 
   /* A task is optionally broken into ordered stages. An empty array means an
      ordinary single-step task, which is what every task created before this
@@ -119,21 +139,43 @@ function normalize(raw){
     note       : s.note ? String(s.note) : null
   })) : [];
 
-  board.tasks = Array.isArray(d.tasks) ? d.tasks.filter(t => t && t.id && t.title).map(t => ({
-    id         : String(t.id),
-    title      : String(t.title),
-    description: t.description ? String(t.description) : "",
-    createdBy  : t.createdBy ? String(t.createdBy) : null,
-    createdAt  : t.createdAt ? String(t.createdAt) : null,
-    status     : OK.includes(t.status) ? t.status : "pending",
-    statusBy   : t.statusBy ? String(t.statusBy) : null,
-    statusAt   : t.statusAt ? String(t.statusAt) : null,
-    statusNote : t.statusNote ? String(t.statusNote) : null,
-    // Completing this earns leaderboard credit. Absent on every task created
-    // before the leaderboard existed, which normalizes to false — no migration.
-    leaderboard: t.leaderboard === true,
-    stages     : stagesOf(t)
-  })) : [];
+  board.tasks = Array.isArray(d.tasks) ? d.tasks.filter(t => t && t.id && t.title).map(t => {
+    /* A timed task is one-step by definition: the timer measures the whole
+       task, and a per-stage timer is a different feature that does not exist.
+       The add form will not let the two be combined, but data.json is a file
+       people can hand-edit, so the invariant is enforced on the way in rather
+       than assumed by every reader downstream. */
+    const timed  = t.timed === true;
+    const limit  = timed ? minutesOf(t.limitMinutes) : null;
+    return {
+      id         : String(t.id),
+      title      : String(t.title),
+      description: t.description ? String(t.description) : "",
+      createdBy  : t.createdBy ? String(t.createdBy) : null,
+      createdAt  : t.createdAt ? String(t.createdAt) : null,
+      status     : OK.includes(t.status) ? t.status : "pending",
+      statusBy   : t.statusBy ? String(t.statusBy) : null,
+      statusAt   : t.statusAt ? String(t.statusAt) : null,
+      statusNote : t.statusNote ? String(t.statusNote) : null,
+      // Completing this earns leaderboard credit. Absent on every task created
+      // before the leaderboard existed, which normalizes to false — no migration.
+      leaderboard: t.leaderboard === true,
+      /* Timed tasks: a limit in minutes, a clock that starts on Start, and the
+         person it belongs to. `timed` is false on every task that predates the
+         feature, so old boards need no migration.
+
+         A ticked box with no usable limit is NOT a timed task — otherwise it
+         would sit on the board with a Start button that can never expire. */
+      timed      : timed && limit != null,
+      limitMinutes: limit,
+      startedAt  : t.startedAt ? String(t.startedAt) : null,
+      startedBy  : t.startedBy ? String(t.startedBy) : null,
+      // Stamped when the expiry is persisted, so a failure keeps the moment it
+      // actually ran out rather than the moment a browser noticed.
+      failedAt   : t.failedAt ? String(t.failedAt) : null,
+      stages     : timed ? [] : stagesOf(t)
+    };
+  }) : [];
 
   board.audit = Array.isArray(d.audit) ? d.audit.filter(a => a && a.action).slice(0, AUDIT_CAP).map(a => ({
     id     : a.id ? String(a.id) : uid("a"),
@@ -421,7 +463,12 @@ function pushAudit(data, entries){
   const who = me() || "Unknown";
   list.filter(Boolean).forEach(e => {
     data.audit.unshift({
-      id: uid("a"), at: nowIso(), who,
+      id: uid("a"), at: nowIso(),
+      /* Almost always the person clicking, which is why it defaults. The
+         exception is a timed task running out: whichever teammate's browser
+         happens to notice is the one that writes it, but the entry has to read
+         "Bob failed X" — Bob being whoever started the clock, not the witness. */
+      who: e.who ? String(e.who) : who,
       action : e.action,
       subject: e.subject || "",
       detail : e.detail || ""

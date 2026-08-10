@@ -13,6 +13,11 @@ const ICON = {
   check   : '<path d="M20 6 9 17l-5-5"/>',
   half    : '<path d="M12 3v18"/><circle cx="12" cy="12" r="9"/>',
   slash   : '<circle cx="12" cy="12" r="9"/><path d="m8.4 8.4 7.2 7.2"/>',
+  // A clock face for a running timer, and a crossed one for a task that ran out.
+  in_progress: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 1.8"/>',
+  failed  : '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.6v4.9"/><path d="M12 15.8h.01"/>',
+  play    : '<path d="M8 5.5v13l10-6.5z"/>',
+  lock    : '<rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
   undo    : '<path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.1-6.4L3 9"/>',
   up      : '<path d="m6 15 6-6 6 6"/>',
   down    : '<path d="m6 9 6 6 6-6"/>',
@@ -28,7 +33,10 @@ const STATUS = {
   pending : { label:"Pending",            pill:"idle", verb:"reopened"  },
   complete: { label:"Complete",           pill:"ok",   verb:"completed" },
   partial : { label:"Partial",            pill:"warm", verb:"partially completed" },
-  blocked : { label:"Could not complete", pill:"bad",  verb:"marked blocked on" }
+  blocked : { label:"Could not complete", pill:"bad",  verb:"marked blocked on" },
+  // Timed tasks only. "failed" is terminal — nothing reopens it, by design.
+  in_progress: { label:"In progress",     pill:"info", verb:"started" },
+  failed  : { label:"Failed",             pill:"bad",  verb:"failed" }
 };
 
 /* ─────────────────────────────── toasts ────────────────────────────────── */
@@ -178,20 +186,105 @@ function closeConfirm(answer){
   if(r) r(answer);
 }
 
+/* ─────────────────────────────── timers ────────────────────────────────
+   A timed task is given a limit in minutes when it is added. It sits Pending
+   until someone presses Start; from that moment it has until the deadline to
+   be completed, and if it isn't, it fails and locks.
+
+   Nothing runs when the tab is closed — this is a static page whose only
+   backend is a JSON file on GitHub. So expiry is DERIVED for display and
+   PERSISTED opportunistically:
+
+     · effectiveStatus() reports "failed" the moment the deadline passes,
+       whatever data.json still says. Every display path reads it, so the board
+       is right immediately for everyone — including viewers, who cannot write.
+     · sweepExpiredTimers() further down writes that conclusion back, from the
+       first member client to notice. The mutator no-ops unless the stored
+       status is still in_progress, so racing clients converge on one write.
+     · The lock itself lives in the mutators, not the buttons. A tab left open
+       from before the deadline still has a live Complete button; pressing it
+       is rejected at the moment of writing.
+
+   The consequence to know about: if nobody with write access opens the board
+   for a week, the failure shows correctly all week but is not recorded in the
+   audit log until someone does. Fixing that properly needs a server. */
+
+const isTimed = t => t.timed === true && Number(t.limitMinutes) > 0;
+
+// null unless the clock is actually running — an unstarted timed task has no
+// deadline at all, which is what keeps it sitting Pending indefinitely.
+const deadlineOf = t => {
+  if(!isTimed(t) || !t.startedAt) return null;
+  const started = Date.parse(t.startedAt);
+  return Number.isNaN(started) ? null : started + t.limitMinutes * 60000;
+};
+
+const msLeft = (t, now = Date.now()) => {
+  const d = deadlineOf(t);
+  return d == null ? null : d - now;
+};
+
+const isExpired = (t, now = Date.now()) => {
+  if(t.status !== "in_progress") return false;      // only a running clock expires
+  const left = msLeft(t, now);
+  return left != null && left <= 0;
+};
+
+/* The status to SHOW and to count, as opposed to the one on disk. They differ
+   only for a running timer that has passed its deadline and has not been
+   written back yet. */
+const effectiveStatus = (t, now = Date.now()) => isExpired(t, now) ? "failed" : t.status;
+
+// How long a finished timed task actually took. Null unless both ends exist.
+const elapsedMs = t => {
+  if(!t.startedAt || !t.statusAt) return null;
+  const a = Date.parse(t.startedAt), b = Date.parse(t.statusAt);
+  return (Number.isNaN(a) || Number.isNaN(b) || b < a) ? null : b - a;
+};
+
+/* "9m 04s" while it matters, "2h 05m" once it doesn't. Seconds are padded so a
+   ticking countdown doesn't change width every second and jiggle the row. */
+function fmtDuration(ms){
+  if(ms == null) return "";
+  const total = Math.max(0, Math.round(ms / 1000));
+  const h = Math.floor(total / 3600), m = Math.floor((total % 3600) / 60), s = total % 60;
+  if(h) return `${h}h ${String(m).padStart(2, "0")}m`;
+  return `${m}m ${String(s).padStart(2, "0")}s`;
+}
+
+// Plain minutes, for prose in the audit log rather than a ticking display.
+const fmtMinutes = n => `${n} minute${n === 1 ? "" : "s"}`;
+
 /* ───────────────────────────── derived data ────────────────────────────── */
 
 const counts = () => {
-  const c = { all: state.data.tasks.length, pending:0, complete:0, partial:0, blocked:0 };
-  state.data.tasks.forEach(t => { c[t.status] = (c[t.status] || 0) + 1; });
+  const c = { all: state.data.tasks.length, pending:0, complete:0, partial:0,
+              blocked:0, in_progress:0, failed:0 };
+  state.data.tasks.forEach(t => {
+    const s = effectiveStatus(t);
+    c[s] = (c[s] || 0) + 1;
+  });
   return c;
 };
 
-const doneCount = () => state.data.tasks.filter(t => t.status !== "pending").length;
+/* "Addressed" means the task has reached an end state. A timer that is still
+   running has not — it is work in flight, and counting it as done would put
+   the hero bar ahead of reality. A failed one has, unhappily. */
+const doneCount = () => state.data.tasks.filter(t => {
+  const s = effectiveStatus(t);
+  return s !== "pending" && s !== "in_progress";
+}).length;
 
 /* Board progress in task-equivalents rather than whole tasks. A plain task is
    worth 1 once it's addressed; a staged one earns its stages as they land, so
    finishing 2 of 3 moves the bar by two thirds of a task instead of nothing. */
 const progressSum = () => state.data.tasks.reduce((sum, t) => {
+  // A timed task is all-or-nothing: it has no stages, and a clock part-way
+  // through has produced nothing yet.
+  if(isTimed(t)){
+    const s = effectiveStatus(t);
+    return sum + (s === "pending" || s === "in_progress" ? 0 : 1);
+  }
   if(!hasStages(t)) return sum + (t.status !== "pending" ? 1 : 0);
   if(t.status !== "pending") return sum + 1;          // halted or finished: whole task
   return sum + t.stages.filter(s => s.status === "complete").length / t.stages.length;
@@ -241,6 +334,11 @@ function render(){
   renderList();
   if($("adminModal").classList.contains("on") && !$("adminBody").hidden) renderAdmin();
   if($("plateMenu").classList.contains("on")) renderPlateMenu();
+  /* Start or stop the countdown depending on what is now on the board, and
+     write back anything that expired while this tab was asleep or closed —
+     a poll landing a started task is the usual way both of these come up. */
+  syncTimerTicker();
+  sweepExpiredTimers();
 }
 
 function renderChrome(){
@@ -344,6 +442,8 @@ function renderStats(){
   $("sPartial").textContent  = c.partial;
   $("sBlocked").textContent  = c.blocked;
   $("sPending").textContent  = c.pending;
+  $("sRunning").textContent  = c.in_progress;
+  $("sFailed").textContent   = c.failed;
   document.querySelectorAll(".strip .stat").forEach(cell => {
     cell.classList.toggle("on", cell.dataset.filter === state.filter);
   });
@@ -352,7 +452,7 @@ function renderStats(){
 function renderList(){
   const list = $("list");
   const all  = state.data.tasks;
-  const shown = state.filter === "all" ? all : all.filter(t => t.status === state.filter);
+  const shown = state.filter === "all" ? all : all.filter(t => effectiveStatus(t) === state.filter);
 
   $("empty").hidden       = all.length > 0;
   $("filterEmpty").hidden = !(all.length > 0 && shown.length === 0);
@@ -386,6 +486,12 @@ function renderList(){
 const cardSig = (t, readOnly) => JSON.stringify([
   t.title, t.description, t.status, t.statusBy, t.statusAt, t.statusNote,
   t.createdBy, t.createdAt, readOnly,
+  /* Timer fields, or a task would not repaint when someone starts it. The
+     EFFECTIVE status is in here rather than just t.status: an expiry changes
+     nothing on disk, so without it the card would keep its Complete button
+     until a write happened to land. me() matters because whether the Complete
+     button is live depends on who is looking. */
+  t.timed, t.limitMinutes, t.startedAt, t.startedBy, effectiveStatus(t), me(),
   (state.data.reopenRequests || []).some(r => r.taskId === t.id),
   (t.stages || []).map(s => [s.title, s.description, s.status, s.by, s.at, s.note])
 ]);
@@ -454,10 +560,62 @@ function reconcileChildren(container, desired){
   });
 }
 
+/* The action row for a timed task, which replaces Complete/Partial/Blocked
+   entirely — a timed task has exactly one path through it.
+
+     pending      Start
+     in_progress  Complete, but only for whoever started it, plus a countdown
+     complete     how long it took
+     failed       nothing at all; it is locked
+
+   The countdown text is written once here and then rewritten in place every
+   second by the ticker, never by a re-render — see startTimerTicker(). */
+function timedActions(t, readOnly, eff){
+  if(readOnly) return `<div class="dw-meta">Connect a token to change this task.</div>`;
+
+  if(eff === "failed"){
+    const ran = t.limitMinutes ? ` after ${escHtml(fmtMinutes(t.limitMinutes))}` : "";
+    return `<div class="timer-locked">${svg(ICON.lock)}<span>Ran out of time${ran} — this task is locked and cannot be reopened.</span></div>`;
+  }
+
+  if(eff === "complete"){
+    const took = elapsedMs(t);
+    return took == null ? "" :
+      `<div class="timer-done">${svg(ICON.check)}<span>Completed in <strong>${escHtml(fmtDuration(took))}</strong> of ${escHtml(fmtMinutes(t.limitMinutes))}.</span></div>`;
+  }
+
+  if(eff === "in_progress"){
+    const mine = t.startedBy === me();
+    return `
+<div class="timer-run" data-timer="${t.id}">
+  <span class="timer-left" data-timer-left="${t.id}">${escHtml(fmtDuration(msLeft(t)))}</span>
+  <span class="timer-cap">left of ${escHtml(fmtMinutes(t.limitMinutes))} · started by ${escHtml(t.startedBy || "—")}</span>
+</div>
+<div class="acts">
+  ${mine
+    ? `<button class="act good" data-act="timed-complete" data-id="${t.id}">${svg(ICON.check)}Complete</button>`
+    : `<button class="act good" disabled title="Only ${escHtml(t.startedBy || "the person who started it")} can complete this">${svg(ICON.check)}Complete</button>`}
+</div>
+${mine ? "" : `<div class="dw-meta">Only ${escHtml(t.startedBy || "whoever starts it")} can complete this one.</div>`}`;
+  }
+
+  // pending — not started, so no clock is running yet.
+  return `
+<div class="acts">
+  <button class="act good" data-act="timed-start" data-id="${t.id}">${svg(ICON.play)}Start</button>
+</div>
+<div class="dw-meta">The ${escHtml(fmtMinutes(t.limitMinutes))} starts when you press Start.</div>`;
+}
+
 function taskCard(t, readOnly){
-  const st     = STATUS[t.status];
+  /* Everything below reads the EFFECTIVE status, so a timer that ran out while
+     the tab sat idle renders as failed immediately rather than waiting for a
+     write to land. */
+  const eff    = effectiveStatus(t);
+  const st     = STATUS[eff];
   const open   = state.openTaskId === t.id;
   const staged = hasStages(t);
+  const timed  = isTimed(t);
 
   /* A staged task in flight is still "pending" as far as the stat strip and
      the board bar are concerned — but "Pending" tells the team nothing useful
@@ -471,8 +629,11 @@ function taskCard(t, readOnly){
   const noteBlock = t.statusNote
     ? `<div class="dw-note">${escHtml(t.statusNote)}</div>` : "";
 
+  /* A failed timed task is terminal — no reopen button, and no request path
+     either. The refusal is repeated in requestReopen() and in the admin
+     approval, because this line only hides the button. */
   const roPending = (state.data.reopenRequests || []).some(r => r.taskId === t.id);
-  const reopenBtn = t.status === "pending" ? ""
+  const reopenBtn = (t.status === "pending" || eff === "failed") ? ""
     : roPending
       ? `<button class="act ghost" disabled>${svg(ICON.undo)}Reopen requested</button>`
       : `<button class="act ghost" data-act="reopen" data-id="${t.id}">${svg(ICON.undo)}Reopen</button>`;
@@ -482,7 +643,9 @@ function taskCard(t, readOnly){
   const done      = staged && currentStageIndex(t) >= t.stages.length;
   const doneLabel = staged && !done ? `Complete stage ${currentStageIndex(t) + 1}` : "Complete";
 
-  const actions = readOnly
+  const actions = timed
+    ? timedActions(t, readOnly, eff)
+    : readOnly
     ? `<div class="dw-meta">Connect a token to change this task.</div>`
     : `<div class="acts">
          <button class="act good ${t.status === "complete" ? "on" : ""}" data-act="complete" data-id="${t.id}"
@@ -497,14 +660,22 @@ function taskCard(t, readOnly){
          ${reopenBtn}
        </div>`;
 
+  /* The collapsed row carries the countdown too, so a running timer is visible
+     without opening the drawer — that is the whole point of a deadline. Same
+     data-timer-left hook, so the ticker updates both copies in one pass. */
+  const headTimer = timed && eff === "in_progress"
+    ? `<span class="task-by timer-chip"><span class="timer-left" data-timer-left="${t.id}">${escHtml(fmtDuration(msLeft(t)))}</span> left</span>`
+    : "";
+
   return `
-<article class="task s-${t.status}${open ? " open" : ""}" data-task="${t.id}">
+<article class="task s-${eff}${open ? " open" : ""}" data-task="${t.id}">
   <button class="task-head" data-toggle="${t.id}" aria-expanded="${open}">
-    <span class="task-glyph">${svg(ICON[t.status])}</span>
+    <span class="task-glyph">${svg(ICON[eff])}</span>
     <span class="task-main">
       <span class="task-title">${escHtml(t.title)}</span>
       ${t.description ? `<span class="task-desc">${escHtml(t.description)}</span>` : ""}
       ${staged ? stageBubbles(t) : ""}
+      ${headTimer}
     </span>
     <span class="task-right">
       <span class="pill ${staged && t.status === "pending" ? "info" : st.pill}">${escHtml(headline)}</span>
@@ -626,6 +797,12 @@ function setTaskStatus(taskId, status, note){
   return commit(`${STATUS[status].label} "${title}"`, data => {
     const t = data.tasks.find(x => x.id === taskId);
     if(!t) throw new Error("That task was deleted by someone else.");
+
+    /* A timed task has its own two actions and never renders these buttons. It
+       can still be reached for ~10 minutes after a deploy by a teammate running
+       cached JS from before timers existed, which would otherwise let them
+       complete — or reopen — a task the timer already failed. */
+    if(t.timed) throw new Error("That's a timed task — reload the page to get the Start button.");
 
     /* Read off the FRESH task, before we write. Two people can complete the
        same task at once: the loser gets a 409 and replays against data where
@@ -760,9 +937,174 @@ async function markWithNote(taskId, status){
   setTaskStatus(taskId, status, clean);
 }
 
+/* ──────────────────────────── timed tasks ──────────────────────────────
+   Two actions and a sweep. Each mutator re-finds the task by id and refuses on
+   a state that no longer allows the move, because between the click and the
+   write someone else may have started it, finished it, or the clock may have
+   run out — and the button the user pressed can be from before any of that. */
+
+function startTimedTask(taskId){
+  const task = state.data.tasks.find(t => t.id === taskId);
+  if(!task || !isTimed(task)) return;
+
+  const startedAt = nowIso();
+
+  return commit(`Start "${task.title}"`, data => {
+    const t = data.tasks.find(x => x.id === taskId);
+    if(!t) throw new Error("That task was deleted by someone else.");
+    if(!t.timed) throw new Error("That task is no longer a timed task.");
+    if(t.status !== "pending") throw new Error(`${t.startedBy || "Someone"} already started this one.`);
+
+    t.status    = "in_progress";
+    t.startedAt = startedAt;
+    t.startedBy = me();
+    // statusBy/At track the last status change for the card footer, same as
+    // every other transition.
+    t.statusBy  = me();
+    t.statusAt  = startedAt;
+    t.statusNote = null;
+
+    return { action:"task.start", subject: t.title, detail: fmtMinutes(t.limitMinutes) };
+  });
+}
+
+function completeTimedTask(taskId){
+  const task = state.data.tasks.find(t => t.id === taskId);
+  if(!task || !isTimed(task)) return;
+
+  // Minted outside the mutator — uid() bumps a module counter, so a replay
+  // would mint a second id and credit the completion twice.
+  const scoreId = uid("sc"), scoreAt = nowIso(), scoreWho = me();
+
+  return commit(`Complete "${task.title}"`, data => {
+    const t = data.tasks.find(x => x.id === taskId);
+    if(!t) throw new Error("That task was deleted by someone else.");
+    if(t.status === "failed") throw new Error("That task ran out of time and is locked.");
+    if(t.status !== "in_progress") throw new Error("That task isn't running.");
+    if(t.startedBy !== me()) throw new Error(`Only ${t.startedBy} can complete this one.`);
+
+    /* The deadline is checked HERE, against the data being written, not against
+       what the button looked like. A tab open from before the deadline still
+       shows a live Complete button; this is what stops it landing. */
+    if(isExpired(t)) throw new Error("Time ran out on that task — it can no longer be completed.");
+
+    const finishedAt = nowIso();
+    t.status     = "complete";
+    t.statusBy   = me();
+    t.statusAt   = finishedAt;
+    t.statusNote = null;
+
+    if(t.leaderboard){
+      awardScore(data, {
+        id: scoreId, at: scoreAt, who: scoreWho,
+        taskId: t.id, stageId: null, title: t.title, value: 1
+      });
+    }
+
+    return {
+      action : "task.timedComplete",
+      subject: t.title,
+      detail : `${fmtDuration(elapsedMs(t))} of ${fmtMinutes(t.limitMinutes)}`
+    };
+  });
+}
+
+/* Write back the expiries that effectiveStatus() is already showing.
+
+   Runs from the ticker and after every sync. Only members can write, so a
+   viewer-only audience sees the right board and records nothing until someone
+   with a token turns up — that is the accepted cost of having no server. */
+const timeoutsInFlight = new Set();
+
+function sweepExpiredTimers(){
+  if(state.mode !== "member" || amBlocked() || !me()) return;
+
+  const due = state.data.tasks.filter(t =>
+    t.status === "in_progress" && isExpired(t) && !timeoutsInFlight.has(t.id));
+  if(!due.length) return;
+
+  due.forEach(task => {
+    timeoutsInFlight.add(task.id);
+    const deadline = deadlineOf(task);
+    // The moment it actually ran out, not the moment a browser noticed. Those
+    // can be days apart if nobody had the board open.
+    const failedAt = deadline ? new Date(deadline).toISOString() : nowIso();
+
+    commit(`Time out "${task.title}"`, data => {
+      const t = data.tasks.find(x => x.id === task.id);
+      // Someone completed it in time, or another client already wrote the
+      // timeout. Either way there is nothing to do and nothing to log — this
+      // is what makes concurrent sweeps converge on one entry.
+      if(!t || t.status !== "in_progress") return null;
+      if(!isExpired(t)) return null;
+
+      t.status     = "failed";
+      t.failedAt   = failedAt;
+      t.statusBy   = t.startedBy;
+      t.statusAt   = failedAt;
+      t.statusNote = null;
+
+      return {
+        action : "task.timeout",
+        subject: t.title,
+        // Attributed to whoever started the clock, not to whoever's browser
+        // happened to be open when it ran out. See pushAudit in sync.js.
+        who    : t.startedBy || "Unknown",
+        detail : `ran out after ${fmtMinutes(t.limitMinutes)}`
+      };
+    }).finally(() => timeoutsInFlight.delete(task.id));
+  });
+}
+
+/* One interval for the whole board. It rewrites the countdown text in place —
+   touching a text node, never re-rendering — because the list is keyed and
+   reconciled, and rebuilding cards every second would replay the row animation
+   and fight the drawer transition. It only runs while something is counting. */
+let timerTicker = null;
+
+function syncTimerTicker(){
+  const running = state.data.tasks.some(t => t.status === "in_progress" && isTimed(t));
+  if(running && !timerTicker){
+    timerTicker = setInterval(tickTimers, 1000);
+  }else if(!running && timerTicker){
+    clearInterval(timerTicker);
+    timerTicker = null;
+  }
+}
+
+function tickTimers(){
+  let expired = false;
+  document.querySelectorAll("[data-timer-left]").forEach(el => {
+    const t = state.data.tasks.find(x => x.id === el.dataset.timerLeft);
+    if(!t) return;
+    const left = msLeft(t);
+    if(left == null) return;
+    if(left <= 0) expired = true;
+    el.textContent = fmtDuration(left);
+  });
+
+  /* A card that just hit zero has to change shape, not just text — the Complete
+     button goes, the pill flips to Failed. That is a real render, but only on
+     the tick where it actually happens. */
+  if(expired){
+    renderStats();
+    renderHero();
+    renderList();
+    syncTimerTicker();
+    sweepExpiredTimers();
+  }
+}
+
 async function requestReopen(taskId){
   const task = state.data.tasks.find(t => t.id === taskId);
   if(!task) return;
+
+  /* Hidden in the card too, but a failed task must be unreopenable by every
+     route — this is the one that a stale tab or a keyboard shortcut would hit. */
+  if(effectiveStatus(task) === "failed"){
+    toast("That task ran out of time and is locked. It cannot be reopened.", "bad");
+    return;
+  }
 
   if((state.data.reopenRequests || []).some(r => r.taskId === taskId)){
     toast("A reopen request for this task is already pending.", "");
@@ -1113,6 +1455,12 @@ function wireEvents(){
       case "partial":
       case "blocked":
         markWithNote(id, act.dataset.act);
+        break;
+      case "timed-start":
+        startTimedTask(id);
+        break;
+      case "timed-complete":
+        completeTimedTask(id);
         break;
       case "reopen":
         requestReopen(id);

@@ -263,6 +263,16 @@ async function approveReopen(id){
     const task = data.tasks.find(t => t.id === req.taskId);
     if(!task) return null;                  // task deleted meanwhile — just drop the request
 
+    /* A timed task that ran out is terminal for everyone, admins included.
+       There is no route to a pending reopen request on one — the button is
+       hidden and requestReopen refuses — but a request raised before the clock
+       expired can still be sitting here when it does. Dropping the request and
+       refusing is the honest outcome; the alternative is an admin quietly
+       undoing a failure the whole team saw. */
+    if(task.status === "failed"){
+      throw new Error(`“${task.title}” ran out of time and is locked. It cannot be reopened.`);
+    }
+
     /* Hand back this round's leaderboard credit. A board reset keeps credit —
        it starts a new round, and the work really was done. A reopen says the
        opposite: it wasn't. Without this, complete → reopen → complete scores
@@ -382,6 +392,7 @@ function renderQuickAdd(){
     <div class="adm-s">${tp.description ? escHtml(tp.description) : "No description"}</div>
   </div>
   ${tp.leaderboard ? `<span class="pill ok">Leaderboard</span>` : ""}
+  ${tp.timed && tp.limitMinutes ? `<span class="pill info">${tp.limitMinutes}m timed</span>` : ""}
   ${n ? `<span class="pill info">${n} stages</span>` : ""}
   <button class="mini" data-qaadd="${tp.id}">Add to board</button>
   <button class="mini" data-qaedit="${tp.id}">Edit</button>
@@ -403,7 +414,30 @@ function clearTaskForm(){
   $("taskTitle").value = "";
   $("taskDesc").value  = "";
   $("taskLb").checked  = false;
+  $("taskTimed").checked = false;
+  $("taskTimerMins").value = "10";
+  syncTimedFields();
   clearStageRows();
+}
+
+/* Ticking Timed swaps the stage editor for an explanation and reveals the
+   minutes box. Called from the checkbox, from clearTaskForm and from
+   loadTemplateIntoForm, so the three can never disagree about what is on
+   screen. */
+function syncTimedFields(){
+  const on = $("taskTimed").checked;
+  $("taskTimerWrap").hidden     = !on;
+  $("taskStagesField").hidden   = on;
+  $("taskStagesBlocked").hidden = !on;
+}
+
+/* The minutes box, validated. Returns null when Timed is off, or when the
+   value is not a whole number of minutes above zero — the caller turns that
+   second case into an error rather than silently adding an untimed task. */
+function readTimerMinutes(){
+  if(!$("taskTimed").checked) return null;
+  const n = Number($("taskTimerMins").value);
+  return Number.isFinite(n) && n >= 1 ? Math.floor(n) : NaN;
 }
 
 /* Excludes the template being edited, or changing only a description would
@@ -419,6 +453,11 @@ function loadTemplateIntoForm(tp){
   $("taskTitle").value = tp.title;
   $("taskDesc").value  = tp.description || "";
   $("taskLb").checked  = tp.leaderboard === true;
+  $("taskTimed").checked   = tp.timed === true;
+  $("taskTimerMins").value = tp.limitMinutes || 10;
+  // Before renderStageRows: a timed template has no stages and the stage
+  // editor must already be hidden when it runs.
+  syncTimedFields();
   /* slice(1) is load-bearing. stages[0] IS the title and description above —
      see stagesToSave, which prepends them — and the base row already renders
      it. Passing the whole array shows stage 1 twice and re-saving keeps the
@@ -474,10 +513,18 @@ async function updateTemplate(){
   const titleEl = $("taskTitle"), descEl = $("taskDesc");
   const title = titleEl.value.trim();
   const desc  = descEl.value.trim();
-  const stages = stagesToSave(title, desc);
+  const mins  = readTimerMinutes();
+  const timed = mins !== null;
+  // A timed task is single-step, so its stage rows are hidden and ignored.
+  const stages = timed ? [] : stagesToSave(title, desc);
   const leaderboard = $("taskLb").checked;
 
   if(!title){ toast("Give the task a title.", "bad"); titleEl.focus(); return; }
+  if(Number.isNaN(mins)){
+    toast("A timed task needs a limit of at least 1 minute.", "bad");
+    $("taskTimerMins").focus();
+    return;
+  }
   if(templateTitleTaken(title, id)){
     toast(`"${title}" is already in Quick add.`, "bad");
     return;
@@ -487,6 +534,7 @@ async function updateTemplate(){
     const t = (data.templates || []).find(x => x.id === id);
     if(!t) throw new Error("That saved task no longer exists.");
     t.title = title; t.description = desc; t.stages = stages; t.leaderboard = leaderboard;
+    t.timed = timed; t.limitMinutes = mins;
     return { action:"template.edit", subject: title };
   });
 
@@ -578,9 +626,16 @@ async function saveTaskTemplate(){
   const titleEl = $("taskTitle"), descEl = $("taskDesc");
   const title = titleEl.value.trim();
   const desc  = descEl.value.trim();
-  const stages = stagesToSave(title, desc);
+  const mins  = readTimerMinutes();
+  const timed = mins !== null;
+  const stages = timed ? [] : stagesToSave(title, desc);
 
   if(!title){ toast("Give the task a title to save it.", "bad"); titleEl.focus(); return; }
+  if(Number.isNaN(mins)){
+    toast("A timed task needs a limit of at least 1 minute.", "bad");
+    $("taskTimerMins").focus();
+    return;
+  }
   if(templateTitleTaken(title, null)){
     toast(`"${title}" is already in Quick add.`, "bad");
     return;
@@ -590,7 +645,8 @@ async function saveTaskTemplate(){
   const id = uid("q");
   const ok = await commit(`Save task template "${title}"`, data => {
     data.templates = data.templates || [];
-    data.templates.push({ id, title, description: desc, leaderboard, stages });
+    data.templates.push({ id, title, description: desc, leaderboard, stages,
+                          timed, limitMinutes: mins });
     return { action:"template.save", subject: title };
   });
 
@@ -607,6 +663,7 @@ async function saveTaskTemplate(){
    blueprint — titles and descriptions — so every stage starts pending with a
    new id and no attribution. */
 function taskFromTemplate(tp){
+  const timed = tp.timed === true && Number(tp.limitMinutes) > 0;
   return {
     id: uid("t"), title: tp.title, description: tp.description,
     createdBy: me(), createdAt: nowIso(),
@@ -614,7 +671,11 @@ function taskFromTemplate(tp){
     // Carried here rather than at the call sites, so Add to board and Add all
     // both pick it up.
     leaderboard: tp.leaderboard === true,
-    stages: (tp.stages || []).map(s => ({
+    /* The limit is part of the blueprint; the clock is not. Every re-add starts
+       unstarted, which is what makes a saved timed task reusable. */
+    timed, limitMinutes: timed ? Math.floor(Number(tp.limitMinutes)) : null,
+    startedAt: null, startedBy: null, failedAt: null,
+    stages: timed ? [] : (tp.stages || []).map(s => ({
       id: uid("s"), title: s.title, description: s.description || "",
       status: "pending", by: null, at: null, note: null
     }))
@@ -1237,7 +1298,10 @@ function renderAdminTasks(){
   }
 
   box.innerHTML = tasks.map((t, i) => {
-    const st = STATUS[t.status];
+    // Effective, so a timer that ran out reads Failed here too rather than
+    // still showing In progress until a write lands.
+    const eff = effectiveStatus(t);
+    const st = STATUS[eff];
     // Mirror the board: a staged task in flight says where it is, not "Pending".
     const staged = hasStages(t);
     const label  = staged && t.status === "pending" ? stageLabel(t) : st.label;
@@ -1255,6 +1319,7 @@ function renderAdminTasks(){
     <div class="adm-s">${sub}</div>
   </div>
   ${t.leaderboard ? `<span class="pill ok" title="Completing this scores on the leaderboard">Leaderboard</span>` : ""}
+  ${isTimed(t) ? `<span class="pill info" title="Fails and locks if not completed inside the limit">${t.limitMinutes}m</span>` : ""}
   <span class="pill ${staged && t.status === "pending" ? "info" : st.pill}">${escHtml(label)}</span>
   <button class="mini red" data-deltask="${t.id}">Delete</button>
 </div>`;
@@ -1325,11 +1390,17 @@ function renderAdminAudit(){
 <div class="audit-row">
   <span class="aw">${escHtml(r.who)}</span>
   <span class="ax">${escHtml(auditPhrase(r))}
-    ${r.detail ? `<span class="ad">“${escHtml(r.detail)}”</span>` : ""}
+    ${r.detail && !DETAIL_IN_PHRASE.has(r.action) ? `<span class="ad">“${escHtml(r.detail)}”</span>` : ""}
   </span>
   <span class="at" title="${escHtml(fullTime(r.at))}">${escHtml(relTime(r.at))}</span>
 </div>`).join("");
 }
+
+/* Actions whose phrase already reads their own detail. The row appends detail
+   in quotes after the phrase, which is right for a note someone typed and
+   wrong for a duration the sentence is built around — "took 8m 30s to complete
+   X “8m 30s”". */
+const DETAIL_IN_PHRASE = new Set(["task.timedComplete", "task.timeout"]);
 
 function auditPhrase(r){
   const s = r.subject;
@@ -1341,6 +1412,13 @@ function auditPhrase(r){
     case "task.partial":   return `partially completed “${s}”`;
     case "task.blocked":   return `could not complete “${s}”`;
     case "task.pending":   return `reopened “${s}”`;
+    /* Timed tasks. The detail carries the duration, so the row reads
+       "Bob · took 8m 30s of 10 minutes to complete X" — and a timeout reads
+       "Bob failed X", attributed to whoever started the clock rather than to
+       whichever browser noticed it run out. */
+    case "task.start":     return `started “${s}”`;
+    case "task.timedComplete": return `took ${r.detail || "—"} to complete “${s}”`;
+    case "task.timeout":   return `failed “${s}” — ${r.detail || "ran out of time"}`;
     case "task.add":       return `added task “${s}”`;
     case "template.save":  return `saved “${s}” to Quick add`;
     case "template.edit":  return `edited saved task “${s}”`;
@@ -1380,9 +1458,16 @@ async function addTask(){
   const titleEl = $("taskTitle"), descEl = $("taskDesc");
   const title = titleEl.value.trim();
   const desc  = descEl.value.trim();
-  const stages = stagesToSave(title, desc);
+  const mins  = readTimerMinutes();
+  const timed = mins !== null;
+  const stages = timed ? [] : stagesToSave(title, desc);
 
   if(!title){ toast("Give the task a title.", "bad"); titleEl.focus(); return; }
+  if(Number.isNaN(mins)){
+    toast("A timed task needs a limit of at least 1 minute.", "bad");
+    $("taskTimerMins").focus();
+    return;
+  }
   if(state.data.tasks.some(t => t.title.toLowerCase() === title.toLowerCase())){
     const ok = await askConfirm({
       title: "Duplicate title",
@@ -1400,6 +1485,8 @@ async function addTask(){
       createdBy: me(), createdAt: nowIso(),
       status: "pending", statusBy: null, statusAt: null, statusNote: null,
       leaderboard,
+      // Added unstarted — the clock begins when someone presses Start.
+      timed, limitMinutes: mins, startedAt: null, startedBy: null, failedAt: null,
       stages: stages.map(s => ({
         id: uid("s"), title: s.title, description: s.description,
         status: "pending", by: null, at: null, note: null
@@ -1408,14 +1495,15 @@ async function addTask(){
     return {
       action : "task.add",
       subject: title,
-      detail : stages.length ? `${stages.length} stages` : ""
+      detail : timed ? `${mins} minute limit` : (stages.length ? `${stages.length} stages` : "")
     };
   });
 
   if(ok){
     clearTaskForm();
     titleEl.focus();
-    flash(stages.length ? `Task added with ${stages.length} stages` : "Task added");
+    flash(timed ? `Timed task added — ${mins} minute limit`
+                : stages.length ? `Task added with ${stages.length} stages` : "Task added");
     renderAdmin();
   }
 }
@@ -1705,6 +1793,7 @@ function exportAuditCsv(){
 
   $("stageAdd").addEventListener("click", addStageRow);
   $("taskTitle").addEventListener("input", refreshStageBase);
+  $("taskTimed").addEventListener("change", syncTimedFields);
   $("stageList").addEventListener("click", e => {
     const del = e.target.closest("[data-stagedel]");
     if(del) removeStageRow(Number(del.dataset.stagedel));

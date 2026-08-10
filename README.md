@@ -209,6 +209,40 @@ completed *that* stage. Two people splitting a three-stage task earn 0.67 and
 
 Only **Complete** scores. Partial and Could-not-complete earn nothing.
 
+### Timed tasks
+
+Tick **Timed task** when adding one and give it a limit in minutes. The team
+sees a **Start** button instead of the usual three:
+
+| state | what the board shows |
+|---|---|
+| Pending | **Start**. The clock has not begun — an unstarted timed task waits forever. |
+| In progress | A live countdown, and **Complete** for the person who started it. |
+| Complete | How long it took, against the limit. |
+| Failed | Nothing. It is locked. |
+
+**Only the person who pressed Start can complete it.** Everyone else sees the
+task as In progress with their button disabled and whose it is.
+
+**Running out is final.** There is no reopen button, the reopen-request path
+refuses, and an admin cannot approve one either — the only thing left is Delete.
+The audit log records `Bob failed "X" — ran out after 10 minutes`, attributed to
+whoever started the clock. A task finished in time reads `Bob took 8m 30s to
+complete "X"`.
+
+Timed tasks are single-step: the limit covers the whole task, so the stage
+editor is hidden while the box is ticked.
+
+**How expiry works, honestly.** Nothing runs when the page is closed — there is
+no server. The countdown reaching zero flips the task to Failed *on screen*
+immediately for everyone, including read-only viewers, because the status is
+derived from the start time rather than read from the file. Writing that
+conclusion into `data.json` and the audit log happens when the first person with
+edit access has the board open. If nobody does for a week, the failure is
+visible all week and recorded when someone finally loads it. The lock itself is
+enforced at write time, so a tab left open from before the deadline cannot
+sneak a completion through.
+
 **Progress bar** — how much of the board is done, in task-equivalents. A plain
 task counts once it's addressed; a staged one earns partial credit as its stages
 land, so finishing 2 of 3 moves the bar by two thirds of a task. Turns green when
@@ -349,10 +383,17 @@ on `file://`, and double-clicking `index.html` should work.
       "description": "Panel gaps, paint, badge alignment.",
       "createdBy": "Danny", "createdAt": "2026-07-30T15:00:00Z",
       "status": "complete",        // pending | complete | partial | blocked
+                                   // timed tasks add: in_progress | failed
       "statusBy": "Marisol", "statusAt": "2026-07-31T19:40:00Z",
       "statusNote": null,
       "leaderboard": true,         // completing it scores
+      "timed": false,              // absent on older tasks — reads as false
+      "limitMinutes": null,        // whole minutes > 0, else null
+      "startedAt": null,           // set by Start; the deadline counts from here
+      "startedBy": null,           // only this person can complete it
+      "failedAt": null,            // the deadline it missed, not when it was noticed
       "stages": [] }               // empty = an ordinary one-step task
+                                   // always empty on a timed task
   ],
   "audit": [
     { "id": "a_b3", "at": "2026-07-31T19:40:00Z", "who": "Marisol",

@@ -15,7 +15,7 @@
 <!-- ?v= is a cache-buster. GitHub Pages serves assets with a 10-minute max-age,
      so without it a browser keeps running old JS after a deploy while happily
      showing fresh HTML. Bump these on every release. -->
-<link rel="stylesheet" href="styles.css?v=23">
+<link rel="stylesheet" href="styles.css?v=24">
 </head>
 <body>
 
@@ -123,6 +123,10 @@
   <div class="stat" data-filter="partial"  tabindex="0" role="button"><div class="stat-k">Partial</div><div class="stat-v" id="sPartial">0</div></div>
   <div class="stat" data-filter="blocked"  tabindex="0" role="button"><div class="stat-k">Could not complete</div><div class="stat-v" id="sBlocked">0</div></div>
   <div class="stat" data-filter="pending"  tabindex="0" role="button"><div class="stat-k">Pending</div><div class="stat-v" id="sPending">0</div></div>
+  <!-- Timed tasks only. Without these two the other cells stop summing to
+       "All tasks" the moment someone presses Start. -->
+  <div class="stat" data-filter="in_progress" tabindex="0" role="button"><div class="stat-k">In progress</div><div class="stat-v" id="sRunning">0</div></div>
+  <div class="stat" data-filter="failed"   tabindex="0" role="button"><div class="stat-k">Failed</div><div class="stat-v" id="sFailed">0</div></div>
 </section>
 
 <!-- Mode / connection banner -->
@@ -313,10 +317,29 @@
         </div>
 
         <div class="field">
+          <label class="check" for="taskTimed">
+            <input type="checkbox" id="taskTimed">
+            <span>Timed task</span>
+          </label>
+          <div class="hint">The team gets a <strong>Start</strong> button instead of the usual ones. If it isn't completed inside the limit it is marked <strong>Failed</strong> and locked — it cannot be reopened by anyone.</div>
+          <div id="taskTimerWrap" hidden>
+            <label for="taskTimerMins">Limit in minutes</label>
+            <input class="inp" id="taskTimerMins" type="number" min="1" max="1440" step="1" value="10" inputmode="numeric">
+            <div class="hint">The clock starts when someone presses Start, not when the task is added. Only the person who starts it can complete it.</div>
+          </div>
+        </div>
+
+        <div class="field" id="taskStagesField">
           <label>Stages <span class="opt">optional</span></label>
           <div id="stageList"></div>
           <button class="btn-block" id="stageAdd">Add stage</button>
           <div class="hint">The title and description above are <strong>stage 1</strong>. Add stages to break the task into steps the team completes in order — leave it alone for a normal one-step task.</div>
+        </div>
+
+        <!-- Shown in place of the stage editor while Timed is ticked: the timer
+             measures the whole task, so the two cannot be combined. -->
+        <div class="field" id="taskStagesBlocked" hidden>
+          <div class="hint">A timed task is a single step — the limit covers the whole thing — so stages are unavailable while <strong>Timed task</strong> is ticked.</div>
         </div>
 
         <div id="taskBtns">
@@ -556,9 +579,9 @@
 <!-- Toasts -->
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="config.js?v=23"></script>
-<script src="sync.js?v=23"></script>
-<script src="app.js?v=23"></script>
-<script src="admin.js?v=23"></script>
+<script src="config.js?v=24"></script>
+<script src="sync.js?v=24"></script>
+<script src="app.js?v=24"></script>
+<script src="admin.js?v=24"></script>
 </body>
 </html>
