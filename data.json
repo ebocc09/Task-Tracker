@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-10T20:27:07.001Z",
+  "updatedAt": "2026-08-10T20:27:19.111Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -50,38 +50,6 @@
     }
   ],
   "tasks": [
-    {
-      "id": "t_msawzfcw1",
-      "title": "Plate Audit",
-      "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
-      "createdBy": "Daily rollover",
-      "createdAt": "2026-08-01T21:59:37.565Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
-      "statusNote": null,
-      "leaderboard": true,
-      "stages": [
-        {
-          "id": "s_msawzfcw2",
-          "title": "Plate Audit",
-          "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
-          "status": "pending",
-          "by": null,
-          "at": null,
-          "note": null
-        },
-        {
-          "id": "s_msawzfcw3",
-          "title": "Plate Audit (EoD)",
-          "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task.",
-          "status": "pending",
-          "by": null,
-          "at": null,
-          "note": null
-        }
-      ]
-    },
     {
       "id": "t_msawzfcw4",
       "title": "Box Audit - Service",
@@ -157,6 +125,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msnondmvb",
+      "at": "2026-08-10T20:27:19.111Z",
+      "who": "Enzo",
+      "action": "task.delete",
+      "subject": "Plate Audit",
+      "detail": ""
+    },
     {
       "id": "a_msnon4ah9",
       "at": "2026-08-10T20:27:07.001Z",
