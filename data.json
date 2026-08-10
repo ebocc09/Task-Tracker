@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-10T21:04:10.783Z",
+  "updatedAt": "2026-08-10T21:04:25.726Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -178,9 +178,35 @@
           "note": null
         }
       ]
+    },
+    {
+      "id": "t_msnpz3pa6",
+      "title": "Pull Keys",
+      "description": "Pull all keys for tomorrow and the following day.",
+      "createdBy": "Enzo",
+      "createdAt": "2026-08-10T21:04:25.726Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
+      "statusNote": null,
+      "leaderboard": true,
+      "timed": true,
+      "limitMinutes": 30,
+      "startedAt": null,
+      "startedBy": null,
+      "failedAt": null,
+      "stages": []
     }
   ],
   "audit": [
+    {
+      "id": "a_msnpz3pa7",
+      "at": "2026-08-10T21:04:25.726Z",
+      "who": "Enzo",
+      "action": "task.add",
+      "subject": "Pull Keys",
+      "detail": ""
+    },
     {
       "id": "a_msnpys673",
       "at": "2026-08-10T21:04:10.783Z",
@@ -1359,9 +1385,9 @@
       "title": "Pull Keys",
       "description": "Pull all keys for tomorrow and the following day.",
       "leaderboard": true,
-      "stages": [],
       "timed": true,
-      "limitMinutes": 30
+      "limitMinutes": 30,
+      "stages": []
     }
   ],
   "renames": [
