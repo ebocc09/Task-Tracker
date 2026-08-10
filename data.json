@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-10T21:09:47.929Z",
+  "updatedAt": "2026-08-10T21:12:34.583Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -235,6 +235,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msnq9kwno",
+      "at": "2026-08-10T21:12:34.583Z",
+      "who": "Enzo",
+      "action": "template.save",
+      "subject": "Pull-Ins - Tomorrow",
+      "detail": ""
+    },
     {
       "id": "a_msnq60bdl",
       "at": "2026-08-10T21:09:47.929Z",
@@ -1474,6 +1482,24 @@
       "timed": false,
       "limitMinutes": null,
       "stages": []
+    },
+    {
+      "id": "q_msnq9kpim",
+      "title": "Pull-Ins - Tomorrow",
+      "description": "Bring all vehicles scheduled for tomorrow delivery on-site.",
+      "leaderboard": true,
+      "stages": [
+        {
+          "title": "Pull-Ins - Tomorrow",
+          "description": "Bring all vehicles scheduled for tomorrow delivery on-site."
+        },
+        {
+          "title": "Charging Tomorrow's Deliveries",
+          "description": "Charge all the vehicles for tomorrow and line them up in the wash line by time, and put the key inside the vehicle."
+        }
+      ],
+      "timed": false,
+      "limitMinutes": null
     }
   ],
   "renames": [
