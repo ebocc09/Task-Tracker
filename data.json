@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-10T21:12:34.583Z",
+  "updatedAt": "2026-08-10T21:12:39.619Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -232,9 +232,54 @@
       "startedBy": null,
       "failedAt": null,
       "stages": []
+    },
+    {
+      "id": "t_msnq9osjt",
+      "title": "Pull-Ins - Tomorrow",
+      "description": "Bring all vehicles scheduled for tomorrow delivery on-site.",
+      "createdBy": "Enzo",
+      "createdAt": "2026-08-10T21:12:39.619Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
+      "statusNote": null,
+      "leaderboard": true,
+      "timed": false,
+      "limitMinutes": null,
+      "startedAt": null,
+      "startedBy": null,
+      "failedAt": null,
+      "stages": [
+        {
+          "id": "s_msnq9osju",
+          "title": "Pull-Ins - Tomorrow",
+          "description": "Bring all vehicles scheduled for tomorrow delivery on-site.",
+          "status": "pending",
+          "by": null,
+          "at": null,
+          "note": null
+        },
+        {
+          "id": "s_msnq9osjv",
+          "title": "Charging Tomorrow's Deliveries",
+          "description": "Charge all the vehicles for tomorrow and line them up in the wash line by time, and put the key inside the vehicle.",
+          "status": "pending",
+          "by": null,
+          "at": null,
+          "note": null
+        }
+      ]
     }
   ],
   "audit": [
+    {
+      "id": "a_msnq9osjw",
+      "at": "2026-08-10T21:12:39.619Z",
+      "who": "Enzo",
+      "action": "task.add",
+      "subject": "Pull-Ins - Tomorrow",
+      "detail": ""
+    },
     {
       "id": "a_msnq9kwno",
       "at": "2026-08-10T21:12:34.583Z",
@@ -1488,6 +1533,8 @@
       "title": "Pull-Ins - Tomorrow",
       "description": "Bring all vehicles scheduled for tomorrow delivery on-site.",
       "leaderboard": true,
+      "timed": false,
+      "limitMinutes": null,
       "stages": [
         {
           "title": "Pull-Ins - Tomorrow",
@@ -1497,9 +1544,7 @@
           "title": "Charging Tomorrow's Deliveries",
           "description": "Charge all the vehicles for tomorrow and line them up in the wash line by time, and put the key inside the vehicle."
         }
-      ],
-      "timed": false,
-      "limitMinutes": null
+      ]
     }
   ],
   "renames": [
