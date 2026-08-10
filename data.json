@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-10T21:09:34.171Z",
+  "updatedAt": "2026-08-10T21:09:45.567Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -196,9 +196,35 @@
       "startedBy": null,
       "failedAt": null,
       "stages": []
+    },
+    {
+      "id": "t_msnq5yhrg",
+      "title": "Clear Trade-in Parking",
+      "description": "Remove all vehicles from the trade-in parking zone, post any vehicles that cannot be moved into the teams chat before marking task completed.",
+      "createdBy": "Enzo",
+      "createdAt": "2026-08-10T21:09:45.567Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
+      "statusNote": null,
+      "leaderboard": true,
+      "timed": false,
+      "limitMinutes": null,
+      "startedAt": null,
+      "startedBy": null,
+      "failedAt": null,
+      "stages": []
     }
   ],
   "audit": [
+    {
+      "id": "a_msnq5yhrh",
+      "at": "2026-08-10T21:09:45.567Z",
+      "who": "Enzo",
+      "action": "task.add",
+      "subject": "Clear Trade-in Parking",
+      "detail": ""
+    },
     {
       "id": "a_msnq5pp7d",
       "at": "2026-08-10T21:09:34.171Z",
@@ -1419,9 +1445,9 @@
       "title": "Restore Display",
       "description": "Replace any vehicles we remove from display with new vehicles. ALL vehicles part of the front building display need to be washed, if we remove a vehicle from front building display, locate a replacement, park it under canopy and post the VIN in the main teams chat so day shift can prepare it for display.",
       "leaderboard": true,
-      "stages": [],
       "timed": false,
-      "limitMinutes": null
+      "limitMinutes": null,
+      "stages": []
     }
   ],
   "renames": [
