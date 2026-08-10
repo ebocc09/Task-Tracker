@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-10T20:27:05.258Z",
+  "updatedAt": "2026-08-10T20:27:07.001Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -157,6 +157,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msnon4ah9",
+      "at": "2026-08-10T20:27:07.001Z",
+      "who": "Enzo",
+      "action": "template.edit",
+      "subject": "Plate Audit - Opening",
+      "detail": ""
+    },
     {
       "id": "a_msnon2y26",
       "at": "2026-08-10T20:27:05.258Z",
