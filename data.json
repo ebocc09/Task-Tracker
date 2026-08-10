@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-10T20:26:27.466Z",
+  "updatedAt": "2026-08-10T20:27:05.258Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -157,6 +157,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msnon2y26",
+      "at": "2026-08-10T20:27:05.258Z",
+      "who": "Enzo",
+      "action": "template.edit",
+      "subject": "Plate Audit - Opening",
+      "detail": ""
+    },
     {
       "id": "a_msnom9sa4",
       "at": "2026-08-10T20:26:27.466Z",
@@ -1213,16 +1221,20 @@
   "templates": [
     {
       "id": "q_msalojo61",
-      "title": "Plate Audit",
+      "title": "Plate Audit - Opening",
       "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
       "leaderboard": true,
       "stages": [
         {
-          "title": "Plate Audit",
+          "title": "Plate Audit - Opening",
           "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage."
         },
         {
-          "title": "Plate Audit (EoD)",
+          "title": "Plate Audit - Evening",
+          "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task."
+        },
+        {
+          "title": "Plate Audit - Closing",
           "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task."
         }
       ]
