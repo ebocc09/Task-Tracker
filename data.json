@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-10T20:31:37.823Z",
+  "updatedAt": "2026-08-10T20:31:39.258Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -51,47 +51,6 @@
   ],
   "tasks": [
     {
-      "id": "t_msawzfcw4",
-      "title": "Box Audit - Service",
-      "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
-      "createdBy": "Daily rollover",
-      "createdAt": "2026-08-01T21:59:37.565Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
-      "statusNote": null,
-      "leaderboard": true,
-      "stages": [
-        {
-          "id": "s_msawzfcw5",
-          "title": "Box Audit - Service",
-          "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
-          "status": "pending",
-          "by": null,
-          "at": null,
-          "note": null
-        },
-        {
-          "id": "s_msawzfcw6",
-          "title": "Box Audit - Washline",
-          "description": "Remove any of our keys (White envelops) from the service drop off box and sort them in the key bin.",
-          "status": "pending",
-          "by": null,
-          "at": null,
-          "note": null
-        },
-        {
-          "id": "s_msawzfcw7",
-          "title": "Box Audit - Offsite",
-          "description": "Remove any keys in the offsite drop off box and sort them into the key bin.",
-          "status": "pending",
-          "by": null,
-          "at": null,
-          "note": null
-        }
-      ]
-    },
-    {
       "id": "t_msnonfdkh",
       "title": "Plate Audit - Opening",
       "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
@@ -125,6 +84,47 @@
           "id": "s_msnonfdkk",
           "title": "Plate Audit - Closing",
           "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task.",
+          "status": "pending",
+          "by": null,
+          "at": null,
+          "note": null
+        }
+      ]
+    },
+    {
+      "id": "t_msawzfcw4",
+      "title": "Box Audit - Service",
+      "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
+      "createdBy": "Daily rollover",
+      "createdAt": "2026-08-01T21:59:37.565Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
+      "statusNote": null,
+      "leaderboard": true,
+      "stages": [
+        {
+          "id": "s_msawzfcw5",
+          "title": "Box Audit - Service",
+          "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
+          "status": "pending",
+          "by": null,
+          "at": null,
+          "note": null
+        },
+        {
+          "id": "s_msawzfcw6",
+          "title": "Box Audit - Washline",
+          "description": "Remove any of our keys (White envelops) from the service drop off box and sort them in the key bin.",
+          "status": "pending",
+          "by": null,
+          "at": null,
+          "note": null
+        },
+        {
+          "id": "s_msawzfcw7",
+          "title": "Box Audit - Offsite",
+          "description": "Remove any keys in the offsite drop off box and sort them into the key bin.",
           "status": "pending",
           "by": null,
           "at": null,
