@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-09T04:52:34.430Z",
+  "updatedAt": "2026-08-10T20:25:53.992Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -157,6 +157,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msnoljyg2",
+      "at": "2026-08-10T20:25:53.992Z",
+      "who": "Enzo",
+      "action": "template.edit",
+      "subject": "Loaner Audit - Opening",
+      "detail": ""
+    },
     {
       "id": "a_mslbtfr24",
       "at": "2026-08-09T04:52:34.430Z",
@@ -1233,10 +1241,14 @@
     },
     {
       "id": "q_msaokjgqe",
-      "title": "Loaner Audit - Evening",
+      "title": "Loaner Audit - Opening",
       "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
       "leaderboard": true,
       "stages": [
+        {
+          "title": "Loaner Audit - Opening",
+          "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete."
+        },
         {
           "title": "Loaner Audit - Evening",
           "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete."
