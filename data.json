@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-11T18:54:29.381Z",
-  "updatedBy": "Not Enzo",
+  "updatedAt": "2026-08-11T21:28:19.546Z",
+  "updatedBy": "Enzo",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -272,6 +272,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msp69opm2",
+      "at": "2026-08-11T21:28:19.546Z",
+      "who": "Enzo",
+      "action": "leaderboard.remove",
+      "subject": "Enzo",
+      "detail": "8 completions removed"
+    },
     {
       "id": "a_msp0ruo55",
       "at": "2026-08-11T18:54:29.381Z",
@@ -1664,15 +1672,6 @@
       "value": 0.5
     },
     {
-      "id": "sc_msnoni1tm",
-      "at": "2026-08-10T20:27:24.833Z",
-      "who": "Enzo",
-      "taskId": "t_msnonfdkh",
-      "stageId": "s_msnonfdki",
-      "title": "Plate Audit - Opening",
-      "value": 0.3333333333333333
-    },
-    {
       "id": "sc_msazmj2b4",
       "at": "2026-08-01T23:13:34.979Z",
       "who": "Not Malcolm",
@@ -1687,69 +1686,6 @@
       "who": "Not Malcolm",
       "taskId": "t_msawzfcw1",
       "stageId": "s_msawzfcw3",
-      "title": "Plate Audit",
-      "value": 0.5
-    },
-    {
-      "id": "sc_msaxf8e91",
-      "at": "2026-08-01T22:11:55.329Z",
-      "who": "Enzo",
-      "taskId": "t_msawzfcw1",
-      "stageId": "s_msawzfcw2",
-      "title": "Plate Audit",
-      "value": 0.5
-    },
-    {
-      "id": "sc_msaw8y211j",
-      "at": "2026-08-01T21:39:02.377Z",
-      "who": "Enzo",
-      "taskId": "t_msarml1n1l",
-      "stageId": "s_msarml1n1n",
-      "title": "Box Audit - Service",
-      "value": 0.3333333333333333
-    },
-    {
-      "id": "sc_msaw8v3n1g",
-      "at": "2026-08-01T21:38:58.547Z",
-      "who": "Enzo",
-      "taskId": "t_msarmgdf1c",
-      "stageId": "s_msarmgdf1e",
-      "title": "Loaner Audit - Evening",
-      "value": 0.5
-    },
-    {
-      "id": "sc_msaw8q8y1b",
-      "at": "2026-08-01T21:38:52.258Z",
-      "who": "Enzo",
-      "taskId": "t_msarml1n1l",
-      "stageId": "s_msarml1n1m",
-      "title": "Box Audit - Service",
-      "value": 0.3333333333333333
-    },
-    {
-      "id": "sc_msaw8oto17",
-      "at": "2026-08-01T21:38:50.412Z",
-      "who": "Enzo",
-      "taskId": "t_msarmgdf1c",
-      "stageId": "s_msarmgdf1d",
-      "title": "Loaner Audit - Evening",
-      "value": 0.5
-    },
-    {
-      "id": "sc_msaw8myaz",
-      "at": "2026-08-01T21:38:47.986Z",
-      "who": "Enzo",
-      "taskId": "t_msarmf1t14",
-      "stageId": "s_msarmf1t16",
-      "title": "Plate Audit",
-      "value": 0.5
-    },
-    {
-      "id": "sc_msaw8lvew",
-      "at": "2026-08-01T21:38:46.586Z",
-      "who": "Enzo",
-      "taskId": "t_msarmf1t14",
-      "stageId": "s_msarmf1t15",
       "title": "Plate Audit",
       "value": 0.5
     }
