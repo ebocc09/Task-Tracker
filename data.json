@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-11T21:28:23.106Z",
-  "updatedBy": "Enzo",
+  "updatedAt": "2026-08-11T21:28:45.475Z",
+  "updatedBy": "Zafar",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -16,8 +16,8 @@
       "id": "p_ms9tjkoid",
       "label": "6EU-300",
       "note": "",
-      "checkedOutBy": null,
-      "checkedOutAt": null,
+      "checkedOutBy": "Zafar",
+      "checkedOutAt": "2026-08-11T21:28:45.475Z",
       "forcedBy": null,
       "forcedAt": null
     },
@@ -272,6 +272,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msp6a8pv2",
+      "at": "2026-08-11T21:28:45.475Z",
+      "who": "Zafar",
+      "action": "plate.checkout",
+      "subject": "6EU-300",
+      "detail": ""
+    },
     {
       "id": "a_msp69rgi4",
       "at": "2026-08-11T21:28:23.106Z",
