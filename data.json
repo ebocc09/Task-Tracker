@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-11T18:52:35.790Z",
+  "updatedAt": "2026-08-11T18:53:09.030Z",
   "updatedBy": "Bob",
   "plates": [
     {
@@ -273,9 +273,17 @@
   ],
   "audit": [
     {
+      "id": "a_msp0q4o64",
+      "at": "2026-08-11T18:53:09.030Z",
+      "who": "Bob",
+      "action": "person.rename",
+      "subject": "Not Enzo",
+      "detail": ""
+    },
+    {
       "id": "a_msp0p9hp6",
       "at": "2026-08-11T18:52:28.621Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "request.cancel",
       "subject": "Bob",
       "detail": ""
@@ -283,7 +291,7 @@
     {
       "id": "a_msp0p8ca4",
       "at": "2026-08-11T18:52:27.130Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "request.open",
       "subject": "Not Enzo",
       "detail": ""
@@ -595,7 +603,7 @@
     {
       "id": "a_msazn2l24",
       "at": "2026-08-01T23:14:00.278Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "plate.checkout",
       "subject": "6UE-688",
       "detail": ""
@@ -931,7 +939,7 @@
     {
       "id": "a_msarlm1t3",
       "at": "2026-08-01T19:28:55.265Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "task.complete",
       "subject": "Plate Audit",
       "detail": ""
@@ -1291,7 +1299,7 @@
     {
       "id": "a_ms9vpq554",
       "at": "2026-08-01T04:36:19.481Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "reopen.request",
       "subject": "Plate Audit",
       "detail": "Completed by mistake"
@@ -1299,7 +1307,7 @@
     {
       "id": "a_ms9vp9kbe",
       "at": "2026-08-01T04:35:57.995Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "task.complete",
       "subject": "Plate Audit",
       "detail": ""
@@ -1307,7 +1315,7 @@
     {
       "id": "a_ms9vp8d4c",
       "at": "2026-08-01T04:35:56.440Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "task.pending",
       "subject": "Plate Audit",
       "detail": ""
@@ -1315,7 +1323,7 @@
     {
       "id": "a_ms9ve406a",
       "at": "2026-08-01T04:27:17.574Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "task.complete",
       "subject": "Plate Audit",
       "detail": ""
@@ -1323,7 +1331,7 @@
     {
       "id": "a_ms9ve0oo8",
       "at": "2026-08-01T04:27:13.272Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "task.pending",
       "subject": "Plate Audit",
       "detail": ""
@@ -1331,7 +1339,7 @@
     {
       "id": "a_ms9vdy8d6",
       "at": "2026-08-01T04:27:10.093Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "task.complete",
       "subject": "Plate Audit",
       "detail": ""
@@ -1355,7 +1363,7 @@
     {
       "id": "a_ms9vamoy4",
       "at": "2026-08-01T04:24:35.170Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "request.open",
       "subject": "Bob",
       "detail": ""
@@ -1379,7 +1387,7 @@
     {
       "id": "a_ms9tw8h1c",
       "at": "2026-08-01T03:45:23.941Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "plate.checkout",
       "subject": "6UE-688",
       "detail": ""
@@ -1387,7 +1395,7 @@
     {
       "id": "a_ms9tw6m0a",
       "at": "2026-08-01T03:45:21.528Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "plate.release",
       "subject": "6EU-300",
       "detail": ""
@@ -1395,7 +1403,7 @@
     {
       "id": "a_ms9tw2kp8",
       "at": "2026-08-01T03:45:16.297Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "plate.checkout",
       "subject": "6EU-300",
       "detail": ""
@@ -1403,7 +1411,7 @@
     {
       "id": "a_ms9tw2kp7",
       "at": "2026-08-01T03:45:16.297Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "plate.release",
       "subject": "6UE-688",
       "detail": ""
@@ -1435,7 +1443,7 @@
     {
       "id": "a_ms9tv43y2",
       "at": "2026-08-01T03:44:31.630Z",
-      "who": "Bob",
+      "who": "Not Enzo",
       "action": "identity.rename",
       "subject": "Robert",
       "detail": "was Enzo"
@@ -1845,6 +1853,13 @@
       "by": "Enzo",
       "from": "Hibert",
       "to": "Bob"
+    },
+    {
+      "id": "r_msp0q4o63",
+      "at": "2026-08-11T18:53:09.030Z",
+      "by": "Bob",
+      "from": "Bob",
+      "to": "Not Enzo"
     }
   ],
   "requests": [],
