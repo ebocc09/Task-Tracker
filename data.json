@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-11T05:52:53.388Z",
-  "updatedBy": "Gabriel",
+  "updatedAt": "2026-08-11T18:52:27.130Z",
+  "updatedBy": "Bob",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -272,6 +272,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msp0p8ca4",
+      "at": "2026-08-11T18:52:27.130Z",
+      "who": "Bob",
+      "action": "request.open",
+      "subject": "Not Enzo",
+      "detail": ""
+    },
     {
       "id": "a_mso8upho6",
       "at": "2026-08-11T05:52:53.388Z",
@@ -1831,6 +1839,13 @@
       "to": "Bob"
     }
   ],
-  "requests": [],
+  "requests": [
+    {
+      "id": "req_msp0p8ca3",
+      "at": "2026-08-11T18:52:27.130Z",
+      "from": "Bob",
+      "to": "Not Enzo"
+    }
+  ],
   "reopenRequests": []
 }
