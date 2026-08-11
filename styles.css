@@ -327,6 +327,15 @@ code{font-size:12px;font-weight:500;letter-spacing:.04em;font-variant-numeric:ta
 /* Same as the menu: these are spans, so they need blockifying before
    ellipsis truncation does anything. */
 .task-main{min-width:0;display:block}
+/* The parent task name above a stage title. Deliberately quiet and uppercase —
+   it is the label the stage belongs under, not a second heading competing with
+   it. Only appears from stage 2 onward; stage 1's title IS the task title. */
+.task-kicker{
+  display:block;
+  font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-mute);margin-bottom:3px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
 .task-title{
   display:block;
   font-size:15px;font-weight:600;letter-spacing:.055em;

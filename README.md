@@ -186,12 +186,19 @@ stage at a time rather than finishing the whole thing:
   └──────── done
 ```
 
+- **The card is titled by the stage you're on**, not by the task. A five-stage job
+  that says *Plate Audit* on every card tells you nothing about what to do next;
+  *Photograph the damage* does. The task name sits above it in small caps so the
+  stage still has an owner. On stage 1 there's no second line, because stage 1's
+  title **is** the task title — and once every stage is done the card goes back to
+  naming the task, since there's no current stage left to name it.
+- The description under the title follows the current stage too.
 - While stages remain, the task stays in the **Pending** bucket — but the pill reads
   *Stage 2 of 3* rather than *Pending*, so the board still tells you where it is.
 - The final stage completing is the task completing.
 - **Partial** and **Could not complete** apply to the *current stage* and stop the
   task there. Finished stages are kept, and the audit log records which stage it
-  stalled on.
+  stalled on, by name — `Plate Audit · stage 2 of 3: Photograph the damage`.
 - **Reopen** starts the whole task over from stage 1.
 - Saving a staged task to **Quick add** keeps its stages, so you can re-add the
   whole sequence in one click.

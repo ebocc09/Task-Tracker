@@ -622,6 +622,24 @@ function taskCard(t, readOnly){
      when two of three stages are done, so the card says where it actually is. */
   const headline = staged && t.status === "pending" ? stageLabel(t) : st.label;
 
+  /* ── what the card is called ──
+     On a staged task the big line is the CURRENT STAGE, not the task. Reading
+     "Plate Audit" on every card of a five-stage job tells you nothing about
+     what to actually do next; "Photograph the damage" does.
+
+     The task name moves to a small line above it so the stage still has an
+     owner — without it a board of stage names is a list of orphans.
+
+     Two cases where this collapses back to the old behaviour:
+       · stage 1, whose title IS the task title (stagesToSave prepends it), so
+         the kicker would simply repeat the line under it;
+       · a finished or halted-at-the-end task with no current stage, which is
+         about the task as a whole again. */
+  const cur = staged ? currentStage(t) : null;
+  const showTitle = cur ? cur.title : t.title;
+  const showDesc  = cur ? (cur.description || "") : (t.description || "");
+  const kicker    = cur && cur.title !== t.title ? t.title : "";
+
   const meta = t.statusBy
     ? `${headline} · ${escHtml(t.statusBy)} · <span title="${escHtml(fullTime(t.statusAt))}">${escHtml(relTime(t.statusAt))}</span>`
     : `Added by ${escHtml(t.createdBy || "—")} · <span title="${escHtml(fullTime(t.createdAt))}">${escHtml(relTime(t.createdAt))}</span>`;
@@ -672,8 +690,9 @@ function taskCard(t, readOnly){
   <button class="task-head" data-toggle="${t.id}" aria-expanded="${open}">
     <span class="task-glyph">${svg(ICON[eff])}</span>
     <span class="task-main">
-      <span class="task-title">${escHtml(t.title)}</span>
-      ${t.description ? `<span class="task-desc">${escHtml(t.description)}</span>` : ""}
+      ${kicker ? `<span class="task-kicker">${escHtml(kicker)}</span>` : ""}
+      <span class="task-title">${escHtml(showTitle)}</span>
+      ${showDesc ? `<span class="task-desc">${escHtml(showDesc)}</span>` : ""}
       ${staged ? stageBubbles(t) : ""}
       ${headTimer}
     </span>
@@ -884,9 +903,15 @@ function setStageStatus(taskId, status, note){
 
     // The final stage completing is the task completing — log it as such.
     const done = next === "complete";
+    /* Name the stage, not just its number. "Plate Audit · stage 2 of 3" leaves
+       a reader counting rows in the admin panel to work out what happened;
+       "…: Photograph the damage" does not. Skipped on stage 1, whose title is
+       the task title and would read as "Plate Audit · stage 1 of 3: Plate
+       Audit". */
+    const named = s.title && s.title !== t.title ? `: ${s.title}` : "";
     return {
       action : done ? "task.complete" : (status === "complete" ? "task.stage" : "task." + status),
-      subject: done ? t.title : `${t.title} · stage ${idx} of ${of}`,
+      subject: done ? t.title : `${t.title} · stage ${idx} of ${of}${named}`,
       detail : note || ""
     };
   });
