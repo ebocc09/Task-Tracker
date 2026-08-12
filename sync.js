@@ -197,6 +197,12 @@ function normalize(raw){
     total: wholeNum(r.total, Number.MAX_SAFE_INTEGER),
     done : wholeNum(r.done,  Number.MAX_SAFE_INTEGER),
     pct  : wholeNum(r.pct, 100),
+    /* Plates handed back by this reset. Entries written before the two resets
+       were separated have no such field and read as 0 — those resets did
+       release plates, but how many was never recorded. The history shows this
+       line only when it is above zero, so an old entry stays silent rather
+       than claiming none were released. */
+    plates: wholeNum(r.plates, Number.MAX_SAFE_INTEGER),
     tasks: Array.isArray(r.tasks) ? r.tasks.filter(t => t && t.title).map(t => ({
       title : String(t.title),
       status: OK.includes(t.status) ? t.status : "pending",

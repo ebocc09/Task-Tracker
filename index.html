@@ -15,7 +15,7 @@
 <!-- ?v= is a cache-buster. GitHub Pages serves assets with a 10-minute max-age,
      so without it a browser keeps running old JS after a deploy while happily
      showing fresh HTML. Bump these on every release. -->
-<link rel="stylesheet" href="styles.css?v=27">
+<link rel="stylesheet" href="styles.css?v=28">
 </head>
 <body>
 
@@ -590,12 +590,18 @@
       <section class="sec" data-sec="danger">
         <h4 class="sec-h">Reset board</h4>
         <p class="sec-p">
-          Returns every task to <strong>Pending</strong> and releases every plate.
-          Tasks, plates, and the audit log are kept — this starts a new round, it
-          does not erase history. Where the board had got to is saved to
+          Returns every task to <strong>Pending</strong>. Tasks, plates, and the
+          audit log are kept — this starts a new round, it does not erase
+          history. Where the board had got to is saved to
           <strong>Reset history</strong> first.
         </p>
         <button class="btn-block red" id="resetBoard">Reset board</button>
+        <p class="sec-p" style="margin-top:14px">
+          Plates stay with whoever checked them out. A plate says who has the
+          car, not how far the work has got, so a new round leaves it alone —
+          use the second button when you want them handed back too.
+        </p>
+        <button class="btn-block red" id="resetBoardPlates">Reset board and Release plates</button>
 
         <div class="sep"></div>
         <h4 class="sec-h danger-h">Destructive</h4>
@@ -630,9 +636,9 @@
 <!-- Toasts -->
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="config.js?v=27"></script>
-<script src="sync.js?v=27"></script>
-<script src="app.js?v=27"></script>
-<script src="admin.js?v=27"></script>
+<script src="config.js?v=28"></script>
+<script src="sync.js?v=28"></script>
+<script src="app.js?v=28"></script>
+<script src="admin.js?v=28"></script>
 </body>
 </html>

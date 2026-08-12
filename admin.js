@@ -1426,7 +1426,8 @@ function renderResetHistory(){
     <span class="reset-pct">${r.pct}<small>%</small></span>
     <span class="reset-main">
       <span class="reset-when" title="${escHtml(fullTime(r.at))}">${escHtml(relTime(r.at))}</span>
-      <span class="reset-sub">${r.done} of ${r.total} addressed · by ${escHtml(r.by)}</span>
+      <span class="reset-sub">${r.done} of ${r.total} addressed · by ${escHtml(r.by)}${
+        r.plates ? ` · ${r.plates} plate${r.plates === 1 ? "" : "s"} released` : ""}</span>
     </span>
     <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
@@ -1510,6 +1511,7 @@ function auditPhrase(r){
     case "reopen.approve": return `approved a reopen of “${s}”`;
     case "reopen.reject":  return `rejected a reopen of “${s}”`;
     case "board.reset":    return `reset the board`;
+    case "board.resetPlates": return `reset the board and released every plate`;
     case "audit.clear":    return `cleared the audit log`;
     case "board.wipe":     return `deleted all tasks and plates`;
     case "identity.rename":return `changed their display name`;
@@ -1684,17 +1686,31 @@ async function forceReleasePlate(id){
 
 /* ────────────────────────────── destructive ────────────────────────────── */
 
-async function resetBoard(){
+/**
+ * Start a new round.
+ * @param {boolean} withPlates release every checked-out plate as well.
+ *
+ * Two callers, one implementation. Clearing the tasks and handing back the
+ * plates used to be the same button, which meant a new round took everyone's
+ * plate off them whether or not they were still holding it — a plate is who has
+ * the car, not how far the work has got.
+ */
+async function resetBoard(withPlates){
   const total = state.data.tasks.length;
   const done  = doneCount();
   const out   = state.data.plates.filter(p => p.checkedOutBy).length;
 
-  if(!total && !out){ toast("Nothing to reset.", ""); return; }
+  // Releasing plates is reason enough to run even with no tasks on the board.
+  if(!total && !(withPlates && out)){ toast("Nothing to reset.", ""); return; }
 
   const first = await askConfirm({
-    title: "Reset the board?",
-    text : "Every task goes back to Pending and every plate is released. Tasks, plates, the audit log and the leaderboard are kept — completing a task again next round scores again.",
-    facts: [["Tasks to reset", `${done} of ${total}`], ["Plates to release", String(out)]],
+    title: withPlates ? "Reset the board and release plates?" : "Reset the board?",
+    text : withPlates
+      ? "Every task goes back to Pending and every plate is handed back. Tasks, plates, the audit log and the leaderboard are kept — completing a task again next round scores again."
+      : "Every task goes back to Pending. Plates stay checked out to whoever has them. Tasks, plates, the audit log and the leaderboard are kept — completing a task again next round scores again.",
+    facts: withPlates
+      ? [["Tasks to reset", `${done} of ${total}`], ["Plates to release", String(out)]]
+      : [["Tasks to reset", `${done} of ${total}`], ["Plates left alone", String(out)]],
     yes  : "Continue", danger: true
   });
   if(!first) return;
@@ -1702,7 +1718,7 @@ async function resetBoard(){
   const second = await askConfirm({
     title: "Really reset?",
     text : "This affects everyone's board immediately and cannot be undone.",
-    yes  : "Reset board", danger: true
+    yes  : withPlates ? "Reset and release" : "Reset board", danger: true
   });
   if(!second) return;
 
@@ -1714,7 +1730,7 @@ async function resetBoard(){
   const resetAt = nowIso();
   const resetBy = me() || "Unknown";
 
-  const ok = await commit("Reset board", data => {
+  const ok = await commit(withPlates ? "Reset board and release plates" : "Reset board", data => {
     /* Snapshot BEFORE anything is cleared, and from `data` rather than
        state.data — on a replay this is the fresh board, and that is the one
        actually being reset. Reading state.data here would freeze whatever this
@@ -1724,6 +1740,10 @@ async function resetBoard(){
       total: data.tasks.length,
       done : doneCount(data.tasks),
       pct  : progressPct(data.tasks),
+      // How many plates this reset handed back. Zero on a tasks-only reset,
+      // which is the whole distinction the history needs to record: two entries
+      // that read alike would hide which kind of round change happened.
+      plates: withPlates ? data.plates.filter(p => p.checkedOutBy).length : 0,
       tasks: data.tasks.map(t => ({
         // The title is copied, not referenced: a snapshot has to stay readable
         // after the task is renamed or deleted, same reasoning as scores.
@@ -1747,19 +1767,34 @@ async function resetBoard(){
       t.status = "pending"; t.statusBy = null; t.statusAt = null; t.statusNote = null;
       resetStages(t);
     });
-    data.plates.forEach(p => {
-      if(p.checkedOutBy) released++;
-      p.checkedOutBy = null; p.checkedOutAt = null;
-    });
-    return { action:"board.reset", subject:"", detail:`${cleared} tasks cleared, ${released} plates released` };
+    /* Only when asked. A plate is a statement about who has the car, not about
+       how far the work has got, so a new round has no business taking one back
+       from somebody who is still driving it. */
+    if(withPlates){
+      data.plates.forEach(p => {
+        if(p.checkedOutBy) released++;
+        p.checkedOutBy = null; p.checkedOutAt = null;
+      });
+    }
+
+    const n = (count, word) => `${count} ${word}${count === 1 ? "" : "s"}`;
+    return {
+      action : withPlates ? "board.resetPlates" : "board.reset",
+      subject: "",
+      detail : withPlates
+        ? `${n(cleared, "task")} cleared, ${n(released, "plate")} released`
+        : `${n(cleared, "task")} cleared`
+    };
   });
 
   if(ok){
     state.openTaskId = null;
     state.filter = "all";
     render();
-    flash("Board reset");
-    toast("Board reset. Everyone starts fresh.", "good");
+    flash(withPlates ? "Board reset" : "Tasks reset");
+    toast(withPlates
+      ? "Board reset and plates released. Everyone starts fresh."
+      : "Tasks reset. Plates are still checked out.", "good");
   }
 }
 
@@ -1960,7 +1995,11 @@ function exportAuditCsv(){
   $("auditAct").addEventListener("change", renderAdminAudit);
   $("auditExport").addEventListener("click", exportAuditCsv);
 
-  $("resetBoard").addEventListener("click", resetBoard);
+  /* Wrapped, not passed directly: a listener is handed the click event as its
+     first argument, and a MouseEvent is truthy — passing resetBoard straight in
+     would make the plain button release every plate. */
+  $("resetBoard").addEventListener("click", () => resetBoard(false));
+  $("resetBoardPlates").addEventListener("click", () => resetBoard(true));
   $("clearAudit").addEventListener("click", clearAuditLog);
   $("wipeAll").addEventListener("click", wipeEverything);
 })();
