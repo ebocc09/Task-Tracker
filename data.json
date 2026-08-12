@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-12T19:01:09.233Z",
+  "updatedAt": "2026-08-12T20:30:05.661Z",
   "updatedBy": "Not Enzo",
   "plates": [
     {
@@ -287,9 +287,35 @@
       "startedBy": null,
       "failedAt": null,
       "stages": []
+    },
+    {
+      "id": "t_msqjmn531",
+      "title": "(Mini) Close wash gate",
+      "description": "",
+      "createdBy": "Not Enzo",
+      "createdAt": "2026-08-12T20:30:05.661Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
+      "statusNote": null,
+      "leaderboard": true,
+      "timed": false,
+      "limitMinutes": null,
+      "startedAt": null,
+      "startedBy": null,
+      "failedAt": null,
+      "stages": []
     }
   ],
   "audit": [
+    {
+      "id": "a_msqjmnh93",
+      "at": "2026-08-12T20:30:05.661Z",
+      "who": "Not Enzo",
+      "action": "task.add",
+      "subject": "(Mini) Close wash gate",
+      "detail": ""
+    },
     {
       "id": "a_msqgg9v53",
       "at": "2026-08-12T19:01:09.233Z",
