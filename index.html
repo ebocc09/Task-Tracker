@@ -15,7 +15,7 @@
 <!-- ?v= is a cache-buster. GitHub Pages serves assets with a 10-minute max-age,
      so without it a browser keeps running old JS after a deploy while happily
      showing fresh HTML. Bump these on every release. -->
-<link rel="stylesheet" href="styles.css?v=26">
+<link rel="stylesheet" href="styles.css?v=27">
 </head>
 <body>
 
@@ -308,6 +308,11 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
         Audit log
       </button>
+      <button class="rail-item" data-sec="resets">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/></svg>
+        Reset history
+        <span class="count rail-count" id="resetRailCount">0</span>
+      </button>
       <button class="rail-item" data-sec="conn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
         Connection
@@ -513,6 +518,16 @@
         <button class="btn-block red" id="clearAudit">Clear audit log</button>
       </section>
 
+      <!-- Reset history -->
+      <section class="sec" data-sec="resets">
+        <h4 class="sec-h">Reset history <span class="count" id="resetCount">0</span></h4>
+        <p class="sec-p">
+          Every board reset, newest first. Open one to see how far the board had
+          got and what each task was sitting at the moment before it was cleared.
+        </p>
+        <div class="reset-list" id="resetList"></div>
+      </section>
+
       <!-- Connection -->
       <section class="sec" data-sec="conn">
         <h4 class="sec-h">Team connection</h4>
@@ -577,7 +592,8 @@
         <p class="sec-p">
           Returns every task to <strong>Pending</strong> and releases every plate.
           Tasks, plates, and the audit log are kept — this starts a new round, it
-          does not erase history.
+          does not erase history. Where the board had got to is saved to
+          <strong>Reset history</strong> first.
         </p>
         <button class="btn-block red" id="resetBoard">Reset board</button>
 
@@ -614,9 +630,9 @@
 <!-- Toasts -->
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="config.js?v=26"></script>
-<script src="sync.js?v=26"></script>
-<script src="app.js?v=26"></script>
-<script src="admin.js?v=26"></script>
+<script src="config.js?v=27"></script>
+<script src="sync.js?v=27"></script>
+<script src="app.js?v=27"></script>
+<script src="admin.js?v=27"></script>
 </body>
 </html>

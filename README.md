@@ -355,6 +355,35 @@ One separately-confirmed destructive action lives below it: **Delete all tasks
 and plates**. (**Clear audit log** lives in the Audit section, next to the log
 it clears.)
 
+### Reset history
+
+Every reset writes a snapshot of the board as it stood the instant before it was
+cleared, and **Admin → Reset history** lists them newest first. Each line shows
+the percentage, how many tasks were addressed, and who pressed the button; open
+one and it expands into every task's status at that moment, stages included.
+
+This is what the audit log can't tell you. The log records that a reset happened
+and how many tasks it cleared; it can't say *which* ones were done, so "how did
+we actually finish last round?" was unanswerable once the board went back to
+Pending.
+
+Three things worth knowing:
+
+- **The percentage is stored, not recalculated.** It's the same number the hero
+  bar was showing, taken from the same function. The snapshot's tasks are frozen
+  copies so recomputing would agree today — but that formula has already changed
+  once (stages made it fractional), and a snapshot has to keep meaning what it
+  meant on the day.
+- **A running timer that had already expired is recorded as Failed**, matching
+  what the board displayed, even if the write that persists it never happened.
+- **Kept: `RESET_CAP` (30) snapshots.** A reset is the only action that writes a
+  copy of the whole board, so the cost of one entry grows with the board — hence
+  a cap well below the audit log's 500. The 31st reset drops the oldest.
+
+Task titles are copied into the snapshot rather than referenced, the same way
+leaderboard entries are, so a snapshot stays readable after a task is renamed or
+deleted.
+
 ---
 
 ## What's honest about the limits

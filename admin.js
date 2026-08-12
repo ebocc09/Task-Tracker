@@ -140,6 +140,7 @@ function renderAdmin(){
   renderAdminPeople();
   renderApprovals();
   renderAdminAudit();
+  renderResetHistory();
   renderConnection();
   renderRailFoot();
 }
@@ -1400,6 +1401,66 @@ function renderAdminAudit(){
 </div>`).join("");
 }
 
+/* ─────────────────────────── reset history ─────────────────────────────── */
+
+/* One open at a time, like the task cards on the board. Held outside the data
+   because it is this browser's idea of what it is looking at, not the team's. */
+let openResetId = null;
+
+function renderResetHistory(){
+  const rows = state.data.resets || [];
+  $("resetCount").textContent = rows.length;
+  $("resetRailCount").textContent = rows.length;
+
+  const box = $("resetList");
+  if(!rows.length){
+    box.innerHTML = `<div class="adm-empty">No resets yet — the board has never been cleared.</div>`;
+    return;
+  }
+
+  box.innerHTML = rows.map(r => {
+    const open = r.id === openResetId;
+    return `
+<div class="reset-item${open ? " on" : ""}">
+  <button class="reset-head" data-reset="${escHtml(r.id)}" aria-expanded="${open}">
+    <span class="reset-pct">${r.pct}<small>%</small></span>
+    <span class="reset-main">
+      <span class="reset-when" title="${escHtml(fullTime(r.at))}">${escHtml(relTime(r.at))}</span>
+      <span class="reset-sub">${r.done} of ${r.total} addressed · by ${escHtml(r.by)}</span>
+    </span>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  ${open ? resetBodyHtml(r) : ""}
+</div>`;
+  }).join("");
+}
+
+function resetBodyHtml(r){
+  if(!r.tasks.length){
+    return `<div class="reset-body"><div class="adm-empty">There were no tasks on the board.</div></div>`;
+  }
+
+  return `<div class="reset-body">${r.tasks.map(t => {
+    const meta = STATUS[t.status] || STATUS.pending;
+    const when = t.at ? ` · ${escHtml(relTime(t.at))}` : "";
+    return `
+<div class="reset-task">
+  <span class="stage-dot s-${escHtml(t.status)}"></span>
+  <span class="rt-title">${escHtml(t.title)}</span>
+  <span class="rt-status">${escHtml(meta.label)}${t.by ? ` · ${escHtml(t.by)}` : ""}${when}</span>
+  ${t.stages.length ? `<div class="rt-stages">${t.stages.map((s, i) => {
+    const sm = STATUS[s.status] || STATUS.pending;
+    return `<div class="rt-stage">
+      <span class="stage-dot s-${escHtml(s.status)}"></span>
+      <span class="rs-t">${i + 1}. ${escHtml(s.title)}</span>
+      <span class="rs-s">${escHtml(sm.label)}${s.by ? ` · ${escHtml(s.by)}` : ""}</span>
+    </div>`;
+  }).join("")}</div>` : ""}
+</div>`;
+  }).join("")}</div>`;
+}
+
 /* Actions whose phrase already reads their own detail. The row appends detail
    in quotes after the phrase, which is right for a note someone typed and
    wrong for a duration the sentence is built around — "took 8m 30s to complete
@@ -1645,7 +1706,41 @@ async function resetBoard(){
   });
   if(!second) return;
 
+  /* Minted out here, not inside the mutator: on a 409 the mutator is replayed
+     against freshly pulled data, and an id or timestamp made in there would
+     differ between the optimistic apply and the replay — leaving two snapshots
+     of one reset, stamped seconds apart. */
+  const resetId = uid("rs");
+  const resetAt = nowIso();
+  const resetBy = me() || "Unknown";
+
   const ok = await commit("Reset board", data => {
+    /* Snapshot BEFORE anything is cleared, and from `data` rather than
+       state.data — on a replay this is the fresh board, and that is the one
+       actually being reset. Reading state.data here would freeze whatever this
+       tab last saw, which may be minutes stale. */
+    const snapshot = {
+      id: resetId, at: resetAt, by: resetBy,
+      total: data.tasks.length,
+      done : doneCount(data.tasks),
+      pct  : progressPct(data.tasks),
+      tasks: data.tasks.map(t => ({
+        // The title is copied, not referenced: a snapshot has to stay readable
+        // after the task is renamed or deleted, same reasoning as scores.
+        title : t.title,
+        // What the board was SHOWING — an expired timer reads failed here even
+        // if the write that persists it never happened.
+        status: effectiveStatus(t),
+        by    : t.statusBy || null,
+        at    : t.statusAt || null,
+        stages: (t.stages || []).map(s => ({
+          title: s.title, status: s.status, by: s.by || null
+        }))
+      }))
+    };
+    data.resets.unshift(snapshot);
+    if(data.resets.length > RESET_CAP) data.resets.length = RESET_CAP;
+
     let cleared = 0, released = 0;
     data.tasks.forEach(t => {
       if(t.status !== "pending" || (t.stages || []).some(s => s.status !== "pending")) cleared++;
@@ -1784,6 +1879,13 @@ function exportAuditCsv(){
     // armed editor with nothing on screen saying so.
     if(btn.dataset.sec !== "tasks") cancelTemplateEdit();
     showSection(btn.dataset.sec);
+  });
+
+  $("resetList").addEventListener("click", e => {
+    const head = e.target.closest(".reset-head");
+    if(!head) return;
+    openResetId = openResetId === head.dataset.reset ? null : head.dataset.reset;
+    renderResetHistory();
   });
 
   $("taskAdd").addEventListener("click", addTask);

@@ -784,6 +784,42 @@ select.inp{cursor:pointer}
 .audit-row .at{flex:none;font-size:11px;color:var(--ink-mute);font-variant-numeric:tabular-nums;white-space:nowrap}
 .audit-row .ad{display:block;margin-top:2px;font-size:11.5px;color:var(--ink-mute)}
 
+/* Reset history — the same bordered, hairline-divided column as .audit-list,
+   but each row opens. The percentage leads the row because it is the one number
+   worth scanning down the list for. */
+.reset-list{display:flex;flex-direction:column;border:1px solid var(--line-soft);border-radius:var(--r-md);overflow:hidden}
+.reset-item+.reset-item{border-top:1px solid var(--line-soft)}
+.reset-head{
+  display:flex;align-items:center;gap:12px;width:100%;padding:11px 13px;
+  background:none;border:0;text-align:left;cursor:pointer;color:inherit;font:inherit;
+}
+.reset-head:hover{background:var(--paper-alt)}
+.reset-item.on .reset-head{background:var(--paper-alt)}
+.reset-pct{
+  flex:none;min-width:46px;font-size:16px;font-weight:600;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;
+}
+.reset-pct small{font-size:10px;font-weight:500;margin-left:1px;color:var(--ink-mute)}
+.reset-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.reset-when{font-size:12.5px;font-weight:600}
+.reset-sub{font-size:11.5px;color:var(--ink-mute);font-variant-numeric:tabular-nums}
+.reset-head .chev{flex:none;width:13px;height:13px;opacity:.5;transition:transform .2s}
+.reset-head[aria-expanded="true"] .chev{transform:rotate(180deg)}
+
+.reset-body{padding:2px 13px 12px;border-top:1px solid var(--line-soft);background:var(--paper-alt)}
+.reset-task{
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:4px 9px;
+  padding:8px 0;font-size:12.5px;
+}
+.reset-task+.reset-task{border-top:1px solid var(--line-soft)}
+.rt-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.rt-status{font-size:11px;color:var(--ink-mute);white-space:nowrap}
+/* Stages sit under the task title, indented past the dot rather than under it. */
+.rt-stages{grid-column:2/4;display:flex;flex-direction:column;gap:3px;margin-top:2px}
+.rt-stage{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--ink-soft)}
+.rs-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rs-s{flex:none;font-size:10.5px;color:var(--ink-mute);white-space:nowrap}
+
 /* Leaderboard — reuses the .audit-list shell for the bordered, hairline-divided
    column. The bar is a light-surface sibling of .hero-bar, which is tuned for
    the dark hero and would vanish here. */

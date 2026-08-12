@@ -29,7 +29,7 @@ const state = {
 };
 
 function emptyBoard(){
-  return { version:1, updatedAt:null, updatedBy:null, plates:[], tasks:[], audit:[], scores:[], blocked:[], templates:[], renames:[], requests:[], reopenRequests:[] };
+  return { version:1, updatedAt:null, updatedBy:null, plates:[], tasks:[], audit:[], scores:[], blocked:[], templates:[], renames:[], requests:[], reopenRequests:[], resets:[] };
 }
 
 /* Defensive: never trust the shape of a file other people can edit. */
@@ -176,6 +176,39 @@ function normalize(raw){
       stages     : timed ? [] : stagesOf(t)
     };
   }) : [];
+
+  /* Board snapshots written by Reset board, newest first. Each one is the board
+     as it stood the instant before it was cleared: the percentage the hero bar
+     was showing, and the status every task and stage was in.
+
+     `pct` is stored rather than recomputed on read. The tasks here are frozen
+     copies, so recomputing would give the same answer today — but the formula
+     behind the hero bar has changed once already (stages made it fractional)
+     and a snapshot has to keep meaning what it meant the day it was taken. */
+  const wholeNum = (v, max) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? Math.min(Math.floor(n), max) : 0;
+  };
+
+  board.resets = Array.isArray(d.resets) ? d.resets.filter(r => r && r.id).slice(0, RESET_CAP).map(r => ({
+    id   : String(r.id),
+    at   : r.at ? String(r.at) : null,
+    by   : r.by ? String(r.by) : "Unknown",
+    total: wholeNum(r.total, Number.MAX_SAFE_INTEGER),
+    done : wholeNum(r.done,  Number.MAX_SAFE_INTEGER),
+    pct  : wholeNum(r.pct, 100),
+    tasks: Array.isArray(r.tasks) ? r.tasks.filter(t => t && t.title).map(t => ({
+      title : String(t.title),
+      status: OK.includes(t.status) ? t.status : "pending",
+      by    : t.by ? String(t.by) : null,
+      at    : t.at ? String(t.at) : null,
+      stages: Array.isArray(t.stages) ? t.stages.filter(s => s && s.title).map(s => ({
+        title : String(s.title),
+        status: OK.includes(s.status) ? s.status : "pending",
+        by    : s.by ? String(s.by) : null
+      })) : []
+    })) : []
+  })) : [];
 
   board.audit = Array.isArray(d.audit) ? d.audit.filter(a => a && a.action).slice(0, AUDIT_CAP).map(a => ({
     id     : a.id ? String(a.id) : uid("a"),

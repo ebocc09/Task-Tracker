@@ -8,7 +8,7 @@
 /* Bump on every deploy, and match the ?v= on the script tags in index.html.
    Shown in the footer and logged at boot, so "which build am I actually
    running?" is answerable at a glance instead of by guesswork. */
-const BUILD = "26";
+const BUILD = "27";
 
 /* Which repository holds the shared board data.
    Point this at your own repo, then commit and push. */
@@ -37,6 +37,11 @@ const POLL_SECONDS = { member: 20, viewer: 120 };
 
 /* Keep at most this many audit entries so data.json cannot grow forever. */
 const AUDIT_CAP = 500;
+
+/* Board snapshots kept by Reset board, newest first. A reset is the one action
+   that writes a copy of every task, so this cap is lower than the audit's by
+   an order of magnitude — the cost of one entry grows with the board. */
+const RESET_CAP = 30;
 
 /* Leaderboard completions kept, as a backstop only. The real bound is age:
    anything older than the start of the PREVIOUS quarter is dropped, which

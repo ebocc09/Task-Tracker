@@ -274,7 +274,7 @@ const counts = () => {
 /* "Addressed" means the task has reached an end state. A timer that is still
    running has not — it is work in flight, and counting it as done would put
    the hero bar ahead of reality. A failed one has, unhappily. */
-const doneCount = () => state.data.tasks.filter(t => {
+const doneCount = (tasks = state.data.tasks) => tasks.filter(t => {
   const s = effectiveStatus(t);
   return s !== "pending" && s !== "in_progress";
 }).length;
@@ -282,7 +282,7 @@ const doneCount = () => state.data.tasks.filter(t => {
 /* Board progress in task-equivalents rather than whole tasks. A plain task is
    worth 1 once it's addressed; a staged one earns its stages as they land, so
    finishing 2 of 3 moves the bar by two thirds of a task instead of nothing. */
-const progressSum = () => state.data.tasks.reduce((sum, t) => {
+const progressSum = (tasks = state.data.tasks) => tasks.reduce((sum, t) => {
   // A timed task is all-or-nothing: it has no stages, and a clock part-way
   // through has produced nothing yet.
   if(isTimed(t)){
@@ -293,6 +293,12 @@ const progressSum = () => state.data.tasks.reduce((sum, t) => {
   if(t.status !== "pending") return sum + 1;          // halted or finished: whole task
   return sum + t.stages.filter(s => s.status === "complete").length / t.stages.length;
 }, 0);
+
+/* The number on the hero bar. Reset board snapshots this, so it lives in one
+   place — a snapshot that disagreed with the bar it was taken from would be
+   worse than no snapshot at all. */
+const progressPct = (tasks = state.data.tasks) =>
+  tasks.length ? Math.round((progressSum(tasks) / tasks.length) * 100) : 0;
 
 /* ── stages ──
    A staged task carries an ordered list of steps. The "current" stage is the
@@ -417,7 +423,7 @@ function renderHero(){
   const total = state.data.tasks.length;
   const done  = doneCount();
   const sum   = progressSum();
-  const pct   = total ? Math.round((sum / total) * 100) : 0;
+  const pct   = progressPct();
 
   $("heroPct").innerHTML = `${pct}<small>%</small>`;
   const fill = $("heroBarFill");
