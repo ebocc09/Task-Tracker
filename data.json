@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-12T21:53:12.169Z",
+  "updatedAt": "2026-08-12T21:54:31.990Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -27,15 +27,6 @@
       "note": "",
       "checkedOutBy": "Wayne",
       "checkedOutAt": "2026-08-12T21:11:50.333Z",
-      "forcedBy": null,
-      "forcedAt": null
-    },
-    {
-      "id": "p_ms9tk05oj",
-      "label": "6EU-998",
-      "note": "",
-      "checkedOutBy": null,
-      "checkedOutAt": null,
       "forcedBy": null,
       "forcedAt": null
     },
@@ -308,6 +299,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msqmn8om6",
+      "at": "2026-08-12T21:54:31.990Z",
+      "who": "Gabriel",
+      "action": "plate.delete",
+      "subject": "6EU-998",
+      "detail": ""
+    },
     {
       "id": "a_msqmlj3d4",
       "at": "2026-08-12T21:53:12.169Z",
