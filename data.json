@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-12T21:11:50.333Z",
-  "updatedBy": "Wayne",
+  "updatedAt": "2026-08-12T21:53:05.172Z",
+  "updatedBy": "Gabriel",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -34,8 +34,8 @@
       "id": "p_ms9tk05oj",
       "label": "6EU-998",
       "note": "",
-      "checkedOutBy": null,
-      "checkedOutAt": null,
+      "checkedOutBy": "Gabriel",
+      "checkedOutAt": "2026-08-12T21:53:05.171Z",
       "forcedBy": null,
       "forcedAt": null
     },
@@ -308,6 +308,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msqmldp02",
+      "at": "2026-08-12T21:53:05.172Z",
+      "who": "Gabriel",
+      "action": "plate.checkout",
+      "subject": "6EU-998",
+      "detail": ""
+    },
     {
       "id": "a_msql4c3h5",
       "at": "2026-08-12T21:11:50.333Z",
