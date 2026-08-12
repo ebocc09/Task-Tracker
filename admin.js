@@ -1096,6 +1096,10 @@ function renderConnection(){
     $("connReveal").textContent = codeRevealed ? "Hide" : "Reveal";
   }else{
     $("connInput").value = "";
+    // Back behind the Scan / Enter manually pair, but only where a camera
+    // makes that a real choice — otherwise the field is the only way in.
+    $("connInput").hidden = cameraPossible();
+    $("connScanned").hidden = true;
     $("connErr").hidden = true;
     codeRevealed = false;
   }

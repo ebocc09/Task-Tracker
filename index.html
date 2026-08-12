@@ -15,7 +15,7 @@
 <!-- ?v= is a cache-buster. GitHub Pages serves assets with a 10-minute max-age,
      so without it a browser keeps running old JS after a deploy while happily
      showing fresh HTML. Bump these on every release. -->
-<link rel="stylesheet" href="styles.css?v=25">
+<link rel="stylesheet" href="styles.css?v=26">
 </head>
 <body>
 
@@ -195,11 +195,18 @@
       <button class="btn-block" id="reqChange">Request change</button>
     </div>
 
-    <!-- Shown only when this device has no team code yet. -->
+    <!-- Shown only when this device has no team code yet. Two ways in: point the
+         camera at the QR in the Hub, or type the code. The Scan button removes
+         itself where a camera cannot be reached, so it is never a dead end. -->
     <div class="field" id="teamCodeField" hidden>
       <label for="teamCodeInput">Team code</label>
+      <div class="row2 code-ways">
+        <button type="button" class="btn-block" id="teamCodeScan" data-scan-for="teamCodeInput">Scan QR</button>
+        <button type="button" class="btn-block" id="teamCodeManual" data-manual-for="teamCodeInput">Enter manually</button>
+      </div>
       <input class="inp" id="teamCodeInput" type="password" placeholder="Paste the code from your admin"
-             autocomplete="off" spellcheck="false">
+             autocomplete="off" spellcheck="false" hidden>
+      <div class="scanned" id="teamCodeScanned" hidden>Code scanned — press Save and connect.</div>
       <div class="hint">
         Once per device. Ask whoever set up the board for it. Without it you can
         still read the board — you just can't change anything.
@@ -212,6 +219,27 @@
       <button class="btn-block" id="userCancel" data-close="userModal">Cancel</button>
       <button class="btn-block solid" id="userSave">Save</button>
     </div>
+  </div>
+</div>
+
+<!-- QR scanner. One modal serving both the Welcome flow and Admin → Connection,
+     so the two can never drift apart in what they accept. -->
+<div class="modal" id="scanModal" role="dialog" aria-modal="true" aria-labelledby="scanTitle">
+  <div class="modal-head">
+    <h3 id="scanTitle">Scan the team code</h3>
+    <button class="btn-x" data-scan-close aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="scan-stage">
+      <video id="scanVideo" playsinline muted autoplay></video>
+      <div class="scan-frame" aria-hidden="true"></div>
+    </div>
+    <div class="hint" id="scanMsg">In the Zo Projects Hub, press <strong>QR</strong> on the
+      Task Tracker tile, then point this camera at the code.</div>
+    <div class="err" id="scanErr" hidden></div>
+    <button class="btn-block" id="scanCancel" data-scan-close>Cancel</button>
   </div>
 </div>
 
@@ -521,12 +549,19 @@
         <div id="connSetup">
           <div class="field">
             <label for="connInput">Team code</label>
+            <div class="row2 code-ways">
+              <button type="button" class="btn-block" id="connScan" data-scan-for="connInput">Scan QR</button>
+              <button type="button" class="btn-block" id="connManual" data-manual-for="connInput">Enter manually</button>
+            </div>
             <input class="inp" id="connInput" type="password" placeholder="github_pat_… or ghp_…"
-                   autocomplete="off" spellcheck="false">
+                   autocomplete="off" spellcheck="false" hidden>
+            <div class="scanned" id="connScanned" hidden>Code scanned — press Connect.</div>
             <div class="hint">
               This is a GitHub <em>fine-grained</em> personal access token with
               <strong>Contents: Read and write</strong> on this repository only.
               Reading the board never needs one — only changing it does.
+              The Zo Projects Hub shows it as a QR code, which is the way to get
+              it onto a phone without it passing through a chat message.
             </div>
           </div>
           <div class="err" id="connErr" hidden></div>
@@ -579,9 +614,9 @@
 <!-- Toasts -->
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="config.js?v=25"></script>
-<script src="sync.js?v=25"></script>
-<script src="app.js?v=25"></script>
-<script src="admin.js?v=25"></script>
+<script src="config.js?v=26"></script>
+<script src="sync.js?v=26"></script>
+<script src="app.js?v=26"></script>
+<script src="admin.js?v=26"></script>
 </body>
 </html>

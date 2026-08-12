@@ -58,7 +58,7 @@ function toast(message, kind = ""){
 
 /* ────────────────────────── overlay plumbing ───────────────────────────── */
 
-const OVERLAYS = ["userModal","adminModal"];
+const OVERLAYS = ["userModal","adminModal","scanModal"];
 let lastFocus = null;
 
 function anyOverlayOpen(){
@@ -98,6 +98,9 @@ function focusFirst(root, preferred){
 function openModal(id, focusSel){
   lastFocus = document.activeElement;
   closePlateMenu();
+  // Switching dialogs must not leave the camera running behind the new one.
+  // openScanner starts its stream after calling this, so it is unaffected.
+  stopScanner();
   OVERLAYS.forEach(o => { if(o !== id) $(o).classList.remove("on"); });
   $(id).classList.add("on");
   $("scrim").classList.add("on");
@@ -106,6 +109,7 @@ function openModal(id, focusSel){
 }
 
 function closeOverlays(){
+  stopScanner();
   OVERLAYS.forEach(id => $(id).classList.remove("on"));
   $("scrim").classList.remove("on");
   syncScrollLock();
@@ -1251,6 +1255,205 @@ async function connectTeamCode(value){
   }
 }
 
+/* ─────────────────────────── scanning a code ───────────────────────────── */
+
+/* Why this exists: a 93-character token cannot be dictated across a desk, and a
+   clipboard does not reach a second device. The Hub paints the code as a QR;
+   this reads it. Scanning only fills the field — the Connect button is still
+   pressed by hand, so nothing about a scan is a shortcut past consent.
+
+   Everything here feeds connectTeamCode() like the typed path does, so the two
+   cannot drift apart in what they accept or how they report failure. */
+
+let scanStream = null;   // MediaStream while the camera is live
+let scanRaf    = null;   // pending animation frame for the decode loop
+let scanTarget = null;   // id of the input a successful scan should fill
+let scanReturn = null;   // modal to restore when the scanner closes
+
+/* getUserMedia needs a secure context, which a double-clicked index.html is
+   not. Rather than offer a button that throws when pressed, the choice is
+   removed and the plain input stands on its own. */
+const cameraPossible = () =>
+  !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) &&
+  window.isSecureContext === true;
+
+/* jsQR is 250KB and only matters to someone holding a camera up to a screen, so
+   it is fetched on the first scan rather than on every page load. Opening the
+   board stays exactly as quick for the people who only ever read it. */
+let decoderLoading = null;
+function loadDecoder(){
+  if(window.jsQR) return Promise.resolve(window.jsQR);
+  if(decoderLoading) return decoderLoading;
+  decoderLoading = new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = `jsqr.js?v=${BUILD}`;
+    s.onload  = () => window.jsQR
+      ? resolve(window.jsQR)
+      : reject(new Error("decoder loaded but did not register"));
+    s.onerror = () => { decoderLoading = null; reject(new Error("decoder failed to load")); };
+    document.head.appendChild(s);
+  });
+  return decoderLoading;
+}
+
+/* Native BarcodeDetector where it exists — no download and hardware-backed on
+   most phones. It is Chromium-only, which is exactly why jsQR is carried as
+   well: on iOS Safari the native path simply is not there. */
+async function makeDecoder(){
+  if("BarcodeDetector" in window){
+    try{
+      const formats = await window.BarcodeDetector.getSupportedFormats();
+      if(formats.includes("qr_code")){
+        const det = new window.BarcodeDetector({ formats: ["qr_code"] });
+        return async video => {
+          const found = await det.detect(video);
+          return found.length ? found[0].rawValue : null;
+        };
+      }
+    }catch{ /* fall through to jsQR */ }
+  }
+
+  const jsQR = await loadDecoder();
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  return async video => {
+    const w = video.videoWidth, h = video.videoHeight;
+    if(!w || !h) return null;
+    // jsQR walks every pixel, so a 1080p frame costs far more time than the
+    // reach it buys. 640 wide still reads a code that fills the frame.
+    const scale = Math.min(1, 640 / w);
+    canvas.width  = Math.round(w * scale);
+    canvas.height = Math.round(h * scale);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const found = jsQR(img.data, img.width, img.height, { inversionAttempts: "dontInvert" });
+    return found ? found.data : null;
+  };
+}
+
+/* Called from every exit: the Cancel button, the X, Escape, the scrim, a
+   successful read, and openModal switching away. A camera light still on after
+   the dialog has gone is the failure people notice and do not forgive. */
+function stopScanner(){
+  if(scanRaf){ cancelAnimationFrame(scanRaf); scanRaf = null; }
+  if(scanStream){
+    scanStream.getTracks().forEach(t => t.stop());
+    scanStream = null;
+  }
+  const video = $("scanVideo");
+  if(video) video.srcObject = null;
+  scanTarget = null;
+}
+
+function closeScanner(){
+  stopScanner();
+  const back = scanReturn;
+  scanReturn = null;
+  // Come back to whichever dialog sent us here — cancelling a scan should not
+  // also throw away a half-finished Welcome form.
+  if(back) openModal(back);
+  else     closeOverlays();
+}
+
+function scanFail(message){
+  stopScanner();
+  $("scanErr").textContent = message;
+  $("scanErr").hidden = false;
+}
+
+function cameraTrouble(err){
+  const name = err && err.name;
+  if(name === "NotAllowedError" || name === "SecurityError")
+    return "Camera access was blocked. Allow it in your browser's settings for this site, or enter the code manually.";
+  if(name === "NotFoundError" || name === "OverconstrainedError")
+    return "No camera found on this device. Enter the code manually instead.";
+  if(name === "NotReadableError")
+    return "The camera is already in use by another app. Close that, or enter the code manually.";
+  return "Couldn't start the camera — " + ((err && err.message) || "unknown error") +
+         ". Enter the code manually instead.";
+}
+
+/* A decoder that throws on every single frame would otherwise spin here for as
+   long as the dialog stayed open, looking like a camera that simply never finds
+   anything. Past this many consecutive failures it says so and stands down. */
+const SCAN_GIVE_UP = 45;
+
+function scanLoop(video, decode, misfires = 0){
+  if(!scanStream) return;                        // torn down mid-flight
+  const again = n => { scanRaf = requestAnimationFrame(() => scanLoop(video, decode, n)); };
+
+  // HAVE_CURRENT_DATA is enough to draw a frame; waiting for HAVE_ENOUGH_DATA
+  // stalls indefinitely on streams that never advertise it.
+  if(video.readyState < video.HAVE_CURRENT_DATA) return again(misfires);
+
+  // The next frame is only queued once this one resolves, so a slow decode
+  // falls behind rather than piling up behind itself.
+  decode(video).then(text => {
+    if(!scanStream) return;                      // closed while decoding
+    if(text) onScanned(text);
+    else     again(0);                           // a frame with no code is normal
+  }).catch(() => {
+    if(!scanStream) return;
+    if(misfires + 1 >= SCAN_GIVE_UP){
+      scanFail("The camera is running but the reader keeps failing. Enter the code manually instead.");
+      return;
+    }
+    again(misfires + 1);
+  });
+}
+
+function onScanned(text){
+  const target = scanTarget;
+  const code = String(text || "").trim();
+  stopScanner();
+
+  if(!code) return scanFail("That code was empty. Try again, or enter it manually.");
+
+  const input = target && $(target);
+  if(input){
+    input.value = code;
+    input.hidden = false;                        // masked, but visibly filled
+    const flag = $(target === "connInput" ? "connScanned" : "teamCodeScanned");
+    if(flag) flag.hidden = false;
+  }
+  closeScanner();
+}
+
+async function openScanner(targetId){
+  $("scanErr").hidden = true;
+  openModal("scanModal");
+  // Set after openModal: it stops any previous scan, which clears scanTarget.
+  scanTarget = targetId;
+
+  try{
+    scanStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: "environment" } },
+      audio: false
+    });
+  }catch(err){
+    return scanFail(cameraTrouble(err));
+  }
+
+  // The dialog can be dismissed while the permission prompt is up; a stream
+  // handed back after that would run with nothing on screen to show for it.
+  if(!$("scanModal").classList.contains("on")){
+    scanStream.getTracks().forEach(t => t.stop());
+    scanStream = null;
+    return;
+  }
+
+  const video = $("scanVideo");
+  video.srcObject = scanStream;
+  try{ await video.play(); }catch{ /* autoplay attributes cover the usual case */ }
+
+  let decode;
+  try{ decode = await makeDecoder(); }
+  catch{ return scanFail("Couldn't load the QR reader. Check your connection, or enter the code manually."); }
+
+  if(!scanStream) return;
+  scanLoop(video, decode);
+}
+
 /* ───────────────────────────── user modal ──────────────────────────────── */
 
 function myPendingRequest(){
@@ -1293,6 +1496,10 @@ function openUserModal(){
 
   $("teamCodeField").hidden = !needsCode;
   $("teamCodeInput").value = "";
+  // Back behind the two buttons on every open — but only where there is a
+  // choice to make. With no camera the field is the only way in and stays out.
+  $("teamCodeInput").hidden = cameraPossible();
+  $("teamCodeScanned").hidden = true;
   $("userErr").hidden = true;
 
   // The solid button: sets the name on first run; only connects a code once the
@@ -1416,11 +1623,48 @@ function wireEvents(){
     else checkoutPlate(id);
   });
 
+  // Team code: scan it, or type it.
+  document.querySelectorAll("[data-scan-for]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      // Remember where we came from so cancelling returns there rather than
+      // dumping the user out of a half-finished form.
+      scanReturn = OVERLAYS.find(id => $(id).classList.contains("on")) || null;
+      openScanner(btn.dataset.scanFor);
+    });
+  });
+  document.querySelectorAll("[data-manual-for]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const input = $(btn.dataset.manualFor);
+      if(!input) return;
+      input.hidden = false;
+      input.focus();
+    });
+  });
+  document.querySelectorAll("[data-scan-close]").forEach(btn => {
+    btn.addEventListener("click", closeScanner);
+  });
+
+  /* No camera reachable — a double-clicked index.html, or a browser without
+     getUserMedia. Drop the choice entirely and show the field, which is exactly
+     what this looked like before the scanner existed. A button that cannot work
+     is worse than no button. */
+  if(!cameraPossible()){
+    document.querySelectorAll("[data-scan-for]").forEach(btn => { btn.hidden = true; });
+    document.querySelectorAll("[data-manual-for]").forEach(btn => {
+      const input = $(btn.dataset.manualFor);
+      if(input) input.hidden = false;
+      btn.hidden = true;
+    });
+  }
+
   // Modal close buttons + scrim
   document.querySelectorAll("[data-close]").forEach(btn => {
     btn.addEventListener("click", closeOverlays);
   });
-  $("scrim").addEventListener("click", closeOverlays);
+  $("scrim").addEventListener("click", () => {
+    if($("scanModal").classList.contains("on")) closeScanner();
+    else closeOverlays();
+  });
   $("confirmScrim").addEventListener("click", () => closeConfirm(false));
   $("confirmNo").addEventListener("click", () => closeConfirm(false));
   $("confirmYes").addEventListener("click", () => closeConfirm(confirmAnswer()));
@@ -1507,6 +1751,7 @@ function wireEvents(){
   document.addEventListener("keydown", e => {
     if(e.key !== "Escape") return;
     if($("confirm").classList.contains("on")){ closeConfirm(false); return; }
+    if($("scanModal").classList.contains("on")){ closeScanner(); return; }
     if(anyOverlayOpen()){ closeOverlays(); return; }
     if($("plateMenu").classList.contains("on")){ closePlateMenu(); return; }
     if(state.openTaskId !== null){

@@ -116,10 +116,39 @@ pastes it once per device.
 
 ### Each teammate, once per device
 
-Open the link, type their name, paste the code, done. No GitHub account, no
+Open the link, type their name, get the code in, done. No GitHub account, no
 token page, nothing to configure.
 
+There are two ways to get the code in, offered side by side:
+
+- **Scan QR** — opens the camera. In the Zo Projects Hub, press **QR** on the
+  Task Tracker tile and point the phone at it. The code fills itself in.
+- **Enter manually** — reveals a field to paste or type into.
+
+Scanning only *fills the field*. You still press **Save and connect**, exactly
+as when typing, so a scan is never a shortcut past a deliberate connect.
+
+The Scan button hides itself where a camera cannot be reached — a
+double-clicked `index.html`, or a browser without `getUserMedia` — leaving the
+plain field on its own rather than a button that fails when pressed. Where a
+camera *is* available, the reader is the browser's native `BarcodeDetector` if
+it has one, falling back to a bundled copy of jsQR otherwise, because iOS
+Safari has no `BarcodeDetector`. That fallback is ~250KB and is fetched **only
+on the first scan**, so it costs nothing to anyone who never scans.
+
 Viewing needs nothing at all — no code, no account.
+
+### Why the QR helps, and what it doesn't fix
+
+A 93-character token cannot be dictated across a desk, and a clipboard does not
+reach a second device. That is the whole gap the QR closes: the code travels
+screen → camera, and no copy of it is left behind.
+
+That property holds **only while it stays a QR**. Photograph it and send the
+picture on, or retype it into a chat, and it is once again a plain-text
+credential sitting in someone's message history — which is the thing this is
+meant to avoid. The Hub helps by not leaving it on screen: the QR closes itself
+after 60 seconds.
 
 ### Why the code can't just be built into the site
 
@@ -370,9 +399,17 @@ teammates would open the file locally or you'd host it elsewhere.
 | `app.js` | rendering, overlays, the board |
 | `admin.js` | the admin panel |
 | `data.json` | the shared board data |
+| `jsqr.js` | QR decoder for the camera scanner — vendored, loaded on demand |
+| `jsqr.LICENSE.txt` | Apache-2.0 licence for the above |
 
 Plain `<script>` tags, deliberately not ES modules — modules are blocked by CORS
 on `file://`, and double-clicking `index.html` should work.
+
+`jsqr.js` is the one vendored dependency, and it is the unmodified
+[jsQR](https://github.com/cozmo/jsQR) 1.4.0 UMD build (Apache-2.0), kept
+byte-identical to the published file so its checksum stays verifiable. It adds
+no build step — nothing imports it at load time; it is injected as a `<script>`
+the first time somebody presses **Scan QR**.
 
 ### Data shape
 
