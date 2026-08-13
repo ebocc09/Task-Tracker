@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-13T05:08:07.727Z",
+  "updatedAt": "2026-08-13T05:09:54.201Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -221,9 +221,9 @@
       "description": "Replace any vehicles we remove from display with new vehicles. ALL vehicles part of the front building display need to be washed, if we remove a vehicle from front building display, locate a replacement, park it under canopy and post the VIN in the main teams chat so day shift can prepare it for display.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:09:47.929Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "status": "complete",
+      "statusBy": "Gabriel",
+      "statusAt": "2026-08-13T05:09:54.201Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -362,6 +362,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msr274pl3",
+      "at": "2026-08-13T05:09:54.201Z",
+      "who": "Gabriel",
+      "action": "task.complete",
+      "subject": "Restore Display",
+      "detail": ""
+    },
     {
       "id": "a_msr24ujz4",
       "at": "2026-08-13T05:08:07.727Z",
@@ -2020,6 +2028,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_msr2749f1",
+      "at": "2026-08-13T05:09:53.619Z",
+      "who": "Gabriel",
+      "taskId": "t_msnq60bdk",
+      "stageId": null,
+      "title": "Restore Display",
+      "value": 1
+    },
     {
       "id": "sc_msqyfti13",
       "at": "2026-08-13T03:24:41.113Z",
