@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-13T05:36:45.333Z",
+  "updatedAt": "2026-08-13T05:37:08.720Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -348,9 +348,9 @@
       "description": "Leave the white shuttle X on the destination charger before leaving so it always stays with a full charge.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-13T00:28:52.161Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "status": "complete",
+      "statusBy": "Gabriel",
+      "statusAt": "2026-08-13T05:37:08.720Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -362,6 +362,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msr365ww6",
+      "at": "2026-08-13T05:37:08.720Z",
+      "who": "Gabriel",
+      "action": "task.complete",
+      "subject": "(Mini) Shuttle Maintenance",
+      "detail": ""
+    },
     {
       "id": "a_msr35nv93",
       "at": "2026-08-13T05:36:45.333Z",
@@ -2060,6 +2068,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_msr365rf4",
+      "at": "2026-08-13T05:37:08.523Z",
+      "who": "Gabriel",
+      "taskId": "t_msqs5pnch",
+      "stageId": null,
+      "title": "(Mini) Shuttle Maintenance",
+      "value": 1
+    },
     {
       "id": "sc_msr35npy1",
       "at": "2026-08-13T05:36:45.142Z",
