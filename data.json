@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-13T03:24:41.421Z",
-  "updatedBy": "Zafar",
+  "updatedAt": "2026-08-13T05:08:07.727Z",
+  "updatedBy": "Gabriel",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -362,6 +362,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msr24ujz4",
+      "at": "2026-08-13T05:08:07.727Z",
+      "who": "Gabriel",
+      "action": "reopen.request",
+      "subject": "Pull-Ins - Tomorrow",
+      "detail": "N/A"
+    },
     {
       "id": "a_msqyftql5",
       "at": "2026-08-13T03:24:41.421Z",
@@ -2408,7 +2416,16 @@
     }
   ],
   "requests": [],
-  "reopenRequests": [],
+  "reopenRequests": [
+    {
+      "id": "ro_msr24ujz3",
+      "at": "2026-08-13T05:08:07.727Z",
+      "by": "Gabriel",
+      "taskId": "t_msnq9osjt",
+      "taskTitle": "Pull-Ins - Tomorrow",
+      "reason": "N/A"
+    }
+  ],
   "resets": [
     {
       "id": "rs_msq8gc9c1",
