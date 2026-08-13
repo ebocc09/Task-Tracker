@@ -1475,6 +1475,8 @@ function auditPhrase(r){
     // A stage landing that didn't finish the whole task. The stage number is
     // carried in the subject, so this reads "completed X · stage 2 of 3".
     case "task.stage":     return `completed “${s}”`;
+    // Retired in BUILD 29. Nothing writes this any more; the case stays so the
+    // rows written before it was removed still read as what actually happened.
     case "task.partial":   return `partially completed “${s}”`;
     case "task.blocked":   return `could not complete “${s}”`;
     case "task.pending":   return `reopened “${s}”`;

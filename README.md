@@ -1,8 +1,8 @@
 # Task Tracker
 
 A shared task board for a small team. Everyone sees the same tasks, marks them
-**Complete**, **Partial**, or **Could Not Complete**, and can check out a license
-plate so nobody doubles up. Every action is attributed by name in an audit log.
+**Complete** or **Could Not Complete**, and can check out a license plate so
+nobody doubles up. Every action is attributed by name in an audit log.
 
 No server, no database, no build step, no dependencies. The board data lives in
 `data.json` in this repository, and the page reads and writes it through the
@@ -183,17 +183,17 @@ on everyone else's screen with *"Checked out by …"* within one refresh. Click 
 own plate again to release it. One plate per person — taking a second releases the
 first automatically.
 
-**Tasks** — click a card to open it. Three actions:
+**Tasks** — click a card to open it. Two actions:
 
 | Action | Card border turns | Prompts for a note |
 |---|---|---|
 | Complete | green | no |
-| Partial | amber | yes — *how much got completed*, required |
 | Could not complete | red | yes — *what's blocking it*, required |
 
-Partial and Could-not-complete open a dialog and won't let you confirm until
-you've typed something. Both take effect immediately — the note is there so the
-audit log tells an admin the story, not to gate the change.
+A task is either completed or it isn't — there's no middle setting. Could-not-
+complete opens a dialog and won't let you confirm until you've typed something.
+It takes effect immediately; the note is there so the audit log tells an admin
+the story, not to gate the change.
 
 Click anywhere outside, or press `Esc`, to collapse. **Reopen** is different: it
 sends a request to an admin for approval rather than changing the task itself.
@@ -225,8 +225,8 @@ stage at a time rather than finishing the whole thing:
 - While stages remain, the task stays in the **Pending** bucket — but the pill reads
   *Stage 2 of 3* rather than *Pending*, so the board still tells you where it is.
 - The final stage completing is the task completing.
-- **Partial** and **Could not complete** apply to the *current stage* and stop the
-  task there. Finished stages are kept, and the audit log records which stage it
+- **Could not complete** applies to the *current stage* and stops the task
+  there. Finished stages are kept, and the audit log records which stage it
   stalled on, by name — `Plate Audit · stage 2 of 3: Photograph the damage`.
 - **Reopen** starts the whole task over from stage 1.
 - Saving a staged task to **Quick add** keeps its stages, so you can re-add the
@@ -243,7 +243,7 @@ and a staged one splits evenly between its stages, each going to whoever
 completed *that* stage. Two people splitting a three-stage task earn 0.67 and
 0.33.
 
-Only **Complete** scores. Partial and Could-not-complete earn nothing.
+Only **Complete** scores. Could-not-complete earns nothing.
 
 ### Timed tasks
 
@@ -455,8 +455,9 @@ the first time somebody presses **Scan QR**.
     { "id": "t_a2", "title": "Pre-delivery inspection",
       "description": "Panel gaps, paint, badge alignment.",
       "createdBy": "Danny", "createdAt": "2026-07-30T15:00:00Z",
-      "status": "complete",        // pending | complete | partial | blocked
+      "status": "complete",        // pending | complete | blocked
                                    // timed tasks add: in_progress | failed
+                                   // legacy "partial" is read as "blocked"
       "statusBy": "Marisol", "statusAt": "2026-07-31T19:40:00Z",
       "statusNote": null,
       "leaderboard": true,         // completing it scores

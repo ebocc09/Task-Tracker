@@ -119,8 +119,20 @@ function normalize(raw){
 
   /* in_progress and failed belong to TIMED tasks only — see the timer helpers
      in app.js. They are in the same list because task.status is one field and
-     every reader keys off it; nothing else distinguishes them here. */
-  const OK = ["pending","complete","partial","blocked","in_progress","failed"];
+     every reader keys off it; nothing else distinguishes them here.
+
+     "partial" was retired in BUILD 29: a task is completed or it is not. It is
+     deliberately absent here so no live task can be in it again, and legacy
+     data lands on "blocked" — "could not complete" is the nearest surviving
+     truth, and the alternative (falling through to "pending") would erase the
+     fact that someone worked on it and wrote a note. */
+  const OK = ["pending","complete","blocked","in_progress","failed"];
+  const statusOf = s => s === "partial" ? "blocked" : (OK.includes(s) ? s : "pending");
+
+  /* Reset snapshots are history, not board state, so they are NOT migrated —
+     a board that read "Partial" the day it was cleared has to keep saying so.
+     STATUS in app.js keeps a legacy entry purely so these still render. */
+  const OK_SNAP = [...OK, "partial"];
 
   /* A task is optionally broken into ordered stages. An empty array means an
      ordinary single-step task, which is what every task created before this
@@ -133,7 +145,7 @@ function normalize(raw){
     id         : s.id ? String(s.id) : `${t.id}_s${i}`,
     title      : String(s.title),
     description: s.description ? String(s.description) : "",
-    status     : OK.includes(s.status) ? s.status : "pending",
+    status     : statusOf(s.status),
     by         : s.by ? String(s.by) : null,
     at         : s.at ? String(s.at) : null,
     note       : s.note ? String(s.note) : null
@@ -153,7 +165,7 @@ function normalize(raw){
       description: t.description ? String(t.description) : "",
       createdBy  : t.createdBy ? String(t.createdBy) : null,
       createdAt  : t.createdAt ? String(t.createdAt) : null,
-      status     : OK.includes(t.status) ? t.status : "pending",
+      status     : statusOf(t.status),
       statusBy   : t.statusBy ? String(t.statusBy) : null,
       statusAt   : t.statusAt ? String(t.statusAt) : null,
       statusNote : t.statusNote ? String(t.statusNote) : null,
@@ -205,12 +217,12 @@ function normalize(raw){
     plates: wholeNum(r.plates, Number.MAX_SAFE_INTEGER),
     tasks: Array.isArray(r.tasks) ? r.tasks.filter(t => t && t.title).map(t => ({
       title : String(t.title),
-      status: OK.includes(t.status) ? t.status : "pending",
+      status: OK_SNAP.includes(t.status) ? t.status : "pending",
       by    : t.by ? String(t.by) : null,
       at    : t.at ? String(t.at) : null,
       stages: Array.isArray(t.stages) ? t.stages.filter(s => s && s.title).map(s => ({
         title : String(s.title),
-        status: OK.includes(s.status) ? s.status : "pending",
+        status: OK_SNAP.includes(s.status) ? s.status : "pending",
         by    : s.by ? String(s.by) : null
       })) : []
     })) : []

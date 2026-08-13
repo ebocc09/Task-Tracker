@@ -15,7 +15,7 @@
 <!-- ?v= is a cache-buster. GitHub Pages serves assets with a 10-minute max-age,
      so without it a browser keeps running old JS after a deploy while happily
      showing fresh HTML. Bump these on every release. -->
-<link rel="stylesheet" href="styles.css?v=28">
+<link rel="stylesheet" href="styles.css?v=29">
 </head>
 <body>
 
@@ -120,7 +120,6 @@
 <section class="strip">
   <div class="stat" data-filter="all"      tabindex="0" role="button"><div class="stat-k">All tasks</div><div class="stat-v" id="sAll">0</div></div>
   <div class="stat" data-filter="complete" tabindex="0" role="button"><div class="stat-k">Complete</div><div class="stat-v" id="sComplete">0</div></div>
-  <div class="stat" data-filter="partial"  tabindex="0" role="button"><div class="stat-k">Partial</div><div class="stat-v" id="sPartial">0</div></div>
   <div class="stat" data-filter="blocked"  tabindex="0" role="button"><div class="stat-k">Could not complete</div><div class="stat-v" id="sBlocked">0</div></div>
   <div class="stat" data-filter="pending"  tabindex="0" role="button"><div class="stat-k">Pending</div><div class="stat-v" id="sPending">0</div></div>
   <!-- Timed tasks only. Without these two the other cells stop summing to
@@ -636,9 +635,9 @@
 <!-- Toasts -->
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="config.js?v=28"></script>
-<script src="sync.js?v=28"></script>
-<script src="app.js?v=28"></script>
-<script src="admin.js?v=28"></script>
+<script src="config.js?v=29"></script>
+<script src="sync.js?v=29"></script>
+<script src="app.js?v=29"></script>
+<script src="admin.js?v=29"></script>
 </body>
 </html>

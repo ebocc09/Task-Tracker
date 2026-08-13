@@ -275,7 +275,6 @@ code{font-size:12px;font-weight:500;letter-spacing:.04em;font-variant-numeric:ta
 @keyframes rowIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 .task:hover{box-shadow:var(--shadow)}
 .task.open{box-shadow:var(--shadow)}
-.task.s-partial{border-color:rgba(245,179,27,.55)}
 .task.s-complete{border-color:rgba(18,187,106,.5)}
 .task.s-blocked{border-color:rgba(232,33,39,.45)}
 /* Timed tasks. A running clock reads as live rather than as a warning; a
@@ -289,7 +288,6 @@ code{font-size:12px;font-weight:500;letter-spacing:.04em;font-variant-numeric:ta
   padding:16px 18px;text-align:left;
 }
 .task-glyph{width:20px;height:20px;color:var(--grey-car);justify-self:center}
-.task.s-partial  .task-glyph{color:var(--amber)}
 .task.s-complete .task-glyph{color:var(--green)}
 .task.s-blocked  .task-glyph{color:var(--red)}
 .task.s-in_progress .task-glyph{color:var(--blue)}
@@ -402,6 +400,8 @@ code{font-size:12px;font-weight:500;letter-spacing:.04em;font-variant-numeric:ta
 }
 .stage-link.done{background:var(--green)}
 .stage-dot.s-complete{background:var(--green);border-color:var(--green)}
+/* Retired status — no live stage can be partial, but reset snapshots taken
+   while it existed still paint these dots. See STATUS in app.js. */
 .stage-dot.s-partial {background:var(--amber);border-color:var(--amber)}
 .stage-dot.s-blocked {background:var(--red);border-color:var(--red)}
 /* The stage the team is on: ink ring, hollow centre — reads as "you are here". */
@@ -418,7 +418,6 @@ code{font-size:12px;font-weight:500;letter-spacing:.04em;font-variant-numeric:ta
 .stage-mark{flex:none;width:16px;height:16px;margin-top:1px;color:var(--grey-car)}
 .stage-mark svg{width:16px;height:16px}
 .stage.s-complete .stage-mark{color:var(--green)}
-.stage.s-partial  .stage-mark{color:var(--amber)}
 .stage.s-blocked  .stage-mark{color:var(--red)}
 .stage-body{min-width:0;display:flex;flex-direction:column;gap:2px}
 .stage-title{font-size:13px;font-weight:600;letter-spacing:.03em;color:var(--ink-soft)}

@@ -8,10 +8,8 @@
 const ICON = {
   pending : '<circle cx="12" cy="12" r="8.5"/>',
   complete: '<circle cx="12" cy="12" r="8.5"/><path d="m8.4 12.2 2.5 2.5 4.7-5"/>',
-  partial : '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none"/>',
   blocked : '<circle cx="12" cy="12" r="8.5"/><path d="m8.6 8.6 6.8 6.8"/>',
   check   : '<path d="M20 6 9 17l-5-5"/>',
-  half    : '<path d="M12 3v18"/><circle cx="12" cy="12" r="9"/>',
   slash   : '<circle cx="12" cy="12" r="9"/><path d="m8.4 8.4 7.2 7.2"/>',
   // A clock face for a running timer, and a crossed one for a task that ran out.
   in_progress: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 1.8"/>',
@@ -32,11 +30,16 @@ const svg = (paths, cls) =>
 const STATUS = {
   pending : { label:"Pending",            pill:"idle", verb:"reopened"  },
   complete: { label:"Complete",           pill:"ok",   verb:"completed" },
-  partial : { label:"Partial",            pill:"warm", verb:"partially completed" },
   blocked : { label:"Could not complete", pill:"bad",  verb:"marked blocked on" },
   // Timed tasks only. "failed" is terminal — nothing reopens it, by design.
   in_progress: { label:"In progress",     pill:"info", verb:"started" },
-  failed  : { label:"Failed",             pill:"bad",  verb:"failed" }
+  failed  : { label:"Failed",             pill:"bad",  verb:"failed" },
+  /* Retired in BUILD 29 — a task is completed or it is not, and "partial" was
+     the fuzzy middle. No live task can hold it any more (normalize() migrates
+     it to blocked), and nothing offers it as an action. It stays here so reset
+     snapshots taken while it existed still render their real labels rather
+     than quietly reading "Pending". Do not put it back on a button. */
+  partial : { label:"Partial",            pill:"warm", verb:"partially completed" }
 };
 
 /* ─────────────────────────────── toasts ────────────────────────────────── */
@@ -262,7 +265,7 @@ const fmtMinutes = n => `${n} minute${n === 1 ? "" : "s"}`;
 /* ───────────────────────────── derived data ────────────────────────────── */
 
 const counts = () => {
-  const c = { all: state.data.tasks.length, pending:0, complete:0, partial:0,
+  const c = { all: state.data.tasks.length, pending:0, complete:0,
               blocked:0, in_progress:0, failed:0 };
   state.data.tasks.forEach(t => {
     const s = effectiveStatus(t);
@@ -304,8 +307,8 @@ const progressPct = (tasks = state.data.tasks) =>
    A staged task carries an ordered list of steps. The "current" stage is the
    first one that isn't complete, derived rather than stored: a stored cursor
    could drift out of step with the stage statuses under concurrent edits, a
-   derived one can't. A stage left partial or blocked stays current, which is
-   exactly the halt we want — the task stops there until it's reopened. */
+   derived one can't. A stage left blocked stays current, which is exactly the
+   halt we want — the task stops there until it's reopened. */
 const hasStages = t => Array.isArray(t.stages) && t.stages.length > 0;
 
 const currentStageIndex = t => {
@@ -324,7 +327,7 @@ const stageLabel = t =>
    counts(), the filter, the hero bar and the admin list all keep working
    unchanged off t.status alone. */
 function statusFromStages(stages){
-  const halted = stages.find(s => s.status === "partial" || s.status === "blocked");
+  const halted = stages.find(s => s.status === "blocked");
   if(halted) return halted.status;
   return stages.every(s => s.status === "complete") ? "complete" : "pending";
 }
@@ -440,8 +443,8 @@ function renderHero(){
     const tail = who && when ? ` · last change ${when} by ${who}` : "";
     /* Say so when the percentage is running ahead of the task count, otherwise
        "1 of 3 addressed" next to 56% just looks like a bug. */
-    const partial = sum - done > 0.001 ? " · plus stage progress" : "";
-    sub.textContent = `${done} of ${total} addressed · ${left} still pending${partial}${tail}`;
+    const extra = sum - done > 0.001 ? " · plus stage progress" : "";
+    sub.textContent = `${done} of ${total} addressed · ${left} still pending${extra}${tail}`;
   }
 }
 
@@ -449,7 +452,6 @@ function renderStats(){
   const c = counts();
   $("sAll").textContent      = c.all;
   $("sComplete").textContent = c.complete;
-  $("sPartial").textContent  = c.partial;
   $("sBlocked").textContent  = c.blocked;
   $("sPending").textContent  = c.pending;
   $("sRunning").textContent  = c.in_progress;
@@ -570,7 +572,7 @@ function reconcileChildren(container, desired){
   });
 }
 
-/* The action row for a timed task, which replaces Complete/Partial/Blocked
+/* The action row for a timed task, which replaces Complete/Could-not-complete
    entirely — a timed task has exactly one path through it.
 
      pending      Start
@@ -679,9 +681,6 @@ function taskCard(t, readOnly){
          <button class="act good ${t.status === "complete" ? "on" : ""}" data-act="complete" data-id="${t.id}"
                  ${done ? "disabled" : ""}>
            ${svg(ICON.check)}${escHtml(doneLabel)}</button>
-         <button class="act warm ${t.status === "partial" ? "on" : ""}" data-act="partial" data-id="${t.id}"
-                 ${done ? "disabled" : ""}>
-           ${svg(ICON.half)}Partial</button>
          <button class="act bad ${t.status === "blocked" ? "on" : ""}" data-act="blocked" data-id="${t.id}"
                  ${done ? "disabled" : ""}>
            ${svg(ICON.slash)}Could not complete</button>
@@ -861,8 +860,8 @@ function setTaskStatus(taskId, status, note){
 }
 
 /* The staged equivalent. Complete advances one stage at a time and only flips
-   the whole task once the last one lands; Partial and Could-not-complete halt
-   the task at whichever stage it reached, keeping the ones already done. */
+   the whole task once the last one lands; Could-not-complete halts the task at
+   whichever stage it reached, keeping the ones already done. */
 function setStageStatus(taskId, status, note){
   const task  = state.data.tasks.find(t => t.id === taskId);
   const stage = currentStage(task);
@@ -927,16 +926,12 @@ function setStageStatus(taskId, status, note){
   });
 }
 
-/* Partial and Could-not-complete both take effect immediately — no approval,
-   unlike Reopen. But neither is much use to an admin reading the audit log
-   without the story behind it, so the note is required rather than optional. */
+/* Could-not-complete takes effect immediately — no approval, unlike Reopen.
+   But it is no use to an admin reading the audit log without the story behind
+   it, so the note is required rather than optional. Kept as a table because it
+   used to hold Partial too, and the next status that needs a note will want
+   the same shape. */
 const NOTE_PROMPT = {
-  partial: {
-    title: "Partially completed",
-    ask  : t => `How much of “${t}” was completed?`,
-    ph   : "What got done, and what's left?",
-    yes  : "Mark partial"
-  },
   blocked: {
     title: "Could not complete",
     ask  : t => `Why couldn't “${t}” be completed?`,
@@ -1727,9 +1722,8 @@ function wireEvents(){
       case "complete":
         setTaskStatus(id, "complete");
         break;
-      case "partial":
       case "blocked":
-        markWithNote(id, act.dataset.act);
+        markWithNote(id, "blocked");
         break;
       case "timed-start":
         startTimedTask(id);
