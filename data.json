@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-13T00:27:28.201Z",
+  "updatedAt": "2026-08-13T00:27:33.204Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -307,24 +307,6 @@
       "stages": []
     },
     {
-      "id": "t_msqrxnf81",
-      "title": "(Mini) Post all cars not here for the next 3 days",
-      "description": "",
-      "createdBy": "Enzo",
-      "createdAt": "2026-08-13T00:22:36.451Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
-      "statusNote": null,
-      "leaderboard": true,
-      "timed": false,
-      "limitMinutes": null,
-      "startedAt": null,
-      "startedBy": null,
-      "failedAt": null,
-      "stages": []
-    },
-    {
       "id": "t_msqs3fpe7",
       "title": "(Mini) Demo Duties",
       "description": "Move 3 demo vehicles under canopy for morning to wash.",
@@ -344,6 +326,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msqs40ycd",
+      "at": "2026-08-13T00:27:33.204Z",
+      "who": "Enzo",
+      "action": "task.delete",
+      "subject": "(Mini) Post all cars not here for the next 3 days",
+      "detail": ""
+    },
     {
       "id": "a_msqs3x3cb",
       "at": "2026-08-13T00:27:28.200Z",
