@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-13T02:41:17.067Z",
+  "updatedAt": "2026-08-13T02:42:38.608Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -239,10 +239,10 @@
       "description": "Bring all vehicles scheduled for tomorrow delivery on-site.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:12:39.619Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
-      "statusNote": null,
+      "status": "partial",
+      "statusBy": "Gabriel",
+      "statusAt": "2026-08-13T02:42:38.608Z",
+      "statusNote": "all of them here at onsite 13 need be charger",
       "leaderboard": true,
       "timed": false,
       "limitMinutes": null,
@@ -254,10 +254,10 @@
           "id": "s_msnq9osju",
           "title": "Pull-Ins - Tomorrow",
           "description": "Bring all vehicles scheduled for tomorrow delivery on-site.",
-          "status": "pending",
-          "by": null,
-          "at": null,
-          "note": null
+          "status": "partial",
+          "by": "Gabriel",
+          "at": "2026-08-13T02:42:38.608Z",
+          "note": "all of them here at onsite 13 need be charger"
         },
         {
           "id": "s_msnq9osjv",
@@ -362,6 +362,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msqwxr4g6",
+      "at": "2026-08-13T02:42:38.608Z",
+      "who": "Gabriel",
+      "action": "task.partial",
+      "subject": "Pull-Ins - Tomorrow · stage 1 of 2",
+      "detail": "all of them here at onsite 13 need be charger"
+    },
     {
       "id": "a_msqww07f3",
       "at": "2026-08-13T02:41:17.067Z",
