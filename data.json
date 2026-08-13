@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-13T01:30:23.028Z",
-  "updatedBy": "Gabriel",
+  "updatedAt": "2026-08-13T01:31:33.341Z",
+  "updatedBy": "Zafar",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -277,9 +277,9 @@
       "createdBy": "Enzo",
       "createdAt": "2026-08-12T17:09:43.095Z",
       "status": "partial",
-      "statusBy": "Gabriel",
-      "statusAt": "2026-08-13T01:30:23.028Z",
-      "statusNote": "I did my part",
+      "statusBy": "Zafar",
+      "statusAt": "2026-08-13T01:31:33.341Z",
+      "statusNote": "Did few vri's",
       "leaderboard": true,
       "timed": false,
       "limitMinutes": null,
@@ -362,6 +362,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msquec0t3",
+      "at": "2026-08-13T01:31:33.341Z",
+      "who": "Zafar",
+      "action": "task.partial",
+      "subject": "VRI's",
+      "detail": "Did few vri's"
+    },
     {
       "id": "a_msquctro3",
       "at": "2026-08-13T01:30:23.028Z",
