@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-13T05:24:21.629Z",
+  "updatedAt": "2026-08-13T05:36:45.333Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -203,10 +203,10 @@
       "description": "Remove all vehicles from the trade-in parking zone, post any vehicles that cannot be moved into the teams chat before marking task completed.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:09:45.567Z",
-      "status": "partial",
-      "statusBy": "Zafar",
-      "statusAt": "2026-08-13T05:20:58.442Z",
-      "statusNote": "2 cars left in the trade in parking",
+      "status": "complete",
+      "statusBy": "Gabriel",
+      "statusAt": "2026-08-13T05:36:45.333Z",
+      "statusNote": null,
       "leaderboard": true,
       "timed": false,
       "limitMinutes": null,
@@ -362,6 +362,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msr35nv93",
+      "at": "2026-08-13T05:36:45.333Z",
+      "who": "Gabriel",
+      "action": "task.complete",
+      "subject": "Clear Trade-in Parking",
+      "detail": ""
+    },
     {
       "id": "a_msr2pq0t2",
       "at": "2026-08-13T05:24:21.629Z",
@@ -2052,6 +2060,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_msr35npy1",
+      "at": "2026-08-13T05:36:45.142Z",
+      "who": "Gabriel",
+      "taskId": "t_msnq5yhrg",
+      "stageId": null,
+      "title": "Clear Trade-in Parking",
+      "value": 1
+    },
     {
       "id": "sc_msr2kh8v1",
       "at": "2026-08-13T05:20:16.975Z",
