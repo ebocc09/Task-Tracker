@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-13T14:58:37.415Z",
+  "updatedAt": "2026-08-13T15:54:28.865Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -362,6 +362,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msrp829to",
+      "at": "2026-08-13T15:54:28.865Z",
+      "who": "Enzo",
+      "action": "reopen.reject",
+      "subject": "Pull-Ins - Tomorrow",
+      "detail": ""
+    },
     {
       "id": "a_msrn889zm",
       "at": "2026-08-13T14:58:37.415Z",
@@ -2618,16 +2626,7 @@
     }
   ],
   "requests": [],
-  "reopenRequests": [
-    {
-      "id": "ro_msr24ujz3",
-      "at": "2026-08-13T05:08:07.727Z",
-      "by": "Gabriel",
-      "taskId": "t_msnq9osjt",
-      "taskTitle": "Pull-Ins - Tomorrow",
-      "reason": "N/A"
-    }
-  ],
+  "reopenRequests": [],
   "resets": [
     {
       "id": "rs_msrn87x2k",
