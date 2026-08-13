@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-13T06:38:45.702Z",
+  "updatedAt": "2026-08-13T06:39:13.842Z",
   "updatedBy": "Justin",
   "plates": [
     {
@@ -239,10 +239,10 @@
       "description": "Bring all vehicles scheduled for tomorrow delivery on-site.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:12:39.619Z",
-      "status": "partial",
-      "statusBy": "Gabriel",
-      "statusAt": "2026-08-13T02:42:38.608Z",
-      "statusNote": "all of them here at onsite 13 need be charger",
+      "status": "pending",
+      "statusBy": "Justin",
+      "statusAt": "2026-08-13T06:39:13.842Z",
+      "statusNote": null,
       "leaderboard": true,
       "timed": false,
       "limitMinutes": null,
@@ -254,10 +254,10 @@
           "id": "s_msnq9osju",
           "title": "Pull-Ins - Tomorrow",
           "description": "Bring all vehicles scheduled for tomorrow delivery on-site.",
-          "status": "partial",
-          "by": "Gabriel",
-          "at": "2026-08-13T02:42:38.608Z",
-          "note": "all of them here at onsite 13 need be charger"
+          "status": "complete",
+          "by": "Justin",
+          "at": "2026-08-13T06:39:13.842Z",
+          "note": null
         },
         {
           "id": "s_msnq9osjv",
@@ -362,6 +362,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msr5e08i9",
+      "at": "2026-08-13T06:39:13.842Z",
+      "who": "Justin",
+      "action": "task.stage",
+      "subject": "Pull-Ins - Tomorrow · stage 1 of 2",
+      "detail": ""
+    },
     {
       "id": "a_msr5deiu6",
       "at": "2026-08-13T06:38:45.702Z",
@@ -2100,6 +2108,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_msr5dzxp7",
+      "at": "2026-08-13T06:39:13.453Z",
+      "who": "Justin",
+      "taskId": "t_msnq9osjt",
+      "stageId": "s_msnq9osju",
+      "title": "Pull-Ins - Tomorrow",
+      "value": 0.5
+    },
     {
       "id": "sc_msr5de9t4",
       "at": "2026-08-13T06:38:45.377Z",
