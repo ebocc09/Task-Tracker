@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T06:31:00.374Z",
+  "updatedAt": "2026-08-14T07:11:27.722Z",
   "updatedBy": "Zafar",
   "plates": [
     {
@@ -56,9 +56,9 @@
       "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T20:27:21.368Z",
-      "status": "pending",
-      "statusBy": "Wayne",
-      "statusAt": "2026-08-13T20:53:33.126Z",
+      "status": "complete",
+      "statusBy": "Zafar",
+      "statusAt": "2026-08-14T07:11:27.722Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -89,9 +89,9 @@
           "id": "s_msnonfdkk",
           "title": "Plate Audit - Closing",
           "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Zafar",
+          "at": "2026-08-14T07:11:27.722Z",
           "note": null
         }
       ]
@@ -362,6 +362,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msslzb3e3",
+      "at": "2026-08-14T07:11:27.722Z",
+      "who": "Zafar",
+      "action": "task.complete",
+      "subject": "Plate Audit - Opening",
+      "detail": ""
+    },
     {
       "id": "a_msskja529",
       "at": "2026-08-14T06:31:00.374Z",
@@ -2300,6 +2308,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_msslzaxo1",
+      "at": "2026-08-14T07:11:27.516Z",
+      "who": "Zafar",
+      "taskId": "t_msnonfdkh",
+      "stageId": "s_msnonfdkk",
+      "title": "Plate Audit - Opening",
+      "value": 0.3333333333333333
+    },
     {
       "id": "sc_msskj9tq7",
       "at": "2026-08-14T06:30:59.966Z",
