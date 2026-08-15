@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-15T07:13:51.364Z",
-  "updatedBy": "Zafar",
+  "updatedAt": "2026-08-15T14:44:06.715Z",
+  "updatedBy": "Enzo",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -56,9 +56,9 @@
       "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T20:27:21.368Z",
-      "status": "complete",
-      "statusBy": "Zafar",
-      "statusAt": "2026-08-15T07:13:23.119Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -71,27 +71,27 @@
           "id": "s_msnonfdki",
           "title": "Plate Audit - Opening",
           "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
-          "status": "complete",
-          "by": "Not Enzo",
-          "at": "2026-08-14T13:17:47.373Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         },
         {
           "id": "s_msnonfdkj",
           "title": "Plate Audit - Evening",
           "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task.",
-          "status": "complete",
-          "by": "Wayne",
-          "at": "2026-08-14T20:58:59.099Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         },
         {
           "id": "s_msnonfdkk",
           "title": "Plate Audit - Closing",
           "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task.",
-          "status": "complete",
-          "by": "Zafar",
-          "at": "2026-08-15T07:13:23.119Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         }
       ]
@@ -148,9 +148,9 @@
       "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
       "createdBy": "Daily rollover",
       "createdAt": "2026-08-01T21:59:37.565Z",
-      "status": "complete",
-      "statusBy": "Zafar",
-      "statusAt": "2026-08-15T07:13:29.802Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -163,18 +163,18 @@
           "id": "s_msawzfcw9",
           "title": "Loaner Audit - Evening",
           "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
-          "status": "complete",
-          "by": "Wayne",
-          "at": "2026-08-14T20:58:08.166Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         },
         {
           "id": "s_msawzfcwa",
           "title": "Loaner Audit - Closing",
           "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
-          "status": "complete",
-          "by": "Zafar",
-          "at": "2026-08-15T07:13:29.802Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         }
       ]
@@ -185,9 +185,9 @@
       "description": "Pull all keys for tomorrow and the following day.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:04:25.726Z",
-      "status": "complete",
-      "statusBy": "Zafar",
-      "statusAt": "2026-08-15T05:04:52.547Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": true,
@@ -203,9 +203,9 @@
       "description": "Remove all vehicles from the trade-in parking zone, post any vehicles that cannot be moved into the teams chat before marking task completed.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:09:45.567Z",
-      "status": "complete",
-      "statusBy": "Zafar",
-      "statusAt": "2026-08-15T07:13:34.202Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -221,9 +221,9 @@
       "description": "Replace any vehicles we remove from display with new vehicles. ALL vehicles part of the front building display need to be washed, if we remove a vehicle from front building display, locate a replacement, park it under canopy and post the VIN in the main teams chat so day shift can prepare it for display.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:09:47.929Z",
-      "status": "complete",
-      "statusBy": "Zafar",
-      "statusAt": "2026-08-15T07:13:37.132Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -239,9 +239,9 @@
       "description": "Bring all vehicles scheduled for tomorrow delivery on-site.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:12:39.619Z",
-      "status": "complete",
-      "statusBy": "Zafar",
-      "statusAt": "2026-08-15T07:13:47.698Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -254,18 +254,18 @@
           "id": "s_msnq9osju",
           "title": "Pull-Ins - Tomorrow",
           "description": "Bring all vehicles scheduled for tomorrow delivery on-site.",
-          "status": "complete",
-          "by": "Zafar",
-          "at": "2026-08-15T05:05:03.749Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         },
         {
           "id": "s_msnq9osjv",
           "title": "Charging Tomorrow's Deliveries",
           "description": "Charge all the vehicles for tomorrow and line them up in the wash line by time, and put the key inside the vehicle.",
-          "status": "complete",
-          "by": "Zafar",
-          "at": "2026-08-15T07:13:47.698Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         }
       ]
@@ -294,9 +294,9 @@
       "description": "",
       "createdBy": "Not Enzo",
       "createdAt": "2026-08-12T20:30:05.661Z",
-      "status": "complete",
-      "statusBy": "Zafar",
-      "statusAt": "2026-08-15T07:13:51.364Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -362,6 +362,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msuhl9rv3",
+      "at": "2026-08-15T14:44:06.715Z",
+      "who": "Enzo",
+      "action": "board.reset",
+      "subject": "",
+      "detail": "7 tasks cleared"
+    },
     {
       "id": "a_msu1i8lgi",
       "at": "2026-08-15T07:13:51.364Z",
@@ -3132,6 +3140,155 @@
   "requests": [],
   "reopenRequests": [],
   "resets": [
+    {
+      "id": "rs_msuhl8dk1",
+      "at": "2026-08-15T14:44:04.904Z",
+      "by": "Enzo",
+      "total": 12,
+      "done": 7,
+      "pct": 58,
+      "plates": 0,
+      "tasks": [
+        {
+          "title": "Plate Audit - Opening",
+          "status": "complete",
+          "by": "Zafar",
+          "at": "2026-08-15T07:13:23.119Z",
+          "stages": [
+            {
+              "title": "Plate Audit - Opening",
+              "status": "complete",
+              "by": "Not Enzo"
+            },
+            {
+              "title": "Plate Audit - Evening",
+              "status": "complete",
+              "by": "Wayne"
+            },
+            {
+              "title": "Plate Audit - Closing",
+              "status": "complete",
+              "by": "Zafar"
+            }
+          ]
+        },
+        {
+          "title": "Box Audit - Service",
+          "status": "pending",
+          "by": null,
+          "at": null,
+          "stages": [
+            {
+              "title": "Box Audit - Service",
+              "status": "pending",
+              "by": null
+            },
+            {
+              "title": "Box Audit - Washline",
+              "status": "pending",
+              "by": null
+            },
+            {
+              "title": "Box Audit - Offsite",
+              "status": "pending",
+              "by": null
+            }
+          ]
+        },
+        {
+          "title": "Loaner Audit - Evening",
+          "status": "complete",
+          "by": "Zafar",
+          "at": "2026-08-15T07:13:29.802Z",
+          "stages": [
+            {
+              "title": "Loaner Audit - Evening",
+              "status": "complete",
+              "by": "Wayne"
+            },
+            {
+              "title": "Loaner Audit - Closing",
+              "status": "complete",
+              "by": "Zafar"
+            }
+          ]
+        },
+        {
+          "title": "Pull Keys",
+          "status": "complete",
+          "by": "Zafar",
+          "at": "2026-08-15T05:04:52.547Z",
+          "stages": []
+        },
+        {
+          "title": "Clear Trade-in Parking",
+          "status": "complete",
+          "by": "Zafar",
+          "at": "2026-08-15T07:13:34.202Z",
+          "stages": []
+        },
+        {
+          "title": "Restore Display",
+          "status": "complete",
+          "by": "Zafar",
+          "at": "2026-08-15T07:13:37.132Z",
+          "stages": []
+        },
+        {
+          "title": "Pull-Ins - Tomorrow",
+          "status": "complete",
+          "by": "Zafar",
+          "at": "2026-08-15T07:13:47.698Z",
+          "stages": [
+            {
+              "title": "Pull-Ins - Tomorrow",
+              "status": "complete",
+              "by": "Zafar"
+            },
+            {
+              "title": "Charging Tomorrow's Deliveries",
+              "status": "complete",
+              "by": "Zafar"
+            }
+          ]
+        },
+        {
+          "title": "VRI's",
+          "status": "pending",
+          "by": null,
+          "at": null,
+          "stages": []
+        },
+        {
+          "title": "(Mini) Close wash gate",
+          "status": "complete",
+          "by": "Zafar",
+          "at": "2026-08-15T07:13:51.364Z",
+          "stages": []
+        },
+        {
+          "title": "(Mini) Demo Duties",
+          "status": "pending",
+          "by": null,
+          "at": null,
+          "stages": []
+        },
+        {
+          "title": "(Mini) Foresight",
+          "status": "pending",
+          "by": null,
+          "at": null,
+          "stages": []
+        },
+        {
+          "title": "(Mini) Shuttle Maintenance",
+          "status": "pending",
+          "by": null,
+          "at": null,
+          "stages": []
+        }
+      ]
+    },
     {
       "id": "rs_mssyx2bl1",
       "at": "2026-08-14T13:13:38.049Z",
