@@ -797,6 +797,96 @@ function leaderboardRows(windowKey){
 
 const LB_WINDOW_LABEL = { wtd:"this week", mtd:"this month", qtd:"this quarter", all:"all time" };
 
+/* ── opening a row onto what is behind its number ──
+
+   Which name is expanded. Held outside the data because it is this browser's
+   idea of what it is looking at, not the team's — same reasoning as
+   openResetId, and it matters more here because renderAdmin() re-runs on every
+   poll while the panel is open and rebuilds this list wholesale. */
+let openLbName = null;
+
+/* The completions themselves, read off `scores` and NOT off the audit log.
+
+   That choice is the whole point. The audit is capped at AUDIT_CAP and an admin
+   can clear it outright; scores are kept back to the start of the previous
+   quarter and survive both, which is why someone can top the leaderboard having
+   long since scrolled off the log. Opening a row that reads "6 completions"
+   onto an audit query returning four would make the leaderboard look broken
+   when it is the only one of the two still telling the truth.
+
+   So this is the exact set of events the row's own number was computed from —
+   same array, same window, same filter. The count above and the rows below
+   cannot disagree. */
+function lbEntries(name, windowKey){
+  const from = windowStart(windowKey);
+  return (state.data.scores || [])
+    .filter(s => {
+      if(s.who !== name) return false;
+      if(from == null) return true;
+      const t = Date.parse(s.at);
+      return !Number.isNaN(t) && t >= from;
+    })
+    /* awardScore unshifts, so the array is already newest-first — but a 409
+       replay can land one out of turn, and this is a list whose order is the
+       thing being read. Sort rather than trust. */
+    .sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
+}
+
+/* What one scored event actually was. A stage id resolves to its number and
+   title while the task is still on the board; once it is deleted or wiped the
+   credit is all that is left, and a fraction still says "a share of a staged
+   task" rather than a whole one. */
+function scoreWhat(s){
+  if(!s.stageId) return "";
+  const t = (state.data.tasks || []).find(x => x.id === s.taskId);
+  const stages = (t && t.stages) || [];
+  const i = stages.findIndex(x => x.id === s.stageId);
+  if(i < 0) return "one stage";
+  /* Stage 1 is auto-named after the task it belongs to, so
+     "Loaner Audit - Evening / stage 1 of 2 · Loaner Audit - Evening" is the
+     common case rather than the odd one. Name the stage only when it says
+     something the title on the line above does not. */
+  const label = stages[i].title;
+  const named = label && label !== (t.title || "") ? ` · ${label}` : "";
+  return `stage ${i + 1} of ${stages.length}${named}`;
+}
+
+function lbBodyHtml(name, windowKey){
+  const mine = lbEntries(name, windowKey);
+  if(!mine.length){
+    return `<div class="lb-body"><div class="adm-empty">No completions ${escHtml(LB_WINDOW_LABEL[windowKey] || "yet")}.</div></div>`;
+  }
+
+  return `<div class="lb-body">${mine.map(s => {
+    const what = scoreWhat(s);
+    return `
+<div class="audit-row lb-done">
+  <span class="ax">${escHtml(s.title || "a task")}${
+    what ? `<span class="ad">${escHtml(what)}</span>` : ""}</span>
+  <span class="lb-val" title="credit earned">+${fmtCredit(s.value)}</span>
+  <span class="at" title="${escHtml(fullTime(s.at))}">${escHtml(relTime(s.at))}</span>
+</div>`;
+  }).join("")}
+  <button class="lb-audit" data-lbaudit="${escHtml(name)}">Everything ${escHtml(name)} did, in the audit log →</button>
+</div>`;
+}
+
+/* The wider question this drilldown deliberately does not answer. The list
+   above is scored completions only; the audit has the rest of what they did —
+   tasks they could not complete, reopens, and completions of tasks nobody
+   ticked Leaderboard on. One press to go and read it, filter already set. */
+function showPersonInAudit(name){
+  showSection("audit");
+  $("auditAct").value = "";
+  $("auditWho").value = name;
+  renderAdminAudit();
+  /* A <select> silently falls back to "" when handed a value it has no option
+     for, and the audit's Everyone filter would then look like an answer. It is
+     not — it is the log having rolled past them. */
+  if($("auditWho").value !== name)
+    toast(`Nothing left in the audit log for ${name} — it keeps the last ${AUDIT_CAP} entries.`, "");
+}
+
 function renderLeaderboard(){
   const key = $("lbWindow").value || "wtd";
   const { rows, total, events } = leaderboardRows(key);
@@ -816,17 +906,33 @@ function renderLeaderboard(){
     return;
   }
 
-  box.innerHTML = rows.map((r, i) => `
-<div class="audit-row lb-row">
-  <span class="aw">${i + 1}</span>
-  <span class="ax">
-    <div class="lb-name">${escHtml(r.name)}</div>
-    <div class="lb-bar"><i style="width:${r.share.toFixed(2)}%"></i></div>
-    <span class="lb-sub">${fmtCredit(r.credit)} task${r.credit === 1 ? "" : "s"} · ${r.events} completion${r.events === 1 ? "" : "s"} · last ${escHtml(relTime(r.lastAt))}</span>
-  </span>
-  <span class="at lb-pct">${r.pct}%</span>
-  <button class="mini red" data-lbdel="${escHtml(r.name)}">Remove</button>
-</div>`).join("");
+  /* Remove is a sibling of the head, not a child of it: the head is the button
+     that opens the row, and a <button> cannot contain a <button>. They share a
+     flex line so the result looks exactly like the single row it replaced.
+     `lb-name` and `lb-bar` are spans for the same reason — a <button> takes
+     phrasing content, and browsers only tolerate a <div> in there. */
+  box.innerHTML = rows.map((r, i) => {
+    const open = r.name === openLbName;
+    return `
+<div class="lb-item${open ? " on" : ""}">
+  <div class="lb-line">
+    <button class="lb-head audit-row lb-row" data-lbopen="${escHtml(r.name)}"
+            aria-expanded="${open}" title="See what ${escHtml(r.name)} completed">
+      <span class="aw">${i + 1}</span>
+      <span class="ax">
+        <span class="lb-name">${escHtml(r.name)}</span>
+        <span class="lb-bar"><i style="width:${r.share.toFixed(2)}%"></i></span>
+        <span class="lb-sub">${fmtCredit(r.credit)} task${r.credit === 1 ? "" : "s"} · ${r.events} completion${r.events === 1 ? "" : "s"} · last ${escHtml(relTime(r.lastAt))}</span>
+      </span>
+      <span class="at lb-pct">${r.pct}%</span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <button class="mini red" data-lbdel="${escHtml(r.name)}">Remove</button>
+  </div>
+  ${open ? lbBodyHtml(r.name, key) : ""}
+</div>`;
+  }).join("");
 
   $("lbFoot").textContent =
     `${fmtCredit(total)} task${total === 1 ? "" : "s"} completed ${LB_WINDOW_LABEL[key] || ""} across ${events} completion${events === 1 ? "" : "s"}.`;
@@ -853,6 +959,9 @@ async function removeFromLeaderboard(name){
     if(!gone) return null;
     return { action:"leaderboard.remove", subject: name, detail: `${gone} completions removed` };
   });
+  // Their row is gone; the pointer to it must not outlive it, or a later
+  // rename or a re-entry would silently reopen onto a name nobody clicked.
+  if(openLbName === name) openLbName = null;
   renderAdmin();
   flash("Removed");
 }
@@ -875,6 +984,7 @@ async function resetLeaderboard(){
     data.scores = [];
     return { action:"leaderboard.reset", subject: "", detail: `${gone} completions removed` };
   });
+  openLbName = null;
   renderAdmin();
   flash("Leaderboard reset");
 }
@@ -1952,8 +2062,18 @@ function exportAuditCsv(){
   $("lbWindow").addEventListener("change", renderLeaderboard);
   $("lbReset").addEventListener("click", resetLeaderboard);
   $("lbList").addEventListener("click", e => {
+    // Remove first. It sits outside the head so the two cannot both match, but
+    // the destructive one goes first regardless of what the markup happens to
+    // look like this week.
     const del = e.target.closest("[data-lbdel]");
-    if(del) removeFromLeaderboard(del.dataset.lbdel);
+    if(del) return removeFromLeaderboard(del.dataset.lbdel);
+    const toAudit = e.target.closest("[data-lbaudit]");
+    if(toAudit) return showPersonInAudit(toAudit.dataset.lbaudit);
+    const head = e.target.closest("[data-lbopen]");
+    if(head){
+      openLbName = openLbName === head.dataset.lbopen ? null : head.dataset.lbopen;
+      renderLeaderboard();
+    }
   });
 
   $("qaAddAll").addEventListener("click", addAllTemplates);

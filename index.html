@@ -15,7 +15,7 @@
 <!-- ?v= is a cache-buster. GitHub Pages serves assets with a 10-minute max-age,
      so without it a browser keeps running old JS after a deploy while happily
      showing fresh HTML. Bump these on every release. -->
-<link rel="stylesheet" href="styles.css?v=29">
+<link rel="stylesheet" href="styles.css?v=30">
 </head>
 <body>
 
@@ -485,6 +485,7 @@
           Share of the team's completed <strong>leaderboard tasks</strong> — tick
           <em>Leaderboard task</em> when adding one to make it count. Credit is kept
           across board resets and is not affected by clearing the audit log.
+          <strong>Click a name</strong> to see every completion behind their score.
         </p>
         <!-- Options are static on purpose. renderAdmin re-runs on every poll while
              the panel is open, so rebuilding them would reset the choice mid-read. -->
@@ -635,9 +636,9 @@
 <!-- Toasts -->
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="config.js?v=29"></script>
-<script src="sync.js?v=29"></script>
-<script src="app.js?v=29"></script>
-<script src="admin.js?v=29"></script>
+<script src="config.js?v=30"></script>
+<script src="sync.js?v=30"></script>
+<script src="app.js?v=30"></script>
+<script src="admin.js?v=30"></script>
 </body>
 </html>
