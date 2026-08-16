@@ -324,6 +324,34 @@ person get through".
 Filter by **week / month / quarter to date**, or all time. Weeks start on Sunday
 — change `WEEK_STARTS_ON` in `config.js` to `1` for Monday.
 
+**Click a name** to open the row onto the completions behind its number — every
+task that earned the credit, newest first, with the stage it landed and what it
+was worth:
+
+```
+  1  Marisol   ████████████░░░░░░░░   45%    8 tasks · 8 completions   ⌄
+     ┌──────────────────────────────────────────────────────────────┐
+     │  Box Audit - Service                                         │
+     │    stage 3 of 3 · Box Audit - Offsite    +0.33    2 days ago  │
+     │  Clear Trade-in Parking                    +1     2 days ago  │
+     │  Loaner Audit - Evening                                      │
+     │    stage 2 of 2 · Loaner Audit - Closing +0.5     3 days ago  │
+     │                                                              │
+     │  Everything Marisol did, in the audit log →                  │
+     └──────────────────────────────────────────────────────────────┘
+```
+
+That list is read from the stored completions, **not** from the audit log, and
+the distinction matters: the audit is capped at `AUDIT_CAP` and an admin can
+clear it, while completions are kept back to the start of the previous quarter.
+Someone can sit at the top of the leaderboard having long since scrolled off the
+log. Sourcing the drilldown from the audit would show four rows under a line
+reading "16 completions" and make the leaderboard look wrong when it is the
+accurate one. The link at the foot goes to the audit filtered to that person —
+that's where their blocked tasks, reopens, and completions of *unflagged* tasks
+are. If the log has rolled past them, it says so rather than silently showing
+everyone.
+
 **Remove** deletes one person's completions; everyone else's percentage
 recalculates over the smaller total, and they reappear if they complete another
 leaderboard task. **Reset leaderboard** clears every recorded completion.
