@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T21:15:49.012Z",
-  "updatedBy": "EJ",
+  "updatedAt": "2026-08-17T21:15:49.322Z",
+  "updatedBy": "Justin",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -43,8 +43,8 @@
       "id": "p_msqmo558c",
       "label": "6EX-724",
       "note": "",
-      "checkedOutBy": "Justin",
-      "checkedOutAt": "2026-08-17T21:15:21.567Z",
+      "checkedOutBy": null,
+      "checkedOutAt": null,
       "forcedBy": null,
       "forcedAt": null
     }
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msxqgpu24",
+      "at": "2026-08-17T21:15:49.322Z",
+      "who": "Justin",
+      "action": "plate.release",
+      "subject": "6EX-724",
+      "detail": ""
+    },
     {
       "id": "a_msxqgplg6",
       "at": "2026-08-17T21:15:49.012Z",
