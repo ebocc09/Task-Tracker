@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T21:15:49.322Z",
-  "updatedBy": "Justin",
+  "updatedAt": "2026-08-17T21:15:54.996Z",
+  "updatedBy": "Enzo",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -34,7 +34,7 @@
       "id": "p_ms9tk9unm",
       "label": "6EY-464",
       "note": "",
-      "checkedOutBy": "EJ",
+      "checkedOutBy": "Eric",
       "checkedOutAt": "2026-08-17T21:14:59.043Z",
       "forcedBy": null,
       "forcedAt": null
@@ -381,6 +381,14 @@
   ],
   "audit": [
     {
+      "id": "a_msxqgu7o7",
+      "at": "2026-08-17T21:15:54.996Z",
+      "who": "Enzo",
+      "action": "request.approve",
+      "subject": "Eric",
+      "detail": ""
+    },
+    {
       "id": "a_msxqgpu24",
       "at": "2026-08-17T21:15:49.322Z",
       "who": "Justin",
@@ -391,7 +399,7 @@
     {
       "id": "a_msxqgplg6",
       "at": "2026-08-17T21:15:49.012Z",
-      "who": "EJ",
+      "who": "Eric",
       "action": "request.open",
       "subject": "Eric",
       "detail": ""
@@ -415,7 +423,7 @@
     {
       "id": "a_msxqfn1f2",
       "at": "2026-08-17T21:14:59.043Z",
-      "who": "EJ",
+      "who": "Eric",
       "action": "plate.checkout",
       "subject": "6EY-464",
       "detail": ""
@@ -3260,16 +3268,16 @@
       "by": "Bob",
       "from": "Bob",
       "to": "Not Enzo"
-    }
-  ],
-  "requests": [
+    },
     {
-      "id": "req_msxqgplg5",
-      "at": "2026-08-17T21:15:49.012Z",
+      "id": "r_msxqgu7n6",
+      "at": "2026-08-17T21:15:54.995Z",
+      "by": "Enzo",
       "from": "EJ",
       "to": "Eric"
     }
   ],
+  "requests": [],
   "reopenRequests": [],
   "resets": [
     {
