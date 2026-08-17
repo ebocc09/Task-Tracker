@@ -1,14 +1,14 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T21:17:33.210Z",
+  "updatedAt": "2026-08-17T21:17:36.223Z",
   "updatedBy": "Eric",
   "plates": [
     {
       "id": "p_ms9tjbasa",
       "label": "6EX-831",
       "note": "",
-      "checkedOutBy": null,
-      "checkedOutAt": null,
+      "checkedOutBy": "Eric",
+      "checkedOutAt": "2026-08-17T21:17:36.223Z",
       "forcedBy": null,
       "forcedAt": null
     },
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msxqj0bj4",
+      "at": "2026-08-17T21:17:36.223Z",
+      "who": "Eric",
+      "action": "plate.checkout",
+      "subject": "6EX-831",
+      "detail": ""
+    },
     {
       "id": "a_msxqixzu2",
       "at": "2026-08-17T21:17:33.210Z",
