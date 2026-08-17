@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T21:15:21.567Z",
-  "updatedBy": "Justin",
+  "updatedAt": "2026-08-17T21:15:49.012Z",
+  "updatedBy": "EJ",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msxqgplg6",
+      "at": "2026-08-17T21:15:49.012Z",
+      "who": "EJ",
+      "action": "request.open",
+      "subject": "Eric",
+      "detail": ""
+    },
     {
       "id": "a_msxqg4f32",
       "at": "2026-08-17T21:15:21.567Z",
@@ -3246,7 +3254,14 @@
       "to": "Not Enzo"
     }
   ],
-  "requests": [],
+  "requests": [
+    {
+      "id": "req_msxqgplg5",
+      "at": "2026-08-17T21:15:49.012Z",
+      "from": "EJ",
+      "to": "Eric"
+    }
+  ],
   "reopenRequests": [],
   "resets": [
     {
