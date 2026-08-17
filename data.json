@@ -1,14 +1,14 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T21:16:26.343Z",
+  "updatedAt": "2026-08-17T21:16:35.317Z",
   "updatedBy": "Eric",
   "plates": [
     {
       "id": "p_ms9tjbasa",
       "label": "6EX-831",
       "note": "",
-      "checkedOutBy": "Eric",
-      "checkedOutAt": "2026-08-17T21:16:26.343Z",
+      "checkedOutBy": null,
+      "checkedOutAt": null,
       "forcedBy": null,
       "forcedAt": null
     },
@@ -34,8 +34,8 @@
       "id": "p_ms9tk9unm",
       "label": "6EY-464",
       "note": "",
-      "checkedOutBy": null,
-      "checkedOutAt": null,
+      "checkedOutBy": "Eric",
+      "checkedOutAt": "2026-08-17T21:16:35.317Z",
       "forcedBy": null,
       "forcedAt": null
     },
@@ -380,6 +380,22 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msxqhpbp7",
+      "at": "2026-08-17T21:16:35.317Z",
+      "who": "Eric",
+      "action": "plate.checkout",
+      "subject": "6EY-464",
+      "detail": ""
+    },
+    {
+      "id": "a_msxqhpbp6",
+      "at": "2026-08-17T21:16:35.317Z",
+      "who": "Eric",
+      "action": "plate.release",
+      "subject": "6EX-831",
+      "detail": ""
+    },
     {
       "id": "a_msxqhiefc",
       "at": "2026-08-17T21:16:26.343Z",
