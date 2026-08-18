@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-18T16:35:08.971Z",
+  "updatedAt": "2026-08-18T16:37:00.553Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msyvy0i1a",
+      "at": "2026-08-18T16:37:00.553Z",
+      "who": "Enzo",
+      "action": "leaderboard.remove",
+      "subject": "Enzo",
+      "detail": "1 completions removed"
+    },
     {
       "id": "a_msyvvmej8",
       "at": "2026-08-18T16:35:08.971Z",
@@ -2798,15 +2806,6 @@
     }
   ],
   "scores": [
-    {
-      "id": "sc_msyvvlvm6",
-      "at": "2026-08-18T16:35:08.290Z",
-      "who": "Enzo",
-      "taskId": "t_msnonfdkh",
-      "stageId": "s_msnonfdki",
-      "title": "Plate Audit - Opening",
-      "value": 0.3333333333333333
-    },
     {
       "id": "sc_msyafzagk",
       "at": "2026-08-18T06:35:07.240Z",
