@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-18T06:02:25.331Z",
-  "updatedBy": "Zafar",
+  "updatedAt": "2026-08-18T06:07:16.605Z",
+  "updatedBy": "Eric",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -276,9 +276,9 @@
       "description": "Zero out the VRI list",
       "createdBy": "Enzo",
       "createdAt": "2026-08-12T17:09:43.095Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "status": "complete",
+      "statusBy": "Eric",
+      "statusAt": "2026-08-18T06:07:16.604Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msy9g67x3",
+      "at": "2026-08-18T06:07:16.605Z",
+      "who": "Eric",
+      "action": "task.complete",
+      "subject": "VRI's",
+      "detail": ""
+    },
     {
       "id": "a_msy99xgzi",
       "at": "2026-08-18T06:02:25.331Z",
@@ -2710,6 +2718,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_msy9g5we1",
+      "at": "2026-08-18T06:07:16.190Z",
+      "who": "Eric",
+      "taskId": "t_msqcgykq4",
+      "stageId": null,
+      "title": "VRI's",
+      "value": 1
+    },
     {
       "id": "sc_msy99x8pg",
       "at": "2026-08-18T06:02:25.033Z",
