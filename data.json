@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-18T05:33:45.460Z",
+  "updatedAt": "2026-08-18T05:33:48.387Z",
   "updatedBy": "Justin",
   "plates": [
     {
@@ -223,7 +223,7 @@
       "createdAt": "2026-08-10T21:09:47.929Z",
       "status": "complete",
       "statusBy": "Justin",
-      "statusAt": "2026-08-18T05:33:45.460Z",
+      "statusAt": "2026-08-18T05:33:48.386Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msy894o36",
+      "at": "2026-08-18T05:33:48.387Z",
+      "who": "Justin",
+      "action": "task.complete",
+      "subject": "Restore Display",
+      "detail": ""
+    },
     {
       "id": "a_msy892es3",
       "at": "2026-08-18T05:33:45.460Z",
