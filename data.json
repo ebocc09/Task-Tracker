@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-18T06:08:37.190Z",
-  "updatedBy": "Zafar",
+  "updatedAt": "2026-08-18T06:11:14.658Z",
+  "updatedBy": "Justin",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -348,9 +348,9 @@
       "description": "Leave the white shuttle X on the destination charger before leaving so it always stays with a full charge.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-13T00:28:52.161Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "status": "complete",
+      "statusBy": "Justin",
+      "statusAt": "2026-08-18T06:11:14.657Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msy9l9wi9",
+      "at": "2026-08-18T06:11:14.658Z",
+      "who": "Justin",
+      "action": "task.complete",
+      "subject": "(Mini) Shuttle Maintenance",
+      "detail": ""
+    },
     {
       "id": "a_msy9hwee5",
       "at": "2026-08-18T06:08:37.190Z",
@@ -2742,6 +2750,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_msy9l9m67",
+      "at": "2026-08-18T06:11:14.286Z",
+      "who": "Justin",
+      "taskId": "t_msqs5pnch",
+      "stageId": null,
+      "title": "(Mini) Shuttle Maintenance",
+      "value": 1
+    },
     {
       "id": "sc_msy9hw5z3",
       "at": "2026-08-18T06:08:36.887Z",
