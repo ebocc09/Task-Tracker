@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-18T05:58:03.502Z",
-  "updatedBy": "Wayne",
+  "updatedAt": "2026-08-18T06:02:25.331Z",
+  "updatedBy": "Zafar",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -294,9 +294,9 @@
       "description": "",
       "createdBy": "Not Enzo",
       "createdAt": "2026-08-12T20:30:05.661Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "status": "complete",
+      "statusBy": "Zafar",
+      "statusAt": "2026-08-18T06:02:25.330Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msy99xgzi",
+      "at": "2026-08-18T06:02:25.331Z",
+      "who": "Zafar",
+      "action": "task.complete",
+      "subject": "(Mini) Close wash gate",
+      "detail": ""
+    },
     {
       "id": "a_msy94bfy3",
       "at": "2026-08-18T05:58:03.502Z",
@@ -2702,6 +2710,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_msy99x8pg",
+      "at": "2026-08-18T06:02:25.033Z",
+      "who": "Zafar",
+      "taskId": "t_msqjmn531",
+      "stageId": null,
+      "title": "(Mini) Close wash gate",
+      "value": 1
+    },
     {
       "id": "sc_msy94b881",
       "at": "2026-08-18T05:58:03.224Z",
