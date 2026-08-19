@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-19T06:29:07.474Z",
+  "updatedAt": "2026-08-19T06:29:23.949Z",
   "updatedBy": "Justin",
   "plates": [
     {
@@ -312,9 +312,9 @@
       "description": "Move 3 demo vehicles under canopy for morning to wash.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-13T00:27:05.968Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "status": "complete",
+      "statusBy": "Justin",
+      "statusAt": "2026-08-19T06:29:23.949Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mszpoh2l3",
+      "at": "2026-08-19T06:29:23.949Z",
+      "who": "Justin",
+      "action": "task.complete",
+      "subject": "(Mini) Demo Duties",
+      "detail": ""
+    },
     {
       "id": "a_mszpo4cy8",
       "at": "2026-08-19T06:29:07.474Z",
@@ -2958,6 +2966,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mszpogta1",
+      "at": "2026-08-19T06:29:23.614Z",
+      "who": "Justin",
+      "taskId": "t_msqs3fpe7",
+      "stageId": null,
+      "title": "(Mini) Demo Duties",
+      "value": 1
+    },
     {
       "id": "sc_mszpo42w6",
       "at": "2026-08-19T06:29:07.112Z",
