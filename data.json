@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-19T05:55:59.984Z",
+  "updatedAt": "2026-08-19T05:56:14.627Z",
   "updatedBy": "Zafar",
   "plates": [
     {
@@ -148,9 +148,9 @@
       "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
       "createdBy": "Daily rollover",
       "createdAt": "2026-08-01T21:59:37.565Z",
-      "status": "pending",
-      "statusBy": "Wayne",
-      "statusAt": "2026-08-18T20:54:11.360Z",
+      "status": "complete",
+      "statusBy": "Zafar",
+      "statusAt": "2026-08-19T05:56:14.627Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -172,9 +172,9 @@
           "id": "s_msawzfcwa",
           "title": "Loaner Audit - Closing",
           "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Zafar",
+          "at": "2026-08-19T05:56:14.627Z",
           "note": null
         }
       ]
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mszohu3n3",
+      "at": "2026-08-19T05:56:14.627Z",
+      "who": "Zafar",
+      "action": "task.complete",
+      "subject": "Loaner Audit - Evening",
+      "detail": ""
+    },
     {
       "id": "a_mszohiswj",
       "at": "2026-08-19T05:55:59.984Z",
@@ -2934,6 +2942,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mszohtvn1",
+      "at": "2026-08-19T05:56:14.339Z",
+      "who": "Zafar",
+      "taskId": "t_msawzfcw8",
+      "stageId": "s_msawzfcwa",
+      "title": "Loaner Audit - Evening",
+      "value": 0.5
+    },
     {
       "id": "sc_mszohikxh",
       "at": "2026-08-19T05:55:59.697Z",
