@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-19T20:54:08.057Z",
+  "updatedAt": "2026-08-19T20:54:15.391Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mt0kkori5",
+      "at": "2026-08-19T20:54:15.391Z",
+      "who": "Enzo",
+      "action": "reopen.reject",
+      "subject": "Box Audit - Service",
+      "detail": ""
+    },
     {
       "id": "a_mt0kkj3t3",
       "at": "2026-08-19T20:54:08.057Z",
@@ -3997,16 +4005,7 @@
     }
   ],
   "requests": [],
-  "reopenRequests": [
-    {
-      "id": "ro_mszogv5x3",
-      "at": "2026-08-19T05:55:29.349Z",
-      "by": "Zafar",
-      "taskId": "t_msawzfcw4",
-      "taskTitle": "Box Audit - Service",
-      "reason": "I did the keys for the offsite"
-    }
-  ],
+  "reopenRequests": [],
   "resets": [
     {
       "id": "rs_mt0kkim61",
