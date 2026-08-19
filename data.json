@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-19T05:31:47.271Z",
+  "updatedAt": "2026-08-19T05:31:50.044Z",
   "updatedBy": "Justin",
   "plates": [
     {
@@ -185,9 +185,9 @@
       "description": "Pull all keys for tomorrow and the following day.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:04:25.726Z",
-      "status": "in_progress",
+      "status": "complete",
       "statusBy": "Justin",
-      "statusAt": "2026-08-19T05:31:46.839Z",
+      "statusAt": "2026-08-19T05:31:50.044Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": true,
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_msznmg0s5",
+      "at": "2026-08-19T05:31:50.044Z",
+      "who": "Justin",
+      "action": "task.timedComplete",
+      "subject": "Pull Keys",
+      "detail": "0m 03s of 30 minutes"
+    },
     {
       "id": "a_msznmdvr2",
       "at": "2026-08-19T05:31:47.271Z",
@@ -2862,6 +2870,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_msznmfnj3",
+      "at": "2026-08-19T05:31:49.567Z",
+      "who": "Justin",
+      "taskId": "t_msnpz3pa6",
+      "stageId": null,
+      "title": "Pull Keys",
+      "value": 1
+    },
     {
       "id": "sc_mszn9x1n7",
       "at": "2026-08-19T05:22:05.579Z",
