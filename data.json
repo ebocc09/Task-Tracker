@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-20T21:13:22.321Z",
+  "updatedAt": "2026-08-20T21:13:25.159Z",
   "updatedBy": "Wayne",
   "plates": [
     {
@@ -58,7 +58,7 @@
       "createdAt": "2026-08-10T20:27:21.368Z",
       "status": "pending",
       "statusBy": "Wayne",
-      "statusAt": "2026-08-20T21:13:22.321Z",
+      "statusAt": "2026-08-20T21:13:25.159Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -80,9 +80,9 @@
           "id": "s_msnonfdkj",
           "title": "Plate Audit - Evening",
           "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Wayne",
+          "at": "2026-08-20T21:13:25.159Z",
           "note": null
         },
         {
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mt20p6lj9",
+      "at": "2026-08-20T21:13:25.159Z",
+      "who": "Wayne",
+      "action": "task.stage",
+      "subject": "Plate Audit - Opening · stage 2 of 3: Plate Audit - Evening",
+      "detail": ""
+    },
     {
       "id": "a_mt20p4ep6",
       "at": "2026-08-20T21:13:22.321Z",
@@ -3190,6 +3198,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mt20p6417",
+      "at": "2026-08-20T21:13:24.529Z",
+      "who": "Wayne",
+      "taskId": "t_msnonfdkh",
+      "stageId": "s_msnonfdkj",
+      "title": "Plate Audit - Opening",
+      "value": 0.3333333333333333
+    },
     {
       "id": "sc_mt20p44a4",
       "at": "2026-08-20T21:13:21.946Z",
