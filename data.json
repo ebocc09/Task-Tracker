@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-20T06:08:13.353Z",
+  "updatedAt": "2026-08-20T06:08:16.043Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -161,6 +161,24 @@
       "stages": []
     },
     {
+      "id": "t_msnq5yhrg",
+      "title": "Clear Trade-in Parking",
+      "description": "Remove all vehicles from the trade-in parking zone, post any vehicles that cannot be moved into the teams chat before marking task completed.",
+      "createdBy": "Enzo",
+      "createdAt": "2026-08-10T21:09:45.567Z",
+      "status": "complete",
+      "statusBy": "Gabriel",
+      "statusAt": "2026-08-20T04:57:17.065Z",
+      "statusNote": null,
+      "leaderboard": true,
+      "timed": false,
+      "limitMinutes": null,
+      "startedAt": null,
+      "startedBy": null,
+      "failedAt": null,
+      "stages": []
+    },
+    {
       "id": "t_msawzfcw8",
       "title": "Loaner Audit - Evening",
       "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
@@ -196,24 +214,6 @@
           "note": null
         }
       ]
-    },
-    {
-      "id": "t_msnq5yhrg",
-      "title": "Clear Trade-in Parking",
-      "description": "Remove all vehicles from the trade-in parking zone, post any vehicles that cannot be moved into the teams chat before marking task completed.",
-      "createdBy": "Enzo",
-      "createdAt": "2026-08-10T21:09:45.567Z",
-      "status": "complete",
-      "statusBy": "Gabriel",
-      "statusAt": "2026-08-20T04:57:17.065Z",
-      "statusNote": null,
-      "leaderboard": true,
-      "timed": false,
-      "limitMinutes": null,
-      "startedAt": null,
-      "startedBy": null,
-      "failedAt": null,
-      "stages": []
     },
     {
       "id": "t_msnq60bdk",
