@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-20T05:19:23.939Z",
+  "updatedAt": "2026-08-20T06:08:13.353Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -143,6 +143,24 @@
       ]
     },
     {
+      "id": "t_msnpz3pa6",
+      "title": "Pull Keys",
+      "description": "Pull all keys for tomorrow and the following day.",
+      "createdBy": "Enzo",
+      "createdAt": "2026-08-10T21:04:25.726Z",
+      "status": "failed",
+      "statusBy": "Gabriel",
+      "statusAt": "2026-08-20T00:35:45.777Z",
+      "statusNote": null,
+      "leaderboard": true,
+      "timed": true,
+      "limitMinutes": 30,
+      "startedAt": "2026-08-20T00:05:45.777Z",
+      "startedBy": "Gabriel",
+      "failedAt": "2026-08-20T00:35:45.777Z",
+      "stages": []
+    },
+    {
       "id": "t_msawzfcw8",
       "title": "Loaner Audit - Evening",
       "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
@@ -178,24 +196,6 @@
           "note": null
         }
       ]
-    },
-    {
-      "id": "t_msnpz3pa6",
-      "title": "Pull Keys",
-      "description": "Pull all keys for tomorrow and the following day.",
-      "createdBy": "Enzo",
-      "createdAt": "2026-08-10T21:04:25.726Z",
-      "status": "failed",
-      "statusBy": "Gabriel",
-      "statusAt": "2026-08-20T00:35:45.777Z",
-      "statusNote": null,
-      "leaderboard": true,
-      "timed": true,
-      "limitMinutes": 30,
-      "startedAt": "2026-08-20T00:05:45.777Z",
-      "startedBy": "Gabriel",
-      "failedAt": "2026-08-20T00:35:45.777Z",
-      "stages": []
     },
     {
       "id": "t_msnq5yhrg",
