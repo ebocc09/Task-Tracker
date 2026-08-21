@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-21T06:11:47.425Z",
-  "updatedBy": "Eric",
+  "updatedAt": "2026-08-21T06:20:12.052Z",
+  "updatedBy": "Wayne",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -239,9 +239,9 @@
       "description": "Bring all vehicles scheduled for tomorrow delivery on-site.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:12:39.619Z",
-      "status": "pending",
+      "status": "complete",
       "statusBy": "Wayne",
-      "statusAt": "2026-08-21T05:58:22.378Z",
+      "statusAt": "2026-08-21T06:20:12.052Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -263,9 +263,9 @@
           "id": "s_msnq9osjv",
           "title": "Charging Tomorrow's Deliveries",
           "description": "Charge all the vehicles for tomorrow and line them up in the wash line by time, and put the key inside the vehicle.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Wayne",
+          "at": "2026-08-21T06:20:12.052Z",
           "note": null
         }
       ]
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mt2k8ck43",
+      "at": "2026-08-21T06:20:12.052Z",
+      "who": "Wayne",
+      "action": "task.complete",
+      "subject": "Pull-Ins - Tomorrow",
+      "detail": ""
+    },
     {
       "id": "a_mt2jxj6p3",
       "at": "2026-08-21T06:11:47.425Z",
@@ -3302,6 +3310,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mt2k8c6z1",
+      "at": "2026-08-21T06:20:11.579Z",
+      "who": "Wayne",
+      "taskId": "t_msnq9osjt",
+      "stageId": "s_msnq9osjv",
+      "title": "Pull-Ins - Tomorrow",
+      "value": 0.5
+    },
     {
       "id": "sc_mt2jxiug1",
       "at": "2026-08-21T06:11:46.985Z",
