@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-21T06:10:03.278Z",
-  "updatedBy": "Justin",
+  "updatedAt": "2026-08-21T06:11:47.425Z",
+  "updatedBy": "Eric",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -184,9 +184,9 @@
       "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
       "createdBy": "Daily rollover",
       "createdAt": "2026-08-01T21:59:37.565Z",
-      "status": "pending",
-      "statusBy": "Wayne",
-      "statusAt": "2026-08-20T21:02:06.979Z",
+      "status": "complete",
+      "statusBy": "Eric",
+      "statusAt": "2026-08-21T06:11:47.425Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -208,9 +208,9 @@
           "id": "s_msawzfcwa",
           "title": "Loaner Audit - Closing",
           "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Eric",
+          "at": "2026-08-21T06:11:47.425Z",
           "note": null
         }
       ]
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mt2jxj6p3",
+      "at": "2026-08-21T06:11:47.425Z",
+      "who": "Eric",
+      "action": "task.complete",
+      "subject": "Loaner Audit - Evening",
+      "detail": ""
+    },
     {
       "id": "a_mt2jvatq7",
       "at": "2026-08-21T06:10:03.278Z",
@@ -3294,6 +3302,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mt2jxiug1",
+      "at": "2026-08-21T06:11:46.985Z",
+      "who": "Eric",
+      "taskId": "t_msawzfcw8",
+      "stageId": "s_msawzfcwa",
+      "title": "Loaner Audit - Evening",
+      "value": 0.5
+    },
     {
       "id": "sc_mt2jvacw5",
       "at": "2026-08-21T06:10:02.672Z",
