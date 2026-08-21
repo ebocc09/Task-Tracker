@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-21T14:45:55.184Z",
+  "updatedAt": "2026-08-21T14:45:59.537Z",
   "updatedBy": "Enzo",
   "plates": [
     {
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mt32astt8",
+      "at": "2026-08-21T14:45:59.537Z",
+      "who": "Enzo",
+      "action": "leaderboard.remove",
+      "subject": "Enzo",
+      "detail": "2 completions removed"
+    },
     {
       "id": "a_mt32apgw6",
       "at": "2026-08-21T14:45:55.184Z",
@@ -3351,15 +3359,6 @@
   ],
   "scores": [
     {
-      "id": "sc_mt32ap4i4",
-      "at": "2026-08-21T14:45:54.738Z",
-      "who": "Enzo",
-      "taskId": "t_msnonfdkh",
-      "stageId": "s_msnonfdki",
-      "title": "Plate Audit - Opening",
-      "value": 0.3333333333333333
-    },
-    {
       "id": "sc_mt2kakak6",
       "at": "2026-08-21T06:21:55.388Z",
       "who": "Eric",
@@ -3662,15 +3661,6 @@
       "who": "Wayne",
       "taskId": "t_msnonfdkh",
       "stageId": "s_msnonfdkj",
-      "title": "Plate Audit - Opening",
-      "value": 0.3333333333333333
-    },
-    {
-      "id": "sc_mt0kkwtx6",
-      "at": "2026-08-19T20:54:25.845Z",
-      "who": "Enzo",
-      "taskId": "t_msnonfdkh",
-      "stageId": "s_msnonfdki",
       "title": "Plate Audit - Opening",
       "value": 0.3333333333333333
     },
