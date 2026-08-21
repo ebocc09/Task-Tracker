@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-21T06:21:56.059Z",
-  "updatedBy": "Eric",
+  "updatedAt": "2026-08-21T14:45:19.082Z",
+  "updatedBy": "Enzo",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -56,9 +56,9 @@
       "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T20:27:21.368Z",
-      "status": "complete",
-      "statusBy": "Eric",
-      "statusAt": "2026-08-21T06:06:25.742Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -71,27 +71,27 @@
           "id": "s_msnonfdki",
           "title": "Plate Audit - Opening",
           "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
-          "status": "complete",
-          "by": "Wayne",
-          "at": "2026-08-20T21:13:22.321Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         },
         {
           "id": "s_msnonfdkj",
           "title": "Plate Audit - Evening",
           "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task.",
-          "status": "complete",
-          "by": "Wayne",
-          "at": "2026-08-20T21:13:25.159Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         },
         {
           "id": "s_msnonfdkk",
           "title": "Plate Audit - Closing",
           "description": "Gather all plates at the end of the shift and post a photo in the teams chat before completing this task.",
-          "status": "complete",
-          "by": "Eric",
-          "at": "2026-08-21T06:06:25.742Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         }
       ]
@@ -102,9 +102,9 @@
       "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
       "createdBy": "Daily rollover",
       "createdAt": "2026-08-01T21:59:37.565Z",
-      "status": "complete",
-      "statusBy": "Wayne",
-      "statusAt": "2026-08-21T05:59:09.269Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -117,27 +117,27 @@
           "id": "s_msawzfcw5",
           "title": "Box Audit - Service",
           "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
-          "status": "complete",
-          "by": "Wayne",
-          "at": "2026-08-21T05:59:03.825Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         },
         {
           "id": "s_msawzfcw6",
           "title": "Box Audit - Washline",
           "description": "Remove any of our keys (White envelops) from the service drop off box and sort them in the key bin.",
-          "status": "complete",
-          "by": "Wayne",
-          "at": "2026-08-21T05:59:06.641Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         },
         {
           "id": "s_msawzfcw7",
           "title": "Box Audit - Offsite",
           "description": "Remove any keys in the offsite drop off box and sort them into the key bin.",
-          "status": "complete",
-          "by": "Wayne",
-          "at": "2026-08-21T05:59:09.269Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         }
       ]
@@ -148,9 +148,9 @@
       "description": "Pull all keys for tomorrow and the following day.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:04:25.726Z",
-      "status": "complete",
-      "statusBy": "Eric",
-      "statusAt": "2026-08-21T06:21:56.058Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": true,
@@ -166,9 +166,9 @@
       "description": "Remove all vehicles from the trade-in parking zone, post any vehicles that cannot be moved into the teams chat before marking task completed.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:09:45.567Z",
-      "status": "complete",
-      "statusBy": "Gabriel",
-      "statusAt": "2026-08-21T04:28:31.064Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -184,9 +184,9 @@
       "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
       "createdBy": "Daily rollover",
       "createdAt": "2026-08-01T21:59:37.565Z",
-      "status": "complete",
-      "statusBy": "Eric",
-      "statusAt": "2026-08-21T06:11:47.425Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -199,18 +199,18 @@
           "id": "s_msawzfcw9",
           "title": "Loaner Audit - Evening",
           "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
-          "status": "complete",
-          "by": "Wayne",
-          "at": "2026-08-20T21:02:06.979Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         },
         {
           "id": "s_msawzfcwa",
           "title": "Loaner Audit - Closing",
           "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
-          "status": "complete",
-          "by": "Eric",
-          "at": "2026-08-21T06:11:47.425Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         }
       ]
@@ -221,9 +221,9 @@
       "description": "Replace any vehicles we remove from display with new vehicles. ALL vehicles part of the front building display need to be washed, if we remove a vehicle from front building display, locate a replacement, park it under canopy and post the VIN in the main teams chat so day shift can prepare it for display.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:09:47.929Z",
-      "status": "complete",
-      "statusBy": "Gabriel",
-      "statusAt": "2026-08-21T04:26:59.503Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -239,9 +239,9 @@
       "description": "Bring all vehicles scheduled for tomorrow delivery on-site.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:12:39.619Z",
-      "status": "complete",
-      "statusBy": "Wayne",
-      "statusAt": "2026-08-21T06:20:12.052Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -254,18 +254,18 @@
           "id": "s_msnq9osju",
           "title": "Pull-Ins - Tomorrow",
           "description": "Bring all vehicles scheduled for tomorrow delivery on-site.",
-          "status": "complete",
-          "by": "Wayne",
-          "at": "2026-08-21T05:58:22.377Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         },
         {
           "id": "s_msnq9osjv",
           "title": "Charging Tomorrow's Deliveries",
           "description": "Charge all the vehicles for tomorrow and line them up in the wash line by time, and put the key inside the vehicle.",
-          "status": "complete",
-          "by": "Wayne",
-          "at": "2026-08-21T06:20:12.052Z",
+          "status": "pending",
+          "by": null,
+          "at": null,
           "note": null
         }
       ]
@@ -276,9 +276,9 @@
       "description": "Zero out the VRI list",
       "createdBy": "Enzo",
       "createdAt": "2026-08-12T17:09:43.095Z",
-      "status": "complete",
-      "statusBy": "Gabriel",
-      "statusAt": "2026-08-21T04:27:13.065Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -294,9 +294,9 @@
       "description": "",
       "createdBy": "Not Enzo",
       "createdAt": "2026-08-12T20:30:05.661Z",
-      "status": "complete",
-      "statusBy": "Justin",
-      "statusAt": "2026-08-21T06:06:31.668Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -312,9 +312,9 @@
       "description": "Move 3 demo vehicles under canopy for morning to wash.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-13T00:27:05.968Z",
-      "status": "complete",
-      "statusBy": "Justin",
-      "statusAt": "2026-08-21T06:10:03.278Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -330,9 +330,9 @@
       "description": "Post all vehicles not onsite for the next 3 days in SALES & DELIVERY chat",
       "createdBy": "Enzo",
       "createdAt": "2026-08-13T00:28:05.149Z",
-      "status": "complete",
-      "statusBy": "Gabriel",
-      "statusAt": "2026-08-20T21:29:24.708Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -348,9 +348,9 @@
       "description": "Leave the white shuttle X on the destination charger before leaving so it always stays with a full charge.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-13T00:28:52.161Z",
-      "status": "complete",
-      "statusBy": "Wayne",
-      "statusAt": "2026-08-21T06:20:17.550Z",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -366,10 +366,10 @@
       "description": "Check LowSoC list email, aim to keep both list under 10 per email and do not let any vehicles drop to 0. to prevent additional damage to battery.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-16T16:20:25.430Z",
-      "status": "blocked",
-      "statusBy": "Gabriel",
-      "statusAt": "2026-08-21T04:28:14.436Z",
-      "statusNote": "Under 9 vehicles in the list",
+      "status": "pending",
+      "statusBy": null,
+      "statusAt": null,
+      "statusNote": null,
       "leaderboard": true,
       "timed": false,
       "limitMinutes": null,
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mt329xm23",
+      "at": "2026-08-21T14:45:19.082Z",
+      "who": "Enzo",
+      "action": "board.reset",
+      "subject": "",
+      "detail": "13 tasks cleared"
+    },
     {
       "id": "a_mt2kakt78",
       "at": "2026-08-21T06:21:56.059Z",
@@ -4666,6 +4674,162 @@
   "requests": [],
   "reopenRequests": [],
   "resets": [
+    {
+      "id": "rs_mt329xb21",
+      "at": "2026-08-21T14:45:18.686Z",
+      "by": "Enzo",
+      "total": 13,
+      "done": 13,
+      "pct": 100,
+      "plates": 0,
+      "tasks": [
+        {
+          "title": "Plate Audit - Opening",
+          "status": "complete",
+          "by": "Eric",
+          "at": "2026-08-21T06:06:25.742Z",
+          "stages": [
+            {
+              "title": "Plate Audit - Opening",
+              "status": "complete",
+              "by": "Wayne"
+            },
+            {
+              "title": "Plate Audit - Evening",
+              "status": "complete",
+              "by": "Wayne"
+            },
+            {
+              "title": "Plate Audit - Closing",
+              "status": "complete",
+              "by": "Eric"
+            }
+          ]
+        },
+        {
+          "title": "Box Audit - Service",
+          "status": "complete",
+          "by": "Wayne",
+          "at": "2026-08-21T05:59:09.269Z",
+          "stages": [
+            {
+              "title": "Box Audit - Service",
+              "status": "complete",
+              "by": "Wayne"
+            },
+            {
+              "title": "Box Audit - Washline",
+              "status": "complete",
+              "by": "Wayne"
+            },
+            {
+              "title": "Box Audit - Offsite",
+              "status": "complete",
+              "by": "Wayne"
+            }
+          ]
+        },
+        {
+          "title": "Pull Keys",
+          "status": "complete",
+          "by": "Eric",
+          "at": "2026-08-21T06:21:56.058Z",
+          "stages": []
+        },
+        {
+          "title": "Clear Trade-in Parking",
+          "status": "complete",
+          "by": "Gabriel",
+          "at": "2026-08-21T04:28:31.064Z",
+          "stages": []
+        },
+        {
+          "title": "Loaner Audit - Evening",
+          "status": "complete",
+          "by": "Eric",
+          "at": "2026-08-21T06:11:47.425Z",
+          "stages": [
+            {
+              "title": "Loaner Audit - Evening",
+              "status": "complete",
+              "by": "Wayne"
+            },
+            {
+              "title": "Loaner Audit - Closing",
+              "status": "complete",
+              "by": "Eric"
+            }
+          ]
+        },
+        {
+          "title": "Restore Display",
+          "status": "complete",
+          "by": "Gabriel",
+          "at": "2026-08-21T04:26:59.503Z",
+          "stages": []
+        },
+        {
+          "title": "Pull-Ins - Tomorrow",
+          "status": "complete",
+          "by": "Wayne",
+          "at": "2026-08-21T06:20:12.052Z",
+          "stages": [
+            {
+              "title": "Pull-Ins - Tomorrow",
+              "status": "complete",
+              "by": "Wayne"
+            },
+            {
+              "title": "Charging Tomorrow's Deliveries",
+              "status": "complete",
+              "by": "Wayne"
+            }
+          ]
+        },
+        {
+          "title": "VRI's",
+          "status": "complete",
+          "by": "Gabriel",
+          "at": "2026-08-21T04:27:13.065Z",
+          "stages": []
+        },
+        {
+          "title": "(Mini) Close wash gate",
+          "status": "complete",
+          "by": "Justin",
+          "at": "2026-08-21T06:06:31.668Z",
+          "stages": []
+        },
+        {
+          "title": "(Mini) Demo Duties",
+          "status": "complete",
+          "by": "Justin",
+          "at": "2026-08-21T06:10:03.278Z",
+          "stages": []
+        },
+        {
+          "title": "(Mini) Foresight",
+          "status": "complete",
+          "by": "Gabriel",
+          "at": "2026-08-20T21:29:24.708Z",
+          "stages": []
+        },
+        {
+          "title": "(Mini) Shuttle Maintenance",
+          "status": "complete",
+          "by": "Wayne",
+          "at": "2026-08-21T06:20:17.550Z",
+          "stages": []
+        },
+        {
+          "title": "LowSoC",
+          "status": "blocked",
+          "by": "Gabriel",
+          "at": "2026-08-21T04:28:14.436Z",
+          "stages": []
+        }
+      ]
+    },
     {
       "id": "rs_mt1mbiud1",
       "at": "2026-08-20T14:30:53.221Z",
