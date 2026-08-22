@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-22T07:09:00.630Z",
+  "updatedAt": "2026-08-22T07:09:47.237Z",
   "updatedBy": "Wayne",
   "plates": [
     {
@@ -312,10 +312,10 @@
       "description": "Move 3 demo vehicles under canopy for morning to wash.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-13T00:27:05.968Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
-      "statusNote": null,
+      "status": "blocked",
+      "statusBy": "Wayne",
+      "statusAt": "2026-08-22T07:09:47.237Z",
+      "statusNote": "Not enough space under the canopy",
       "leaderboard": true,
       "timed": false,
       "limitMinutes": null,
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mt41fyw5c",
+      "at": "2026-08-22T07:09:47.237Z",
+      "who": "Wayne",
+      "action": "task.blocked",
+      "subject": "(Mini) Demo Duties",
+      "detail": "Not enough space under the canopy"
+    },
     {
       "id": "a_mt41eyxi9",
       "at": "2026-08-22T07:09:00.630Z",
