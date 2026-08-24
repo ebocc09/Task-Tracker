@@ -326,6 +326,27 @@ function windowStart(key, back = 0){
   return d.getTime();
 }
 
+/* A filter key as a half-open interval [from, to) of local-midnight epochs.
+   `to` is null for the to-date keys, which run to now — only a closed period
+   like last week carries an upper bound, and it has to be EXCLUSIVE or a
+   completion stamped exactly at this week's first midnight lands in both
+   weeks and the two columns no longer sum to the quarter. */
+function windowRange(key){
+  if(key === "lastweek") return { from: windowStart("wtd", 1), to: windowStart("wtd") };
+  return { from: windowStart(key), to: null };
+}
+
+/* Is a timestamp inside that window? An unparseable date is inside "all time"
+   and outside everything else — the same rule the to-date filters have always
+   applied, kept here so a closed window doesn't quietly invent a second one. */
+function inWindow(at, range){
+  const { from, to } = range;
+  if(from == null && to == null) return true;
+  const t = Date.parse(at);
+  if(Number.isNaN(t)) return false;
+  return (from == null || t >= from) && (to == null || t < to);
+}
+
 /* Identity — the name every action is stamped with. */
 function me(){
   const v = localStorage.getItem(LS.name);

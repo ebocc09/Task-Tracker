@@ -769,12 +769,8 @@ function apportion(values, total){
 
 /* Everyone who earned credit in the window, best first. */
 function leaderboardRows(windowKey){
-  const from = windowStart(windowKey);
-  const events = (state.data.scores || []).filter(s => {
-    if(from == null) return true;
-    const t = Date.parse(s.at);
-    return !Number.isNaN(t) && t >= from;
-  });
+  const range  = windowRange(windowKey);
+  const events = (state.data.scores || []).filter(s => inWindow(s.at, range));
 
   const by = new Map();                 // name -> { name, credit, events, lastAt }
   events.forEach(s => {
@@ -795,7 +791,10 @@ function leaderboardRows(windowKey){
   return { rows, total, events: events.length };
 }
 
-const LB_WINDOW_LABEL = { wtd:"this week", mtd:"this month", qtd:"this quarter", all:"all time" };
+/* Reads inside a sentence both ways round: "No completions <label>." and
+   "4 tasks completed <label> across 6 completions." */
+const LB_WINDOW_LABEL = { wtd:"this week", lastweek:"last week", mtd:"this month",
+                          qtd:"this quarter", all:"all time" };
 
 /* ── opening a row onto what is behind its number ──
 
@@ -818,14 +817,9 @@ let openLbName = null;
    same array, same window, same filter. The count above and the rows below
    cannot disagree. */
 function lbEntries(name, windowKey){
-  const from = windowStart(windowKey);
+  const range = windowRange(windowKey);
   return (state.data.scores || [])
-    .filter(s => {
-      if(s.who !== name) return false;
-      if(from == null) return true;
-      const t = Date.parse(s.at);
-      return !Number.isNaN(t) && t >= from;
-    })
+    .filter(s => s.who === name && inWindow(s.at, range))
     /* awardScore unshifts, so the array is already newest-first — but a 409
        replay can land one out of turn, and this is a list whose order is the
        thing being read. Sort rather than trust. */
