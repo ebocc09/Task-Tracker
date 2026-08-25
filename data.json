@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-25T21:09:00.582Z",
+  "updatedAt": "2026-08-25T21:09:03.974Z",
   "updatedBy": "Wayne",
   "plates": [
     {
@@ -57,8 +57,8 @@
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T20:27:21.368Z",
       "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "statusBy": "Wayne",
+      "statusAt": "2026-08-25T21:09:03.974Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -71,9 +71,9 @@
           "id": "s_msnonfdki",
           "title": "Plate Audit - Opening",
           "description": "Gather all plates at the start of your shift and post a photo in the teams chat before completing this stage.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Wayne",
+          "at": "2026-08-25T21:09:03.974Z",
           "note": null
         },
         {
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mt95quee6",
+      "at": "2026-08-25T21:09:03.974Z",
+      "who": "Wayne",
+      "action": "task.stage",
+      "subject": "Plate Audit - Opening · stage 1 of 3",
+      "detail": ""
+    },
     {
       "id": "a_mt95qrs63",
       "at": "2026-08-25T21:09:00.582Z",
@@ -3670,6 +3678,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mt95qu6a4",
+      "at": "2026-08-25T21:09:03.682Z",
+      "who": "Wayne",
+      "taskId": "t_msnonfdkh",
+      "stageId": "s_msnonfdki",
+      "title": "Plate Audit - Opening",
+      "value": 0.3333333333333333
+    },
     {
       "id": "sc_mt95qrjf1",
       "at": "2026-08-25T21:09:00.267Z",
