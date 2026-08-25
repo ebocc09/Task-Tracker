@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-25T06:45:14.807Z",
-  "updatedBy": "Gabriel",
+  "updatedAt": "2026-08-25T06:45:20.332Z",
+  "updatedBy": "Zafar",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -184,9 +184,9 @@
       "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
       "createdBy": "Daily rollover",
       "createdAt": "2026-08-01T21:59:37.565Z",
-      "status": "pending",
-      "statusBy": "Wayne",
-      "statusAt": "2026-08-24T20:53:43.988Z",
+      "status": "complete",
+      "statusBy": "Zafar",
+      "statusAt": "2026-08-25T06:45:20.332Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -208,9 +208,9 @@
           "id": "s_msawzfcwa",
           "title": "Loaner Audit - Closing",
           "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Zafar",
+          "at": "2026-08-25T06:45:20.332Z",
           "note": null
         }
       ]
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mt8aw30s3",
+      "at": "2026-08-25T06:45:20.332Z",
+      "who": "Zafar",
+      "action": "task.complete",
+      "subject": "Loaner Audit - Evening",
+      "detail": ""
+    },
     {
       "id": "a_mt8avyrb8",
       "at": "2026-08-25T06:45:14.807Z",
@@ -3646,6 +3654,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mt8aw2oa1",
+      "at": "2026-08-25T06:45:19.882Z",
+      "who": "Zafar",
+      "taskId": "t_msawzfcw8",
+      "stageId": "s_msawzfcwa",
+      "title": "Loaner Audit - Evening",
+      "value": 0.5
+    },
     {
       "id": "sc_mt8avyd36",
       "at": "2026-08-25T06:45:14.295Z",
