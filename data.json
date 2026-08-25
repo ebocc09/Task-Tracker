@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-25T06:16:07.310Z",
+  "updatedAt": "2026-08-25T06:16:42.767Z",
   "updatedBy": "Zafar",
   "plates": [
     {
@@ -366,10 +366,10 @@
       "description": "Check LowSoC list email, aim to keep both list under 10 per email and do not let any vehicles drop to 0. to prevent additional damage to battery.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-16T16:20:25.430Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
-      "statusNote": null,
+      "status": "blocked",
+      "statusBy": "Zafar",
+      "statusAt": "2026-08-25T06:16:42.767Z",
+      "statusNote": "Not enough time",
       "leaderboard": true,
       "timed": false,
       "limitMinutes": null,
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mt89v9qn6",
+      "at": "2026-08-25T06:16:42.767Z",
+      "who": "Zafar",
+      "action": "task.blocked",
+      "subject": "LowSoC",
+      "detail": "Not enough time"
+    },
     {
       "id": "a_mt89uidq3",
       "at": "2026-08-25T06:16:07.310Z",
