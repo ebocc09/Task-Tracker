@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-25T21:35:56.125Z",
+  "updatedAt": "2026-08-25T21:36:07.510Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -366,9 +366,9 @@
       "description": "Check LowSoC list email, aim to keep both list under 10 per email and do not let any vehicles drop to 0. to prevent additional damage to battery.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-16T16:20:25.430Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "status": "complete",
+      "statusBy": "Gabriel",
+      "statusAt": "2026-08-25T21:36:07.510Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mt96pn4m6",
+      "at": "2026-08-25T21:36:07.510Z",
+      "who": "Gabriel",
+      "action": "task.complete",
+      "subject": "LowSoC",
+      "detail": ""
+    },
     {
       "id": "a_mt96pecd3",
       "at": "2026-08-25T21:35:56.125Z",
@@ -3694,6 +3702,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mt96pmo94",
+      "at": "2026-08-25T21:36:06.921Z",
+      "who": "Gabriel",
+      "taskId": "t_msw0gz2g1",
+      "stageId": null,
+      "title": "LowSoC",
+      "value": 1
+    },
     {
       "id": "sc_mt96pe111",
       "at": "2026-08-25T21:35:55.717Z",
