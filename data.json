@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-25T06:17:03.204Z",
-  "updatedBy": "Zafar",
+  "updatedAt": "2026-08-25T06:45:00.305Z",
+  "updatedBy": "Gabriel",
   "plates": [
     {
       "id": "p_ms9tjbasa",
@@ -148,15 +148,15 @@
       "description": "Pull all keys for tomorrow and the following day.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:04:25.726Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "status": "in_progress",
+      "statusBy": "Gabriel",
+      "statusAt": "2026-08-25T06:45:00.010Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": true,
       "limitMinutes": 30,
-      "startedAt": "2026-08-21T06:21:52.856Z",
-      "startedBy": "Eric",
+      "startedAt": "2026-08-25T06:45:00.010Z",
+      "startedBy": "Gabriel",
       "failedAt": "2026-08-20T00:35:45.777Z",
       "stages": []
     },
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mt8avnkh2",
+      "at": "2026-08-25T06:45:00.305Z",
+      "who": "Gabriel",
+      "action": "task.start",
+      "subject": "Pull Keys",
+      "detail": "30 minutes"
+    },
     {
       "id": "a_mt89vpicc",
       "at": "2026-08-25T06:17:03.204Z",
