@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-25T05:50:30.207Z",
+  "updatedAt": "2026-08-25T05:50:44.520Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -102,9 +102,9 @@
       "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
       "createdBy": "Daily rollover",
       "createdAt": "2026-08-01T21:59:37.565Z",
-      "status": "pending",
+      "status": "complete",
       "statusBy": "Gabriel",
-      "statusAt": "2026-08-25T05:50:30.207Z",
+      "statusAt": "2026-08-25T05:50:44.520Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -135,9 +135,9 @@
           "id": "s_msawzfcw7",
           "title": "Box Audit - Offsite",
           "description": "Remove any keys in the offsite drop off box and sort them into the key bin.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Gabriel",
+          "at": "2026-08-25T05:50:44.520Z",
           "note": null
         }
       ]
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mt88xve03",
+      "at": "2026-08-25T05:50:44.520Z",
+      "who": "Gabriel",
+      "action": "task.complete",
+      "subject": "Box Audit - Service",
+      "detail": ""
+    },
     {
       "id": "a_mt88xkcf6",
       "at": "2026-08-25T05:50:30.207Z",
@@ -3534,6 +3542,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mt88xv6q1",
+      "at": "2026-08-25T05:50:44.258Z",
+      "who": "Gabriel",
+      "taskId": "t_msawzfcw4",
+      "stageId": "s_msawzfcw7",
+      "title": "Box Audit - Service",
+      "value": 0.3333333333333333
+    },
     {
       "id": "sc_mt88xk474",
       "at": "2026-08-25T05:50:29.911Z",
