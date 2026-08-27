@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-27T06:11:38.412Z",
+  "updatedAt": "2026-08-27T06:11:39.892Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -104,7 +104,7 @@
       "createdAt": "2026-08-01T21:59:37.565Z",
       "status": "pending",
       "statusBy": "Gabriel",
-      "statusAt": "2026-08-27T06:11:38.412Z",
+      "statusAt": "2026-08-27T06:11:39.892Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -126,9 +126,9 @@
           "id": "s_msawzfcw6",
           "title": "Box Audit - Washline",
           "description": "Remove any of our keys (White envelops) from the service drop off box and sort them in the key bin.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Gabriel",
+          "at": "2026-08-27T06:11:39.892Z",
           "note": null
         },
         {
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mtb4khdgb",
+      "at": "2026-08-27T06:11:39.892Z",
+      "who": "Gabriel",
+      "action": "task.stage",
+      "subject": "Box Audit - Service · stage 2 of 3: Box Audit - Washline",
+      "detail": ""
+    },
     {
       "id": "a_mtb4kg8c8",
       "at": "2026-08-27T06:11:38.412Z",
@@ -3958,6 +3966,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mtb4kh5k9",
+      "at": "2026-08-27T06:11:39.608Z",
+      "who": "Gabriel",
+      "taskId": "t_msawzfcw4",
+      "stageId": "s_msawzfcw6",
+      "title": "Box Audit - Service",
+      "value": 0.3333333333333333
+    },
     {
       "id": "sc_mtb4kftq6",
       "at": "2026-08-27T06:11:37.886Z",
