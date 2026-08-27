@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-27T05:36:14.820Z",
+  "updatedAt": "2026-08-27T06:11:21.907Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -148,16 +148,16 @@
       "description": "Pull all keys for tomorrow and the following day.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:04:25.726Z",
-      "status": "in_progress",
+      "status": "failed",
       "statusBy": "Zafar",
-      "statusAt": "2026-08-27T05:27:03.045Z",
+      "statusAt": "2026-08-27T05:57:03.045Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": true,
       "limitMinutes": 30,
       "startedAt": "2026-08-27T05:27:03.045Z",
       "startedBy": "Zafar",
-      "failedAt": "2026-08-20T00:35:45.777Z",
+      "failedAt": "2026-08-27T05:57:03.045Z",
       "stages": []
     },
     {
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mtb4k3hv2",
+      "at": "2026-08-27T06:11:21.907Z",
+      "who": "Zafar",
+      "action": "task.timeout",
+      "subject": "Pull Keys",
+      "detail": "ran out after 30 minutes"
+    },
     {
       "id": "a_mtb3axnoc",
       "at": "2026-08-27T05:36:14.820Z",
