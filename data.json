@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-28T05:49:19.849Z",
+  "updatedAt": "2026-08-28T05:53:40.252Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -184,9 +184,9 @@
       "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
       "createdBy": "Daily rollover",
       "createdAt": "2026-08-01T21:59:37.565Z",
-      "status": "pending",
-      "statusBy": "Wayne",
-      "statusAt": "2026-08-28T01:54:24.978Z",
+      "status": "complete",
+      "statusBy": "Gabriel",
+      "statusAt": "2026-08-28T05:53:40.252Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -208,9 +208,9 @@
           "id": "s_msawzfcwa",
           "title": "Loaner Audit - Closing",
           "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Gabriel",
+          "at": "2026-08-28T05:53:40.252Z",
           "note": null
         }
       ]
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mtcjd6zg3",
+      "at": "2026-08-28T05:53:40.252Z",
+      "who": "Gabriel",
+      "action": "task.complete",
+      "subject": "Loaner Audit - Evening",
+      "detail": ""
+    },
     {
       "id": "a_mtcj7m216",
       "at": "2026-08-28T05:49:19.849Z",
@@ -4110,6 +4118,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mtcjd6nd1",
+      "at": "2026-08-28T05:53:39.817Z",
+      "who": "Gabriel",
+      "taskId": "t_msawzfcw8",
+      "stageId": "s_msawzfcwa",
+      "title": "Loaner Audit - Evening",
+      "value": 0.5
+    },
     {
       "id": "sc_mtcj7lt14",
       "at": "2026-08-28T05:49:19.525Z",
