@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-28T01:54:17.501Z",
+  "updatedAt": "2026-08-28T01:54:24.978Z",
   "updatedBy": "Wayne",
   "plates": [
     {
@@ -185,8 +185,8 @@
       "createdBy": "Daily rollover",
       "createdAt": "2026-08-01T21:59:37.565Z",
       "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "statusBy": "Wayne",
+      "statusAt": "2026-08-28T01:54:24.978Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -199,9 +199,9 @@
           "id": "s_msawzfcw9",
           "title": "Loaner Audit - Evening",
           "description": "Using mission control verify all loaners are present at Cypress and not being stored at offsite lots. If a service loaner is at any of the offsite lots quickly retrieve it before marking the task complete.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Wayne",
+          "at": "2026-08-28T01:54:24.978Z",
           "note": null
         },
         {
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mtcatidu9",
+      "at": "2026-08-28T01:54:24.978Z",
+      "who": "Wayne",
+      "action": "task.stage",
+      "subject": "Loaner Audit - Evening · stage 1 of 2",
+      "detail": ""
+    },
     {
       "id": "a_mtcatcm56",
       "at": "2026-08-28T01:54:17.501Z",
@@ -4086,6 +4094,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mtcati5r7",
+      "at": "2026-08-28T01:54:24.687Z",
+      "who": "Wayne",
+      "taskId": "t_msawzfcw8",
+      "stageId": "s_msawzfcw9",
+      "title": "Loaner Audit - Evening",
+      "value": 0.5
+    },
     {
       "id": "sc_mtcatcaz4",
       "at": "2026-08-28T01:54:17.099Z",
