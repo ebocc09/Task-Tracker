@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-28T01:37:36.634Z",
+  "updatedAt": "2026-08-28T01:38:29.983Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -44,7 +44,9 @@
       "label": "6EX-872",
       "note": "",
       "checkedOutBy": null,
-      "checkedOutAt": null
+      "checkedOutAt": null,
+      "forcedBy": null,
+      "forcedAt": null
     }
   ],
   "tasks": [
@@ -364,9 +366,9 @@
       "description": "Check LowSoC list email, aim to keep both list under 10 per email and do not let any vehicles drop to 0. to prevent additional damage to battery.",
       "createdBy": "Enzo",
       "createdAt": "2026-08-16T16:20:25.430Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "status": "complete",
+      "statusBy": "Gabriel",
+      "statusAt": "2026-08-28T01:38:29.983Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -378,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mtca91i73",
+      "at": "2026-08-28T01:38:29.983Z",
+      "who": "Gabriel",
+      "action": "task.complete",
+      "subject": "LowSoC",
+      "detail": ""
+    },
     {
       "id": "a_mtca7wcan",
       "at": "2026-08-28T01:37:36.634Z",
@@ -4044,6 +4054,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mtca918x1",
+      "at": "2026-08-28T01:38:29.649Z",
+      "who": "Gabriel",
+      "taskId": "t_msw0gz2g1",
+      "stageId": null,
+      "title": "LowSoC",
+      "value": 1
+    },
     {
       "id": "sc_mtb4kizpc",
       "at": "2026-08-27T06:11:41.989Z",
