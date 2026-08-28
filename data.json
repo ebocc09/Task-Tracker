@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-28T01:38:29.983Z",
+  "updatedAt": "2026-08-28T01:38:33.550Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -330,9 +330,9 @@
       "description": "Post all vehicles not onsite for the next 3 days in SALES & DELIVERY chat",
       "createdBy": "Enzo",
       "createdAt": "2026-08-13T00:28:05.149Z",
-      "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "status": "complete",
+      "statusBy": "Gabriel",
+      "statusAt": "2026-08-28T01:38:33.550Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mtca949a6",
+      "at": "2026-08-28T01:38:33.550Z",
+      "who": "Gabriel",
+      "action": "task.complete",
+      "subject": "(Mini) Foresight",
+      "detail": ""
+    },
     {
       "id": "a_mtca91i73",
       "at": "2026-08-28T01:38:29.983Z",
@@ -4054,6 +4062,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mtca93yg4",
+      "at": "2026-08-28T01:38:33.160Z",
+      "who": "Gabriel",
+      "taskId": "t_msqs4pd7e",
+      "stageId": null,
+      "title": "(Mini) Foresight",
+      "value": 1
+    },
     {
       "id": "sc_mtca918x1",
       "at": "2026-08-28T01:38:29.649Z",
