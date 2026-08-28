@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-28T06:00:52.709Z",
+  "updatedAt": "2026-08-28T06:00:55.882Z",
   "updatedBy": "Zafar",
   "plates": [
     {
@@ -103,8 +103,8 @@
       "createdBy": "Daily rollover",
       "createdAt": "2026-08-01T21:59:37.565Z",
       "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "statusBy": "Zafar",
+      "statusAt": "2026-08-28T06:00:55.882Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -117,9 +117,9 @@
           "id": "s_msawzfcw5",
           "title": "Box Audit - Service",
           "description": "Remove any keys from the on-site drop off box and sort them into the key bin.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Zafar",
+          "at": "2026-08-28T06:00:55.882Z",
           "note": null
         },
         {
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mtcjmj4a6",
+      "at": "2026-08-28T06:00:55.882Z",
+      "who": "Zafar",
+      "action": "task.stage",
+      "subject": "Box Audit - Service · stage 1 of 3",
+      "detail": ""
+    },
     {
       "id": "a_mtcjmgo53",
       "at": "2026-08-28T06:00:52.709Z",
@@ -4158,6 +4166,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mtcjmivx4",
+      "at": "2026-08-28T06:00:55.581Z",
+      "who": "Zafar",
+      "taskId": "t_msawzfcw4",
+      "stageId": "s_msawzfcw5",
+      "title": "Box Audit - Service",
+      "value": 0.3333333333333333
+    },
     {
       "id": "sc_mtcjmgeq1",
       "at": "2026-08-28T06:00:52.370Z",
