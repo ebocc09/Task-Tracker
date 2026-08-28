@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-28T01:37:26.089Z",
+  "updatedAt": "2026-08-28T01:37:36.634Z",
   "updatedBy": "Gabriel",
   "plates": [
     {
@@ -38,6 +38,13 @@
       "checkedOutAt": null,
       "forcedBy": null,
       "forcedAt": null
+    },
+    {
+      "id": "p_mtca7w2tl",
+      "label": "6EX-872",
+      "note": "",
+      "checkedOutBy": null,
+      "checkedOutAt": null
     }
   ],
   "tasks": [
@@ -371,6 +378,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mtca7wcan",
+      "at": "2026-08-28T01:37:36.634Z",
+      "who": "Gabriel",
+      "action": "plate.add",
+      "subject": "6EX-872",
+      "detail": ""
+    },
     {
       "id": "a_mtca7o7dk",
       "at": "2026-08-28T01:37:26.089Z",
