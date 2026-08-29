@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-29T06:08:35.893Z",
+  "updatedAt": "2026-08-29T06:08:40.759Z",
   "updatedBy": "Zafar",
   "plates": [
     {
@@ -240,8 +240,8 @@
       "createdBy": "Enzo",
       "createdAt": "2026-08-10T21:12:39.619Z",
       "status": "pending",
-      "statusBy": null,
-      "statusAt": null,
+      "statusBy": "Zafar",
+      "statusAt": "2026-08-29T06:08:40.759Z",
       "statusNote": null,
       "leaderboard": true,
       "timed": false,
@@ -254,9 +254,9 @@
           "id": "s_msnq9osju",
           "title": "Pull-Ins - Tomorrow",
           "description": "Bring all vehicles scheduled for tomorrow delivery on-site.",
-          "status": "pending",
-          "by": null,
-          "at": null,
+          "status": "complete",
+          "by": "Zafar",
+          "at": "2026-08-29T06:08:40.759Z",
           "note": null
         },
         {
@@ -380,6 +380,14 @@
     }
   ],
   "audit": [
+    {
+      "id": "a_mtdzcchjt",
+      "at": "2026-08-29T06:08:40.759Z",
+      "who": "Zafar",
+      "action": "task.stage",
+      "subject": "Pull-Ins - Tomorrow · stage 1 of 2",
+      "detail": ""
+    },
     {
       "id": "a_mtdzc8qdq",
       "at": "2026-08-29T06:08:35.893Z",
@@ -4294,6 +4302,15 @@
     }
   ],
   "scores": [
+    {
+      "id": "sc_mtdzcc6lr",
+      "at": "2026-08-29T06:08:40.365Z",
+      "who": "Zafar",
+      "taskId": "t_msnq9osjt",
+      "stageId": "s_msnq9osju",
+      "title": "Pull-Ins - Tomorrow",
+      "value": 0.5
+    },
     {
       "id": "sc_mtdzaszvl",
       "at": "2026-08-29T06:07:28.844Z",
